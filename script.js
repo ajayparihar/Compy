@@ -1,6 +1,6 @@
 // Author: Ajay Singh
 // Version: 1.0
-// Date: 2023-11-09
+// Date: 09-11-2023
 
 async function loadCommands() {
     // Fetching data from 'commands.csv' Github Gist (Raw)
