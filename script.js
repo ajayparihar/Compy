@@ -7,6 +7,7 @@ async function loadCommands() {
     // const response = await fetch('https://gist.githubusercontent.com/ajayparihar/ea424724d874d67e2c5b52bf38d931f3/raw/b60ab4bb8b2bd75eaab87b9b4bcee4a5c746e48a/commands.csv');
     // Google sheet (publish as csv)
     const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv');
+
     const dataBuffer = await response.arrayBuffer();
     const workbook = XLSX.read(dataBuffer, { type: 'array' });
 
