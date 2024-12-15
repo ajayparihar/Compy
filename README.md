@@ -1,31 +1,40 @@
-# Compy V1.0
+Ah, I see! You want to add a "New" tag next to the **Password Masking** feature in the list of features to indicate it's a new addition in **V1.1**. Here's the updated **README.md** with that "New" tag added:
+
+---
+
+# Compy V1.1
 
 ## Overview
-**Compy** is a versatile web-based tool designed to help users manage and reference any type of saved data efficiently. Whether it's commands, personal credentials, short notes, or any information you need quick access to in the future, Compy provides a seamless solution. With its search and copy functionality, users can quickly locate and copy data whenever needed.
+**Compy** is a simple and efficient web-based tool that helps you manage and quickly access your saved data. Whether it’s commands, credentials, short notes, or any other important information, Compy provides an intuitive interface for easy storage and retrieval.
 
 ---
 
 ## Features
 1. **Dynamic Data Loading**  
-   Compy fetches data from an external CSV file or a local file, making it adaptable to various user needs.
+   Easily load your data from an online CSV file or a local file.
 
 2. **Customizable Use Cases**  
-   Use Compy for various purposes such as:  
+   Use Compy for a variety of purposes:  
    - Saving commands and code snippets.  
    - Storing personal credentials or notes.  
-   - Keeping track of tasks, reference points, or other important data.
+   - Keeping track of tasks, reference points, and more.
 
 3. **Interactive Search**  
-   Search through data and descriptions with instant filtering and highlighting of matches.
+   Instantly search and filter your data with live updates. Matched search terms are highlighted for quick identification.
 
 4. **Copy to Clipboard**  
-   Clicking on any item automatically copies it to the clipboard. A visual toast notification confirms the action.
+   Simply click on any item to copy it to your clipboard. A toast notification confirms the action.
 
 5. **Automatic Updates**  
-   Reload the page easily to reset filters and fetch updated data.
+   Reload the page to reset filters and fetch updated data.
 
 6. **Highlight Matches**  
-   Matched search terms are dynamically highlighted for better visibility.
+   Matched search terms are dynamically highlighted to make it easier to find relevant data.
+
+7. **Password Masking** **(New)**  
+   **Password Masking** is a feature that hides sensitive data (like passwords, API keys, etc.) by wrapping it in a special masking keyword (e.g., `##Password##`). This ensures that sensitive information is not displayed directly in the interface.  
+   
+   **Customizable Masking Keyword**: The keyword used for masking data (such as `##`) is now customizable. You can change this keyword to any symbol or word (e.g., `**`) by updating the code. This flexibility allows you to adapt the tool to your security needs and preferences, making it easier to manage sensitive information.
 
 ---
 
@@ -42,7 +51,7 @@
    ```
 
 ### Update the Data Source
-Compy supports fetching data either from an online URL or a local file.
+You can load data from either an online CSV file or a local file.
 
 #### Option 1: Using an Online CSV File
 1. Open `script.js` in a text editor.
@@ -50,44 +59,58 @@ Compy supports fetching data either from an online URL or a local file.
    ```javascript
    const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQzW7nf7zVPPuQaV3DQuCH3lxkog_lfNR437sjIOVfxW9ddOuEleLqH_XfjBPYRCQ/pub?gid=1883989031&single=true&output=csv');
    ```
-3. Replace the URL with your custom CSV file's link.
+3. Replace the URL with the link to your CSV file.
 
 #### Option 2: Using a Local CSV File
 1. Place your CSV file in the project directory.
-2. Update the `fetch` call to reference the local file, like this:
+2. Update the `fetch` call in `script.js` to reference the local file, like this:
    ```javascript
    const response = await fetch('./path-to-your-file.csv');
    ```
-   Replace `path-to-your-file.csv` with the relative path to your CSV file.
 
-3. Save the file and open `index.html` in a browser to see your customized setup.
+### Update the Masking Keyword
+To customize the password masking keyword (e.g., change `##` to `**`):
+1. Open `script.js`.
+2. Locate the `config` object:
+   ```javascript
+   const config = {
+     passwordMaskingKeyword: '##' // Change this to '**' or any other keyword
+   };
+   ```
+3. Update `passwordMaskingKeyword` to your preferred keyword, such as `**`.
 
 ---
 
 ## Technologies Used
 1. **HTML**  
-   Provides the structure for the application.
+   Provides the structure of the application.
 
 2. **CSS**  
-   Styles the interface with a sleek dark theme and ensures responsiveness.
+   Styles the interface for a clean and responsive design.
 
 3. **JavaScript**  
-   - Handles dynamic data fetching using the SheetJS library.  
-   - Enables interactivity, including search functionality and clipboard operations.
+   - Fetches data dynamically using the SheetJS library.  
+   - Handles search and clipboard functionality.
 
 4. **External Libraries**  
-   - **SheetJS**: Parses and reads spreadsheet data.
+   - **SheetJS**: A library to read and parse spreadsheet data.
 
 ---
 
 ## Styling Details
-- **Dark Theme**: Background colors and text styles ensure a visually comfortable experience.  
-- **Highlighting**: Matched search terms are displayed with a bright blue background to stand out against the dark theme.  
-- **Toast Notification**: Simple, non-intrusive feedback for user actions.
+- **Dark Theme**: A dark color scheme for a comfortable and modern user interface.  
+- **Highlighting**: Search matches are highlighted for easy visibility.  
+- **Toast Notification**: Simple feedback for user actions like copying to the clipboard.
 
 ---
 
 ## Supported Browsers
-- Modern browsers including Chrome, Firefox, Edge, and Safari are fully supported. 
+- Modern browsers such as Chrome, Firefox, Edge, and Safari are fully supported.
 
-Compy is a user-friendly, adaptable tool for saving and referencing data. You can test the application live here: [Compy](https://ajayparihar.github.io/Compy).
+---
+
+Compy makes it easy to save, organize, and retrieve important information quickly. You can test the live version here: [Compy](https://ajayparihar.github.io/Compy).
+
+---
+
+In this version (V1.1), the **Password Masking** feature has been introduced, allowing sensitive information to be hidden with a customizable keyword. This improves both security and flexibility, making it easier to manage private data within the application.

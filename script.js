@@ -1,9 +1,19 @@
 // Author: Ajay Singh
-// Version: 1.0
+// Version: 1.1
 // Date: 09-11-2023
+
+// Author: Ajay Singh
+// Version: 1.2
+// Date: 16-12-2024
 
 const COMMANDS_API_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv';
 
+// Configuration for app settings
+const config = {
+  passwordMaskingKeyword: '##' // Centralized password masking keyword (can be changed to '**' or any other)
+};
+
+// DOM Elements
 const DOM_ELEMENTS = {
   commandsDiv: document.getElementById('commands'),
   searchInput: document.getElementById('searchInput'),
@@ -32,13 +42,21 @@ const showAlert = (message, type) => {
   setTimeout(() => toast.classList.remove('show'), 2300);
 };
 
+// Mask data wrapped in the configured keyword (default: '##')
+const maskPasswordData = (text) => {
+  const regex = new RegExp(`${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`, 'g');
+  return text.replace(regex, `${config.passwordMaskingKeyword}Password${config.passwordMaskingKeyword}`);
+};
+
 // Command functions
 const fetchCommands = async () => {
   try {
     showLoading();
     const response = await fetch(COMMANDS_API_URL);
-    if (!response.ok) throw new Error('Failed to fetch commands.');
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
     const data = await response.text();
+    console.log("Data fetched successfully:", data);
 
     const workbook = XLSX.read(data, { type: 'string' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -47,7 +65,7 @@ const fetchCommands = async () => {
     renderCommands(commands);
   } catch (error) {
     console.error('Error fetching commands:', error);
-    DOM_ELEMENTS.commandsDiv.innerHTML = '<p class="error-message">Failed to load commands. Please try again later.</p>';
+    DOM_ELEMENTS.commandsDiv.innerHTML = `<p class="error-message">Failed to load commands. Error: ${error.message}</p>`;
   } finally {
     hideLoading();
   }
@@ -73,12 +91,28 @@ const renderCommands = (commands) => {
 const createCommandElement = (command, description) => {
   const commandElement = document.createElement('div');
   commandElement.classList.add('command');
-  const originalHTML = `<p><strong>${command}</strong> - ${description}</p>`;
+
+  const maskedCommand = maskPasswordData(command);
+  const maskedDescription = maskPasswordData(description);
+
+  const originalCommand = removeMasking(command);
+  const originalDescription = removeMasking(description);
+
+  const originalHTML = `<p><strong>${maskedCommand}</strong> - ${maskedDescription}</p>`;
   commandElement.innerHTML = originalHTML;
+
+  commandElement.dataset.originalCommand = originalCommand;
+  commandElement.dataset.originalDescription = originalDescription;
   commandElement.dataset.originalHTML = originalHTML;
 
-  commandElement.onclick = () => copyToClipboard(command);
+  commandElement.onclick = () => copyToClipboard(originalCommand);
   return commandElement;
+};
+
+// Remove the masking (i.e., get the original command and description)
+const removeMasking = (text) => {
+  const regex = new RegExp(`${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`, 'g');
+  return text.replace(regex, '$1');
 };
 
 // Copy to clipboard
@@ -98,11 +132,24 @@ const filterCommands = (query) => {
 
   commands.forEach(command => {
     const originalCommandHTML = command.dataset.originalHTML;
-    command.innerHTML = searchValue ? highlightText(originalCommandHTML, searchValue) : originalCommandHTML;
-    command.style.display = command.innerText.toLowerCase().includes(searchValue) ? 'block' : 'none';
+    const originalCommand = command.dataset.originalCommand;
+    const originalDescription = command.dataset.originalDescription;
+
+    const matchesSearch = originalCommand.toLowerCase().includes(searchValue) ||
+                          originalDescription.toLowerCase().includes(searchValue);
+
+    if (matchesSearch) {
+      command.style.display = 'block';
+      command.innerHTML = searchValue ? 
+        highlightText(originalCommandHTML, searchValue) :
+        originalCommandHTML;
+    } else {
+      command.style.display = 'none';
+    }
   });
 };
 
+// Highlight text logic (same as before)
 const highlightText = (text, searchValue) => {
   const regex = new RegExp(`(${searchValue})`, 'gi');
   return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
