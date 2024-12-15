@@ -2,96 +2,122 @@
 // Version: 1.0
 // Date: 09-11-2023
 
-async function loadCommands() {
-    // Fetching data from 'commands.csv' Github Gist (Raw)
-    // const response = await fetch('https://gist.githubusercontent.com/ajayparihar/ea424724d874d67e2c5b52bf38d931f3/raw/b60ab4bb8b2bd75eaab87b9b4bcee4a5c746e48a/commands.csv');
-    // Google sheet (publish as csv)
-    const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv');
+const COMMANDS_API_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv';
 
-    const dataBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(dataBuffer, { type: 'array' });
+const DOM_ELEMENTS = {
+  commandsDiv: document.getElementById('commands'),
+  searchInput: document.getElementById('searchInput'),
+  title: document.querySelector('h1'),
+  toast: document.getElementById('toast'),
+  loadingOverlay: document.querySelector('.loading-overlay'),
+};
 
-    // Extracting data from the sheet
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+// Utility functions
+const showLoading = () => {
+  document.body.classList.add('loading');
+  DOM_ELEMENTS.loadingOverlay.style.display = 'flex';
+};
+
+const hideLoading = () => {
+  document.body.classList.remove('loading');
+  DOM_ELEMENTS.loadingOverlay.style.display = 'none';
+};
+
+const showAlert = (message, type) => {
+  const toast = DOM_ELEMENTS.toast;
+  toast.classList.remove('show', 'success', 'error');
+  toast.classList.add('show', type);
+  toast.textContent = message;
+
+  setTimeout(() => toast.classList.remove('show'), 2300);
+};
+
+// Command functions
+const fetchCommands = async () => {
+  try {
+    showLoading();
+    const response = await fetch(COMMANDS_API_URL);
+    if (!response.ok) throw new Error('Failed to fetch commands.');
+    const data = await response.text();
+
+    const workbook = XLSX.read(data, { type: 'string' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const commands = XLSX.utils.sheet_to_json(sheet, { header: ['command', 'description'] });
 
-    const commandsDiv = document.getElementById('commands');
+    renderCommands(commands);
+  } catch (error) {
+    console.error('Error fetching commands:', error);
+    DOM_ELEMENTS.commandsDiv.innerHTML = '<p class="error-message">Failed to load commands. Please try again later.</p>';
+  } finally {
+    hideLoading();
+  }
+};
 
-    // Creating HTML elements for each command
-    commands.forEach(item => {
-        const { command, description } = item;
+const renderCommands = (commands) => {
+  DOM_ELEMENTS.commandsDiv.innerHTML = '';
+  if (commands.length === 0) {
+    DOM_ELEMENTS.commandsDiv.innerHTML = '<p>No commands available.</p>';
+    return;
+  }
 
-        const commandElement = document.createElement('div');
-        commandElement.classList.add('command');
-        commandElement.innerHTML = `<p><strong>${command}</strong> - ${description}</p>`;
-        commandElement.onclick = function () {
-            copyToClipboard(command);
-        };
-
-        commandsDiv.appendChild(commandElement);
-    });
-}
-
-let initialLoad = true; // Flag to track initial load
-
-document.getElementById('searchInput').addEventListener('input', function () {
-    const searchValue = this.value.toLowerCase();
-    const commands = document.querySelectorAll('.command');
-
-    if (searchValue === '') {
-        location.reload(); // Reload the page
-        return;
+  const fragment = document.createDocumentFragment();
+  commands.forEach(({ command, description }) => {
+    if (command && description) {
+      const commandElement = createCommandElement(command, description);
+      fragment.appendChild(commandElement);
     }
+  });
+  DOM_ELEMENTS.commandsDiv.appendChild(fragment);
+};
 
-    // Filtering and highlighting commands based on search input
-    commands.forEach(command => {
-        const commandText = command.innerText.toLowerCase();
+const createCommandElement = (command, description) => {
+  const commandElement = document.createElement('div');
+  commandElement.classList.add('command');
+  const originalHTML = `<p><strong>${command}</strong> - ${description}</p>`;
+  commandElement.innerHTML = originalHTML;
+  commandElement.dataset.originalHTML = originalHTML;
 
-        if (commandText.includes(searchValue)) {
-            command.style.display = 'block';
-            if (!initialLoad) {
-                const highlightedText = commandText.replace(new RegExp(searchValue, 'gi'), (match) => `<span class="highlight">${match}</span>`);
-                command.innerHTML = `<p><strong>${highlightedText}</strong></p>`;
-            }
-        } else {
-            command.style.display = 'none';
-        }
+  commandElement.onclick = () => copyToClipboard(command);
+  return commandElement;
+};
+
+// Copy to clipboard
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text)
+    .then(() => showAlert('Command copied!', 'success'))
+    .catch((error) => {
+      console.error('Failed to copy:', error);
+      showAlert('Failed to copy command.', 'error');
     });
+};
 
-    initialLoad = false;
-});
+// Filter commands based on search input
+const filterCommands = (query) => {
+  const searchValue = query.trim().toLowerCase();
+  const commands = document.querySelectorAll('.command');
 
-function copyToClipboard(text) {
-    // Copying text to clipboard
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    const selected =
-        document.getSelection().rangeCount > 0
-            ? document.getSelection().getRangeAt(0)
-            : false;
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    if (selected) {
-        document.getSelection().removeAllRanges();
-        document.getSelection().addRange(selected);
-    }
+  commands.forEach(command => {
+    const originalCommandHTML = command.dataset.originalHTML;
+    command.innerHTML = searchValue ? highlightText(originalCommandHTML, searchValue) : originalCommandHTML;
+    command.style.display = command.innerText.toLowerCase().includes(searchValue) ? 'block' : 'none';
+  });
+};
 
-    showCopiedToast();
-}
+const highlightText = (text, searchValue) => {
+  const regex = new RegExp(`(${searchValue})`, 'gi');
+  return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
+};
 
-function showCopiedToast() {
-    // Showing a toast notification for copied command
-    const toast = document.getElementById('toast');
-    toast.style.opacity = '1';
-    setTimeout(() => {
-        toast.style.opacity = '0';
-    }, 2000);
-}
+// Event listeners
+const addEventListeners = () => {
+  DOM_ELEMENTS.searchInput.addEventListener('input', (event) => filterCommands(event.target.value));
+  DOM_ELEMENTS.title.addEventListener('click', () => location.reload());
+};
 
-loadCommands();
+// Initialization function
+const initializeApp = async () => {
+  await fetchCommands();
+  addEventListeners();
+};
+
+initializeApp();

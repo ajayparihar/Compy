@@ -1,0 +1,38 @@
+Command,Description
+ls -al,List files and directories in the current directory with detailed information.
+cd /path/to/directory,Change the current directory to the specified path.
+pwd,Print the current working directory.
+mkdir new_folder,Create a new directory named 'new_folder'.
+rmdir old_folder,Remove an empty directory named 'old_folder'.
+cp file1.txt file2.txt,Copy the contents of 'file1.txt' to 'file2.txt'.
+mv file1.txt file2.txt,Move or rename 'file1.txt' to 'file2.txt'.
+rm -rf old_directory,Remove the directory 'old_directory' and its contents recursively.
+touch newfile.txt,Create a new empty file named 'newfile.txt'.
+"echo 'Hello, World!'","Print the string 'Hello, World!' to the terminal."
+"Reminder: Meeting at 3 PM today. 
+Please don't forget to prepare the agenda.",A reminder for a meeting at 3 PM with a note to prepare the agenda.
+"Note: Update the document before the deadline. 
+Ensure all sections are completed.",A note to update the document with all sections completed before the deadline.
+git status,"Show the current status of the Git repository, including staged, unstaged, and untracked files."
+git commit -m 'Initial commit',Commit changes to the repository with the message 'Initial commit'.
+admin@example.com,Example of an admin email address.
+user123@gmail.com,Example of a user email address.
+contact@company.org,Example of a contact email address.
+support@helpdesk.com,Example of a support email address.
+tar -czvf archive.tar.gz folder_name,Compress the 'folder_name' into a 'tar.gz' archive file named 'archive.tar.gz'.
+curl -X GET https://api.example.com,Send a GET request to the specified URL using curl.
+ping google.com,Send ICMP packets to 'google.com' to check the network connectivity.
+df -h,Display disk space usage in a human-readable format.
+top,"Display real-time system information, including running processes and resource usage."
+ps aux | grep 'process_name',Show all running processes matching the specified 'process_name'.
+chmod 755 script.sh,"Change the file permissions of 'script.sh' to read, write, and execute for the owner, and read and execute for others."
+chown user:group file.txt,Change the owner and group of the file 'file.txt' to 'user' and 'group'.
+"Meeting at 10 AM tomorrow. 
+Location: Conference Room 2.",A note about a meeting scheduled for 10 AM tomorrow in Conference Room 2.
+"Newsletter available for download. 
+Check the latest updates on our website.",A reminder about the availability of a downloadable newsletter with updates.
+admin@website.net,Example of an admin email address for a website.
+cat file.txt,Display the contents of 'file.txt' in the terminal.
+lsblk,List all block devices (disks) attached to the system.
+sudo apt update,Update the package lists on a Debian-based system like Ubuntu.
+sudo apt install package_name,Install the specified package using apt on a Debian-based system.

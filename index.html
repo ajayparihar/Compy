@@ -4,44 +4,37 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <!-- Meta tags and title -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compy</title>
 
-     <!-- Apple Touch Icon -->
-     <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
-    
-     <!-- Favicon for various sizes -->
-     <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
-     <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
-     
-     <!-- Web App Manifest -->
-     <link rel="manifest" href="favicon_io/site.webmanifest">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="favicon_io/site.webmanifest">
 
-    <!-- Link to external CSS file -->
+    <!-- External CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    <!-- Page content -->
-    <h1 onclick="refreshPage()">COMPY</h1>
-    <input type="text" id="searchInput" placeholder="Search">
-    <div id="commands"></div>
-    <div class="toast" id="toast">Command copied!</div>
+    <header>
+        <h1 id="pageTitle">COMPY</h1>
+    </header>
 
-    <!-- Scripts -->
+    <main>
+        <input type="text" id="searchInput" placeholder="Search Commands">
+        <div id="commands" aria-live="polite"></div>
+    </main>
+
+    <div class="toast" id="toast" role="alert" aria-hidden="true">Command copied!</div>
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- External Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
-
-    <!-- Script for refreshing the page -->
-    <script>
-        function refreshPage() {
-            location.reload();
-        }
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
-
 </html>

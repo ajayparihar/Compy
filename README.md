@@ -1,7 +1,7 @@
 # Compy
 
 ## Overview
-**Compy** is a versatile web-based tool designed to help users manage and reference any type of saved data efficiently. Whether it's commands, personal credentials, short notes, or any information you need quick access to in the future, Compy provides a seamless solution. With its search and copy functionality, users can quickly locate and copy data whenever needed.
+**Compy V1.0** is a versatile web-based tool designed to help users manage and reference any type of saved data efficiently. Whether it's commands, personal credentials, short notes, or any information you need quick access to in the future, Compy provides a seamless solution. With its search and copy functionality, users can quickly locate and copy data whenever needed.
 
 ---
 
