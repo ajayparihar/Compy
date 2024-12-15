@@ -1,7 +1,3 @@
-Ah, I see! You want to add a "New" tag next to the **Password Masking** feature in the list of features to indicate it's a new addition in **V1.1**. Here's the updated **README.md** with that "New" tag added:
-
----
-
 # Compy V1.1
 
 ## Overview
