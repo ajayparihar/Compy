@@ -85,7 +85,7 @@ body.loading > *:not(.loading-overlay) {
 h1 {
     color: var(--header-color);
     font-size: var(--font-size-header);
-    font-family: 'Courier New', monospace;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: var(--spacing) 0;
     cursor: pointer;
     text-align: center;

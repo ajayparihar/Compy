@@ -2,10 +2,6 @@
 // Version: 1.1
 // Date: 09-11-2023
 
-// Author: Ajay Singh
-// Version: 1.2
-// Date: 16-12-2024
-
 const COMMANDS_API_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv';
 
 // Configuration for app settings
@@ -25,21 +21,27 @@ const DOM_ELEMENTS = {
 // Utility functions
 const showLoading = () => {
   document.body.classList.add('loading');
-  DOM_ELEMENTS.loadingOverlay.style.display = 'flex';
+  if (DOM_ELEMENTS.loadingOverlay) {
+    DOM_ELEMENTS.loadingOverlay.style.display = 'flex';
+  }
 };
 
 const hideLoading = () => {
   document.body.classList.remove('loading');
-  DOM_ELEMENTS.loadingOverlay.style.display = 'none';
+  if (DOM_ELEMENTS.loadingOverlay) {
+    DOM_ELEMENTS.loadingOverlay.style.display = 'none';
+  }
 };
 
 const showAlert = (message, type) => {
-  const toast = DOM_ELEMENTS.toast;
-  toast.classList.remove('show', 'success', 'error');
-  toast.classList.add('show', type);
-  toast.textContent = message;
+  if (DOM_ELEMENTS.toast) {
+    const toast = DOM_ELEMENTS.toast;
+    toast.classList.remove('show', 'success', 'error');
+    toast.classList.add('show', type);
+    toast.textContent = message;
 
-  setTimeout(() => toast.classList.remove('show'), 2300);
+    setTimeout(() => toast.classList.remove('show'), 2300);
+  }
 };
 
 // Mask data wrapped in the configured keyword (default: '##')
