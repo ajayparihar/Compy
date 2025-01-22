@@ -15,7 +15,6 @@
 
 2. **Customizable Use Cases**  
    Use Compy for a variety of purposes:
-
    - Saving commands and code snippets.
    - Storing personal credentials or notes.
    - Keeping track of tasks, reference points, and more.
@@ -47,7 +46,6 @@
    ```bash
    git clone https://github.com/ajayparihar/Compy.git
    ```
-````
 
 2. Navigate to the project directory:
    ```bash
@@ -100,8 +98,7 @@ To customize the password masking keyword (e.g., change `##` to `**`):
 2. **CSS**  
    Styles the interface for a clean and responsive design.
 
-3. **JavaScript**
-
+3. **JavaScript**  
    - Fetches data dynamically using the SheetJS library.
    - Handles search and clipboard functionality.
 
