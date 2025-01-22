@@ -1,4 +1,3 @@
-````markdown
 # Compy V1.1
 
 [Compy](https://ajayparihar.github.io/Compy)
@@ -166,7 +165,3 @@ This report evaluates the data safety of a local web application running on **VS
 ### Conclusion
 
 The application, running on **VS Code Live Server**, is secure for local use. As long as physical access to the machine is controlled, there is minimal risk of data leakage or external access. Implementing best practices for minimizing exposed sensitive data and ensuring the Live Server is properly configured will further strengthen security.
-
-```
-
-```
