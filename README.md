@@ -15,6 +15,7 @@
 
 2. **Customizable Use Cases**  
    Use Compy for a variety of purposes:
+
    - Saving commands and code snippets.
    - Storing personal credentials or notes.
    - Keeping track of tasks, reference points, and more.
@@ -43,6 +44,7 @@
 ### Clone the Repository
 
 1. Clone the repository to your local system:
+
    ```bash
    git clone https://github.com/ajayparihar/Compy.git
    ```
@@ -61,9 +63,7 @@ You can load data from either an online CSV file or a local file.
 1. Open `script.js` in a text editor.
 2. Locate the following line:
    ```javascript
-   const response = await fetch(
-     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzW7nf7zVPPuQaV3DQuCH3lxkog_lfNR437sjIOVfxW9ddOuEleLqH_XfjBPYRCQ/pub?gid=1883989031&single=true&output=csv"
-   );
+   const response = await fetch("https://your-csv-file-link");
    ```
 3. Replace the URL with the link to your CSV file.
 
@@ -88,6 +88,27 @@ To customize the password masking keyword (e.g., change `##` to `**`):
    ```
 3. Update `passwordMaskingKeyword` to your preferred keyword, such as `**`.
 
+### Running the Local Server
+
+You can run the local server using either VS Code Live Server or the provided batch file.
+
+#### Method 1: Using VS Code Live Server
+
+1. Open the project directory in VS Code.
+2. Install the Live Server extension if you haven't already.
+   - Go to the Extensions view by clicking the Extensions icon in the Activity Bar on the side of the window or by pressing `Ctrl+Shift+X`.
+   - Search for "Live Server" and install it.
+3. Right-click on `index.html` and select "Open with Live Server".
+4. The application will open in your default browser at `http://localhost:5500`.
+
+#### Method 2: Using the Batch File
+
+1. Open `CompyRunner.bat` in a text editor.
+2. Set the `HTML_DIRECTORY` variable to the path where your HTML files are located. Ensure this path is correct.
+3. Optionally, set the `PORT` variable to your desired port number (default is 8000).
+4. Save the changes and close the text editor.
+5. Double-click `CompyRunner.bat` to start the local server and open the application in your default browser.
+
 ---
 
 ## Technologies Used
@@ -98,7 +119,8 @@ To customize the password masking keyword (e.g., change `##` to `**`):
 2. **CSS**  
    Styles the interface for a clean and responsive design.
 
-3. **JavaScript**  
+3. **JavaScript**
+
    - Fetches data dynamically using the SheetJS library.
    - Handles search and clipboard functionality.
 
@@ -129,36 +151,30 @@ In this version (V1.1), the **Password Masking** feature has been introduced, al
 
 ---
 
-## Data Safety (VS Code Live Server)
+## Data Security Report
 
 ### Overview
 
-This report evaluates the data safety of a local web application running on **VS Code's Live Server extension**. The application processes a local CSV file, uses client-side JavaScript for displaying and copying data, and ensures sensitive information is masked.
+This report evaluates the security of a local web application running on **VS Code Live Server**, processing local CSV data and ensuring sensitive information is masked.
 
-### Code Security and Data Handling
+### Code Security & Data Handling
 
-- **Local Data Fetching**: The application fetches a local CSV file using the `fetch` API, meaning no external network requests are made, and no data is transmitted over the internet. This ensures no data leakage to external servers.
-
-- **Password Masking**: Sensitive data is masked with a configurable keyword (e.g., `##Password##`), ensuring it isn't exposed in the user interface. Only the masked version is displayed to the user, with the original data kept secure in memory.
-
-- **Clipboard Access**: Unmasked data is copied to the clipboard when required, but since the application is local and you're the only user, the risk of external access is low. However, clipboard data may be vulnerable to external malware if the machine is compromised.
-
-- **XSS Protection**: Since the data comes from a controlled local source (CSV file) and isn't injected from external inputs, the risk of Cross-Site Scripting (XSS) is minimal. Best practice suggests sanitizing inputs if any external data sources are considered in the future.
+- **Local Data Fetching**: The app fetches local CSV data, with no external network requests, ensuring no data leakage.
+- **Password Masking**: Sensitive data is masked with a customizable keyword (e.g., `##Password##`), keeping original data secure in memory.
+- **Clipboard Access**: Unmasked data is copied to the clipboard locally, with minimal risk of external access unless the machine is compromised.
+- **XSS Protection**: Data is sourced locally (CSV file), minimizing XSS risk. Inputs should be sanitized for future external sources.
 
 ### Live Server Configuration
 
-- **Local Hosting**: The application runs on **VS Code Live Server**, which is configured to serve the application locally (`localhost`). This means only your machine can access the server, making it inaccessible from external devices unless explicitly reconfigured.
-
-- **Port Accessibility**: By default, **Live Server** binds to local ports, ensuring no external access to the application. This setup minimizes the risk of exposure to external users.
+- **Local Hosting**: Runs locally on `localhost`, ensuring it’s inaccessible externally unless reconfigured.
+- **Port Accessibility**: Live Server binds to local ports, minimizing external exposure.
 
 ### Recommendations
 
-1. **Minimize Sensitive Data in the DOM**: While no external access exists, avoid storing unmasked sensitive data in the DOM. Use in-memory storage for unmasked data.
-
-2. **Clipboard Access**: Limit the use of clipboard access for sensitive data to reduce the risk of exposure to malicious software on your machine.
-
-3. **Ensure Live Server is Local**: Double-check that **Live Server** is bound to `localhost` and not exposed to any external IP addresses.
+1. **Minimize Sensitive Data in DOM**: Use in-memory storage for unmasked data.
+2. **Clipboard Access**: Limit clipboard access for sensitive data to reduce exposure risk.
+3. **Ensure Local Hosting**: Verify **Live Server** is bound to `localhost` only.
 
 ### Conclusion
 
-The application, running on **VS Code Live Server**, is secure for local use. As long as physical access to the machine is controlled, there is minimal risk of data leakage or external access. Implementing best practices for minimizing exposed sensitive data and ensuring the Live Server is properly configured will further strengthen security.
+The app is secure for local use. With physical access control and best practices (e.g., limiting exposed data), security remains strong.
