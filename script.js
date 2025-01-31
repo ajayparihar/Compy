@@ -175,11 +175,12 @@ const highlightText = (text, searchValue) => {
 };
 
 // Event listeners
+
 const addEventListeners = () => {
   DOM_ELEMENTS.searchInput.addEventListener("input", (event) =>
     filterCommands(event.target.value)
   );
-  DOM_ELEMENTS.title.addEventListener("click", () => location.reload());
+  DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
 };
 
 // Initialization function
