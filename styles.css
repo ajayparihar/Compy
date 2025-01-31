@@ -109,9 +109,12 @@ h1 {
 }
 
 h1:hover {
-  color: var(--primary);
+  color: var(
+    --primary
+  ); /* Keeps color same on hover (not needed but can be kept) */
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transform: scale(1.05);
+  transform: translateY(-3px);
 }
 
 @keyframes fadeIn {
@@ -128,7 +131,6 @@ h1:hover {
 /* Search Input Styles */
 #searchInput {
   width: 80%;
-  max-width: 100%;
   padding: 1rem 1.2rem;
   border: 1px solid var(--input-border);
   border-radius: 4px;
@@ -147,8 +149,6 @@ h1:hover {
   border-color: var(--input-hover-border);
   background-color: var(--input-focus);
   box-shadow: 0 0 0 2px var(--primary);
-  box-shadow: 0 0 10px 2px var(--primary);
-
 }
 
 /* Highlighted Text */
@@ -214,21 +214,42 @@ h1:hover {
   box-shadow: 0 4px 6px var(--shadow);
   transition: background-color var(--transition-duration) var(--transition-ease),
     transform var(--transition-duration) var(--transition-ease),
-    box-shadow var(--transition-duration) var (--transition-ease);
+    box-shadow var(--transition-duration) var(--transition-ease); /* Fixed extra space */
   cursor: pointer;
   margin-bottom: var(--spacing);
   text-align: left;
   width: 80%;
-  max-width: 100%;
   font-size: var(--font-command);
+  border: 2px solid var(--input-bg);
+  position: relative; /* Ensure the hover message is positioned relative to the item */
 }
 
 .data-item:hover {
   background-color: var(--card-hover);
-  /* border-style:dashed; */
   border-color: var(--input-border);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  border-style: groove;
   transform: translateY(-3px);
+}
+
+.data-item::after {
+  content: "Tap to Copy"; /* Hover message for data items */
+  position: fixed; /* Position relative to the viewport */
+  background-color: var(--card-bg);
+  color: var(--text);
+  padding: 0.5rem;
+  width: max-content;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.data-item:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 2s; /* Add delay for the hover message */
 }
 
 /* Responsive Design */
@@ -266,4 +287,38 @@ h1:hover {
   #searchInput {
     font-size: 1.1rem;
   }
+}
+
+/* Hover Message */
+.hover-message {
+  position: relative;
+  cursor: pointer;
+  transition: color var(--transition-duration) var(--transition-ease),
+    transform 0.2s var(--transition-ease),
+    text-shadow 0.2s var(--transition-ease);
+}
+
+.hover-message::after {
+  content: attr(data-hover-message); /* Fetch the message from the element's data-hover-message attribute */
+  position: fixed; /* Position relative to the viewport */
+  background-color: var(--card-bg); /* Use the app's card background color */
+  color: var(--text); /* Use the app's text color */
+  padding: 0.5rem;
+  width: max-content;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.hover-message:hover {
+  transform: scale(1.05);
+  transform: translateY(-3px);
+}
+
+.hover-message:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 2s; /* Add delay for the hover message */
 }
