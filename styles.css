@@ -221,7 +221,6 @@ h1:hover {
   width: 80%;
   font-size: var(--font-command);
   border: 2px solid var(--input-bg);
-  position: relative; /* Ensure the hover message is positioned relative to the item */
 }
 
 .data-item:hover {
@@ -230,26 +229,6 @@ h1:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
   border-style: groove;
   transform: translateY(-3px);
-}
-
-.data-item::after {
-  content: "Tap to Copy"; /* Hover message for data items */
-  position: fixed; /* Position relative to the viewport */
-  background-color: var(--card-bg);
-  color: var(--text);
-  padding: 0.5rem;
-  width: max-content;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.data-item:hover::after {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 2s; /* Add delay for the hover message */
 }
 
 /* Responsive Design */
@@ -287,38 +266,4 @@ h1:hover {
   #searchInput {
     font-size: 1.1rem;
   }
-}
-
-/* Hover Message */
-.hover-message {
-  position: relative;
-  cursor: pointer;
-  transition: color var(--transition-duration) var(--transition-ease),
-    transform 0.2s var(--transition-ease),
-    text-shadow 0.2s var(--transition-ease);
-}
-
-.hover-message::after {
-  content: attr(data-hover-message); /* Fetch the message from the element's data-hover-message attribute */
-  position: fixed; /* Position relative to the viewport */
-  background-color: var(--card-bg); /* Use the app's card background color */
-  color: var(--text); /* Use the app's text color */
-  padding: 0.5rem;
-  width: max-content;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.hover-message:hover {
-  transform: scale(1.05);
-  transform: translateY(-3px);
-}
-
-.hover-message:hover::after {
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 2s; /* Add delay for the hover message */
 }

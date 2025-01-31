@@ -8,7 +8,6 @@ const DATA_API_URL =
 // Configuration for app settings
 const config = {
   passwordMaskingKeyword: "##", // Centralized password masking keyword (can be changed to '**' or any other)
-  enableHoverMessage: false, // Enable or disable hover message functionality
 };
 
 // DOM Elements
@@ -195,21 +194,6 @@ const addEventListeners = () => {
     if (isCharacterKey && document.activeElement !== DOM_ELEMENTS.searchInput) {
       DOM_ELEMENTS.searchInput.focus();
     }
-  });
-
-  // Event listener for mouse movement
-  if (config.enableHoverMessage) {
-    document.addEventListener('mousemove', updateHoverMessagePosition);
-  }
-};
-
-// Function to update hover message position
-const updateHoverMessagePosition = (event) => {
-  if (!config.enableHoverMessage) return; // Check if hover message is enabled
-  const hoverMessages = document.querySelectorAll('.hover-message::after, .data-item::after');
-  hoverMessages.forEach((hoverMessage) => {
-    hoverMessage.style.top = `${event.clientY}px`;
-    hoverMessage.style.left = `${event.clientX + 10}px`; // Position slightly to the right of the cursor
   });
 };
 
