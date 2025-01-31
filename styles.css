@@ -105,11 +105,24 @@ h1 {
   transition: color var(--transition-duration) var(--transition-ease),
     transform 0.2s var(--transition-ease),
     text-shadow 0.2s var(--transition-ease);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 h1:hover {
   color: var(--primary);
-  transform: translateY(-5px);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Search Input Styles */
@@ -208,8 +221,8 @@ h1:hover {
 
 .command:hover {
   background-color: var(--card-hover);
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  transform: translateY(-3px);
 }
 
 /* Responsive Design */
