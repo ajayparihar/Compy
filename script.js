@@ -15,7 +15,6 @@ const DOM_ELEMENTS = {
   commandsDiv: document.getElementById("commands"),
   searchInput: document.getElementById("searchInput"),
   title: document.querySelector("h1"),
-  toast: document.getElementById("toast"),
   loadingOverlay: document.querySelector(".loading-overlay"),
 };
 
@@ -31,17 +30,6 @@ const hideLoading = () => {
   document.body.classList.remove("loading");
   if (DOM_ELEMENTS.loadingOverlay) {
     DOM_ELEMENTS.loadingOverlay.style.display = "none";
-  }
-};
-
-const showAlert = (message, type) => {
-  if (DOM_ELEMENTS.toast) {
-    const toast = DOM_ELEMENTS.toast;
-    toast.classList.remove("show", "success", "error");
-    toast.classList.add("show", type);
-    toast.textContent = message;
-
-    setTimeout(() => toast.classList.remove("show"), 2300);
   }
 };
 
@@ -133,10 +121,9 @@ const removeMasking = (text) => {
 const copyToClipboard = (text) => {
   navigator.clipboard
     .writeText(text)
-    .then(() => showAlert("Command copied!", "success"))
+    .then(() => console.log("Copied to clipboard!"))
     .catch((error) => {
       console.error("Failed to copy:", error);
-      showAlert("Failed to copy command.", "error");
     });
 };
 
@@ -175,21 +162,20 @@ const highlightText = (text, searchValue) => {
 };
 
 // Event listeners
-
 const addEventListeners = () => {
   DOM_ELEMENTS.searchInput.addEventListener("input", (event) =>
     filterCommands(event.target.value)
   );
   DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
-};
 
-// New event listener to focus on search input when typing
-document.addEventListener("keydown", (event) => {
-  const isCharacterKey = event.key.length === 1;
-  if (isCharacterKey && document.activeElement !== DOM_ELEMENTS.searchInput) {
-    DOM_ELEMENTS.searchInput.focus();
-  }
-});
+  // New event listener to focus on search input when typing
+  document.addEventListener("keydown", (event) => {
+    const isCharacterKey = event.key.length === 1;
+    if (isCharacterKey && document.activeElement !== DOM_ELEMENTS.searchInput) {
+      DOM_ELEMENTS.searchInput.focus();
+    }
+  });
+};
 
 // Initialization function
 const initializeApp = async () => {
