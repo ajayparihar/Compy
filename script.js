@@ -14,8 +14,9 @@ const config = {
 const DOM_ELEMENTS = {
   commandsDiv: document.getElementById("commands"),
   searchInput: document.getElementById("searchInput"),
-  title: document.querySelector("h1"),
+  title: document.getElementById("pageTitle"),
   loadingOverlay: document.querySelector(".loading-overlay"),
+  toast: document.getElementById("toast"),
 };
 
 // Utility functions
@@ -30,6 +31,24 @@ const hideLoading = () => {
   document.body.classList.remove("loading");
   if (DOM_ELEMENTS.loadingOverlay) {
     DOM_ELEMENTS.loadingOverlay.style.display = "none";
+  }
+};
+
+const showAlert = (message, type) => {
+  if (DOM_ELEMENTS.toast) {
+    const toast = DOM_ELEMENTS.toast;
+    toast.classList.remove("show", "hide", "success", "error");
+    toast.classList.add(type);
+    toast.textContent = message;
+
+    // Show the toast
+    setTimeout(() => toast.classList.add("show"), 10);
+
+    // Hide the toast after 2.3 seconds
+    setTimeout(() => {
+      toast.classList.remove("show");
+      toast.classList.add("hide");
+    }, 2300);
   }
 };
 
@@ -121,9 +140,10 @@ const removeMasking = (text) => {
 const copyToClipboard = (text) => {
   navigator.clipboard
     .writeText(text)
-    .then(() => console.log("Copied to clipboard!"))
+    .then(() => showAlert("Copied to clipboard!", "success"))
     .catch((error) => {
       console.error("Failed to copy:", error);
+      showAlert("Failed to copy command.", "error");
     });
 };
 

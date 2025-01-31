@@ -155,10 +155,10 @@ h1:hover {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
   opacity: 0;
-  transition: opacity 0.5s var(--transition-ease),
-    transform 0.3s var(--transition-ease);
+  transition: opacity 0.5s var(--transition-ease), transform 0.3s var(--transition-ease);
   z-index: 1000;
   max-width: 300px;
+  pointer-events: none; /* Prevent interaction */
 }
 
 .toast.success {
@@ -173,7 +173,7 @@ h1:hover {
   transform: translate(-50%, -20px);
 }
 
-.toast.fade-out {
+.toast.hide {
   opacity: 0;
   transform: translate(-50%, 0);
 }
