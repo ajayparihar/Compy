@@ -151,7 +151,6 @@ const copyToClipboard = (text) => {
 const filterData = (query) => {
   const searchValue = query.trim().toLowerCase();
   const items = document.querySelectorAll(".data-item");
-  let hasVisibleItems = false;
 
   items.forEach((item) => {
     const originalItemHTML = item.dataset.originalHTML;
@@ -167,15 +166,10 @@ const filterData = (query) => {
       item.innerHTML = searchValue
         ? highlightText(originalItemHTML, searchValue)
         : originalItemHTML;
-      hasVisibleItems = true;
     } else {
       item.style.display = "none";
     }
   });
-
-  if (!hasVisibleItems) {
-    DOM_ELEMENTS.dataDiv.innerHTML = "<p>No data found.</p>";
-  }
 };
 
 // Highlight text logic (same as before)
