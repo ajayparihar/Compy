@@ -2,7 +2,7 @@
 // Version: 1.1
 // Date: 09-11-2023
 
-const COMMANDS_API_URL =
+const DATA_API_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
 
 // Configuration for app settings
@@ -12,7 +12,7 @@ const config = {
 
 // DOM Elements
 const DOM_ELEMENTS = {
-  commandsDiv: document.getElementById("commands"),
+  dataDiv: document.getElementById("data"),
   searchInput: document.getElementById("searchInput"),
   title: document.getElementById("pageTitle"),
   loadingOverlay: document.querySelector(".loading-overlay"),
@@ -53,22 +53,22 @@ const showAlert = (message, type) => {
 };
 
 // Mask data wrapped in the configured keyword (default: '##')
-const maskPasswordData = (text) => {
+const maskSensitiveData = (text) => {
   const regex = new RegExp(
     `${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`,
     "g"
   );
   return text.replace(
     regex,
-    `${config.passwordMaskingKeyword}Password${config.passwordMaskingKeyword}`
+    `${config.passwordMaskingKeyword}SensitiveData${config.passwordMaskingKeyword}`
   );
 };
 
-// Command functions
-const fetchCommands = async () => {
+// Data functions
+const fetchData = async () => {
   try {
     showLoading();
-    const response = await fetch(COMMANDS_API_URL);
+    const response = await fetch(DATA_API_URL);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.text();
@@ -76,58 +76,58 @@ const fetchCommands = async () => {
 
     const workbook = XLSX.read(data, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const commands = XLSX.utils.sheet_to_json(sheet, {
-      header: ["command", "description"],
+    const items = XLSX.utils.sheet_to_json(sheet, {
+      header: ["item", "description"],
     });
 
-    renderCommands(commands);
+    renderData(items);
   } catch (error) {
-    console.error("Error fetching commands:", error);
-    DOM_ELEMENTS.commandsDiv.innerHTML = `<p class="error-message">Failed to load commands. Error: ${error.message}</p>`;
+    console.error("Error fetching data:", error);
+    DOM_ELEMENTS.dataDiv.innerHTML = `<p class="error-message">Failed to load data. Error: ${error.message}</p>`;
   } finally {
     hideLoading();
   }
 };
 
-const renderCommands = (commands) => {
-  DOM_ELEMENTS.commandsDiv.innerHTML = "";
-  if (commands.length === 0) {
-    DOM_ELEMENTS.commandsDiv.innerHTML = "<p>No commands available.</p>";
+const renderData = (items) => {
+  DOM_ELEMENTS.dataDiv.innerHTML = "";
+  if (items.length === 0) {
+    DOM_ELEMENTS.dataDiv.innerHTML = "<p>No data available.</p>";
     return;
   }
 
   const fragment = document.createDocumentFragment();
-  commands.forEach(({ command, description }) => {
-    if (command && description) {
-      const commandElement = createCommandElement(command, description);
-      fragment.appendChild(commandElement);
+  items.forEach(({ item, description }) => {
+    if (item && description) {
+      const dataElement = createDataElement(item, description);
+      fragment.appendChild(dataElement);
     }
   });
-  DOM_ELEMENTS.commandsDiv.appendChild(fragment);
+  DOM_ELEMENTS.dataDiv.appendChild(fragment);
 };
 
-const createCommandElement = (command, description) => {
-  const commandElement = document.createElement("div");
-  commandElement.classList.add("command");
+const createDataElement = (item, description) => {
+  const dataElement = document.createElement("div");
+  dataElement.classList.add("data-item");
 
-  const maskedCommand = maskPasswordData(command);
-  const maskedDescription = maskPasswordData(description);
+  const maskedItem = maskSensitiveData(item);
+  const maskedDescription = maskSensitiveData(description);
 
-  const originalCommand = removeMasking(command);
+  const originalItem = removeMasking(item);
   const originalDescription = removeMasking(description);
 
-  const originalHTML = `<p><strong>${maskedCommand}</strong> - ${maskedDescription}</p>`;
-  commandElement.innerHTML = originalHTML;
+  const originalHTML = `<p><strong>${maskedItem}</strong> - ${maskedDescription}</p>`;
+  dataElement.innerHTML = originalHTML;
 
-  commandElement.dataset.originalCommand = originalCommand;
-  commandElement.dataset.originalDescription = originalDescription;
-  commandElement.dataset.originalHTML = originalHTML;
+  dataElement.dataset.originalItem = originalItem;
+  dataElement.dataset.originalDescription = originalDescription;
+  dataElement.dataset.originalHTML = originalHTML;
 
-  commandElement.onclick = () => copyToClipboard(originalCommand);
-  return commandElement;
+  dataElement.onclick = () => copyToClipboard(originalItem);
+  return dataElement;
 };
 
-// Remove the masking (i.e., get the original command and description)
+// Remove the masking (i.e., get the original item and description)
 const removeMasking = (text) => {
   const regex = new RegExp(
     `${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`,
@@ -143,33 +143,39 @@ const copyToClipboard = (text) => {
     .then(() => showAlert("Copied to clipboard!", "success"))
     .catch((error) => {
       console.error("Failed to copy:", error);
-      showAlert("Failed to copy command.", "error");
+      showAlert("Failed to copy data.", "error");
     });
 };
 
-// Filter commands based on search input
-const filterCommands = (query) => {
+// Filter data based on search input
+const filterData = (query) => {
   const searchValue = query.trim().toLowerCase();
-  const commands = document.querySelectorAll(".command");
+  const items = document.querySelectorAll(".data-item");
+  let hasVisibleItems = false;
 
-  commands.forEach((command) => {
-    const originalCommandHTML = command.dataset.originalHTML;
-    const originalCommand = command.dataset.originalCommand;
-    const originalDescription = command.dataset.originalDescription;
+  items.forEach((item) => {
+    const originalItemHTML = item.dataset.originalHTML;
+    const originalItem = item.dataset.originalItem;
+    const originalDescription = item.dataset.originalDescription;
 
     const matchesSearch =
-      originalCommand.toLowerCase().includes(searchValue) ||
+      originalItem.toLowerCase().includes(searchValue) ||
       originalDescription.toLowerCase().includes(searchValue);
 
     if (matchesSearch) {
-      command.style.display = "block";
-      command.innerHTML = searchValue
-        ? highlightText(originalCommandHTML, searchValue)
-        : originalCommandHTML;
+      item.style.display = "block";
+      item.innerHTML = searchValue
+        ? highlightText(originalItemHTML, searchValue)
+        : originalItemHTML;
+      hasVisibleItems = true;
     } else {
-      command.style.display = "none";
+      item.style.display = "none";
     }
   });
+
+  if (!hasVisibleItems) {
+    DOM_ELEMENTS.dataDiv.innerHTML = "<p>No data found.</p>";
+  }
 };
 
 // Highlight text logic (same as before)
@@ -184,7 +190,7 @@ const highlightText = (text, searchValue) => {
 // Event listeners
 const addEventListeners = () => {
   DOM_ELEMENTS.searchInput.addEventListener("input", (event) =>
-    filterCommands(event.target.value)
+    filterData(event.target.value)
   );
   DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
 
@@ -199,7 +205,7 @@ const addEventListeners = () => {
 
 // Initialization function
 const initializeApp = async () => {
-  await fetchCommands();
+  await fetchData();
   addEventListeners();
 };
 
