@@ -2,26 +2,35 @@
 /* Version: 1.1 */
 /* Date: 09-11-2023 */
 
-/* Root Variables */
+/* Import Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Itim&display=swap");
+
+/* Theme Colors */
 :root {
-  --bg-color: #232529;
-  --text-color: #ffffff;
-  --header-color: #7289da;
-  --highlight-color: #7289da;
-  --toast-bg: #7289da;
-  --toast-error-bg: #ff0000;
-  --command-bg: #1e1e1e;
-  --command-hover-bg: #333;
-  --input-bg: #333;
-  --input-focus-bg: #444;
-  --input-border-color: #7289da;
-  --input-hover-border-color: #5f73a5;
-  --shadow-color: rgba(0, 0, 0, 0.2);
-  --max-width: 1000px;
+  --bg: #121212;
+  --text: #f0f0f0;
+  --primary: #4a90e2;
+  --error: #ff4d4d;
+  --card-bg: #1e1e1e;
+  --card-hover: #333;
+  --input-bg: #2a2a2a;
+  --input-focus: #3a3a3a;
+  --input-border: #4a90e2;
+  --input-hover-border: #357ab8;
+  --shadow: rgba(0, 0, 0, 0.7);
+}
+
+/* Sizing and Other Variables */
+:root {
+  --max-width: 100%;
   --spacing: 20px;
-  --font-size-base: 16px;
-  --font-size-header: 3rem;
-  --font-size-command: 1rem;
+  --font-base: 18px;
+  --font-header: 3.5rem; /* Increased header font size */
+  --font-command: 1.2rem;
+  --transition-duration: 0.3s;
+  --transition-ease: ease;
+  --spinner-size: 50px;
+  --spinner-border: 8px;
 }
 
 /* Global Styles */
@@ -32,9 +41,9 @@
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   display: flex;
@@ -42,10 +51,10 @@ body {
   justify-content: flex-start;
   align-items: center;
   height: 100vh;
-  font-size: var(--font-size-base);
+  font-size: var(--font-base);
   line-height: 1.6;
   padding: 0 var(--spacing);
-  transition: background-color 0.3s ease;
+  transition: background-color var(--transition-duration) var(--transition-ease);
 }
 
 /* Hide content when loading */
@@ -68,11 +77,11 @@ body.loading > *:not(.loading-overlay) {
 }
 
 .spinner {
-  border: 8px solid #f3f3f3; /* Light gray */
-  border-top: 8px solid var(--highlight-color); /* Highlight color */
+  border: var(--spinner-border) solid #f3f3f3; /* Light gray */
+  border-top: var(--spinner-border) solid var(--primary); /* Highlight color */
   border-radius: 50%; /* Circle shape */
-  width: 50px;
-  height: 50px;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
   animation: spin 1s linear infinite;
 }
 
@@ -87,48 +96,51 @@ body.loading > *:not(.loading-overlay) {
 
 /* Header Styles */
 h1 {
-  color: var(--header-color);
-  font-size: var(--font-size-header);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--primary);
+  font-size: var(--font-header);
+  font-family: "Itim", sans-serif;
   margin: var(--spacing) 0;
   cursor: pointer;
   text-align: center;
-  transition: color 0.3s ease, transform 0.2s ease, text-shadow 0.2s ease;
+  transition: color var(--transition-duration) var(--transition-ease),
+    transform 0.2s var(--transition-ease),
+    text-shadow 0.2s var(--transition-ease);
 }
 
 h1:hover {
-  color: var(--highlight-color);
+  color: var(--primary);
   transform: translateY(-5px);
 }
 
 /* Search Input Styles */
 #searchInput {
   width: 100%;
-  max-width: 800px;
+  max-width: 100%;
   padding: 1rem 1.2rem;
-  border: 1px solid var(--input-border-color);
+  border: 1px solid var(--input-border);
   border-radius: 4px;
   background-color: var(--input-bg);
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  color: var(--text);
+  font-size: 1.1rem;
+  transition: border-color var(--transition-duration),
+    box-shadow var(--transition-duration);
   min-height: 2.5rem;
   margin-bottom: 1.5rem;
 }
 
 #searchInput:focus {
   outline: none;
-  border-color: var(--input-hover-border-color);
-  background-color: var(--input-focus-bg);
-  box-shadow: 0 0 0 2px rgba(114, 137, 218, 0.5);
+  border-color: var(--input-hover-border);
+  background-color: var(--input-focus);
+  box-shadow: 0 0 0 2px var(--primary);
 }
 
 /* Highlighted Text */
 .highlight {
-  background-color: var(--highlight-color);
+  background-color: var(--primary);
   font-weight: bold;
-  font-size: 1.1rem; /* Slightly smaller highlight size */
-  color: var(--bg-color);
+  font-size: 1.2rem; /* Slightly larger highlight size */
+  color: var(--bg);
 }
 
 /* Toast Notification Styles */
@@ -137,22 +149,23 @@ h1:hover {
   bottom: 20px;
   left: 50%;
   transform: translate(-50%, 0);
-  background-color: var(--toast-bg);
-  color: var(--text-color);
+  background-color: var(--primary);
+  color: var(--text);
   padding: 15px 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.3s ease;
+  transition: opacity 0.5s var(--transition-ease),
+    transform 0.3s var(--transition-ease);
   z-index: 1000;
   max-width: 300px;
 }
 
 .toast.success {
-  background-color: var(--toast-bg);
+  background-color: var(--primary);
 }
 .toast.error {
-  background-color: var(--toast-error-bg);
+  background-color: var(--error);
 }
 
 .toast.show {
@@ -177,31 +190,32 @@ h1:hover {
 
 /* Command Styles */
 .command {
-  background-color: var(--command-bg);
-  color: var(--text-color);
+  background-color: var(--card-bg);
+  color: var(--text);
   padding: 1.2rem;
   border-radius: 8px;
-  box-shadow: 0 4px 6px var(--shadow-color);
-  transition: background-color 0.3s ease, transform 0.3s ease,
-    box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px var(--shadow);
+  transition: background-color var(--transition-duration) var(--transition-ease),
+    transform var(--transition-duration) var(--transition-ease),
+    box-shadow var(--transition-duration) var(--transition-ease);
   cursor: pointer;
   margin-bottom: var(--spacing);
   text-align: left;
   width: 100%;
   max-width: 800px;
-  font-size: var(--font-size-command);
+  font-size: var(--font-command);
 }
 
 .command:hover {
-  background-color: var(--command-hover-bg);
+  background-color: var(--card-hover);
   transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   h1 {
-    font-size: calc(2rem + 2vw); /* Scales header size with viewport */
+    font-size: calc(3rem + 2vw); /* Scales header size with viewport */
   }
 
   #searchInput {
@@ -221,16 +235,16 @@ h1:hover {
 
   h1 {
     font-size: calc(
-      1.8rem + 2vw
+      2.5rem + 2vw
     ); /* Scales header size further on smaller screens */
   }
 
   .command {
     padding: 0.8rem;
-    font-size: calc(0.95rem + 0.2vw); /* Further scales command size */
+    font-size: calc(1rem + 0.2vw); /* Further scales command size */
   }
 
   #searchInput {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
