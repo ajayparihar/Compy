@@ -183,6 +183,14 @@ const addEventListeners = () => {
   DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
 };
 
+// New event listener to focus on search input when typing
+document.addEventListener("keydown", (event) => {
+  const isCharacterKey = event.key.length === 1;
+  if (isCharacterKey && document.activeElement !== DOM_ELEMENTS.searchInput) {
+    DOM_ELEMENTS.searchInput.focus();
+  }
+});
+
 // Initialization function
 const initializeApp = async () => {
   await fetchCommands();
