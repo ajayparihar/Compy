@@ -17,7 +17,6 @@
   --input-focus: #3a3a3a;
   --input-border: #4a90e2;
   --input-hover-border: #357ab8;
-  --shadow: rgba(0, 0, 0, 0.7);
 }
 
 /* Sizing and Other Variables */
@@ -31,6 +30,7 @@
   --transition-ease: ease;
   --spinner-size: 50px;
   --spinner-border: 8px;
+  --shadow: rgba(0, 0, 0, 0.7);
 }
 
 /* Global Styles */

@@ -2,7 +2,7 @@
 // Version: 1.1
 // Date: 09-11-2023
 
-const DATA_API_URL =
+const COMMANDS_API_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
 
 // Configuration for app settings
@@ -65,10 +65,10 @@ const maskSensitiveData = (text) => {
 };
 
 // Data functions
-const fetchData = async () => {
+const fetchData = async (filePath) => {
   try {
     showLoading();
-    const response = await fetch(DATA_API_URL);
+    const response = await fetch(filePath);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.text();
@@ -199,7 +199,15 @@ const addEventListeners = () => {
 
 // Initialization function
 const initializeApp = async () => {
-  await fetchData();
+  await fetch("user_config.json")
+    .then((response) => response.json())
+    .then((config) => {
+      const filePath = config.file_settings?.file_path || COMMANDS_API_URL;
+      fetchData(filePath);
+    })
+    .catch((error) =>
+      console.error("Error loading user configuration:", error)
+    );
   addEventListeners();
 };
 
