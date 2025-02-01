@@ -148,7 +148,7 @@ h1:hover {
   outline: none;
   border-color: var(--input-hover-border);
   background-color: var(--input-focus);
-  box-shadow: 0 0 0 2px var(--primary);
+  box-shadow: 0 0 10px 2px var(--primary), 0 0 15px 4px rgba(0, 255, 255, 0.5); /* Added glowing effect */
 }
 
 /* Highlighted Text */

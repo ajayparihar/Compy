@@ -37,6 +37,9 @@
 
    **Customizable Masking Keyword**: The keyword used for masking data (such as `##`) is now customizable. You can change this keyword to any symbol or word (e.g., `**`) by updating the code. This flexibility allows you to adapt the tool to your security needs and preferences, making it easier to manage sensitive information.
 
+8. **Theme Support** **(New)**  
+   Compy now supports multiple themes. You can choose from a variety of dark and light themes to customize the look and feel of the application.
+
 ---
 
 ## Customizing the Tool
@@ -88,6 +91,17 @@ To customize the password masking keyword (e.g., change `##` to `**`):
    ```
 3. Update `passwordMaskingKeyword` to your preferred keyword, such as `**`.
 
+### Update the Theme
+
+To customize the theme:
+
+1. Open `user_config.json`.
+2. Locate the `display_theme` property:
+   ```json
+   "display_theme": "root.d4"
+   ```
+3. Update `display_theme` to your preferred theme. Available themes are listed below.
+
 ### Running the Local Server
 
 You can run the local server using either VS Code Live Server or the provided batch file.
@@ -108,6 +122,37 @@ You can run the local server using either VS Code Live Server or the provided ba
 3. Optionally, set the `PORT` variable to your desired port number (default is 8000).
 4. Save the changes and close the text editor.
 5. Double-click `CompyRunner.bat` to start the local server and open the application in your default browser.
+
+---
+
+## Available Themes
+
+### Dark Themes
+
+1. **Mystic Forest**: `root.d1`
+2. **Crimson Night**: `root.d2`
+3. **Royal Elegance**: `root.d3`
+4. **Galactic Blue**: `root.d4`
+5. **Twilight Dream**: `root.d5`
+6. **Deep Ocean**: `root.d6`
+7. **Cyber Night**: `root.d7`
+8. **Molten Core**: `root.d8`
+9. **Neon Pulse**: `root.d9`
+10. **Toxic Night**: `root.d10`
+
+### Light Themes
+
+1. **Sunrise**: `root.l1`
+2. **Soft Glow**: `root.l2`
+3. **Floral Breeze**: `root.l3`
+4. **Ocean Breeze**: `root.l4`
+5. **Golden Sands**: `root.l5`
+6. **Mint Grove**: `root.l6`
+7. **Sky Dusk**: `root.l7`
+8. **Autumn Leaves**: `root.l8`
+9. **Citrus Burst**: `root.l9`
+10. **Rose Petal**: `root.l10`
+11. **Lavender Mist**: `root.l11`
 
 ---
 

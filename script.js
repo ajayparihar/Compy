@@ -1,6 +1,6 @@
-// Author: Ajay Singh
-// Version: 1.1
-// Date: 09-11-2023
+/* Author: Ajay Singh */
+/* Version: 1.1 */
+/* Date: 09-11-2023 */
 
 const COMMANDS_API_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
@@ -205,9 +205,11 @@ const initializeApp = async () => {
       const filePath = config.file_settings?.file_path || COMMANDS_API_URL;
       fetchData(filePath);
     })
-    .catch((error) =>
-      console.error("Error loading user configuration:", error)
-    );
+    .catch((error) => {
+      console.error("Error loading user configuration:", error);
+      // Load default file path if user configuration fails
+      fetchData(COMMANDS_API_URL);
+    });
   addEventListeners();
 };
 

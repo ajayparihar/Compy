@@ -1,4 +1,6 @@
-// config.js
+/* Author: Ajay Singh */
+/* Version: 1.1 */
+/* Date: 09-11-2023 */
 
 const DEFAULT_FILE_PATH =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
@@ -18,7 +20,11 @@ fetch("user_config.json")
     // Load the specified file
     loadFile(filePath);
   })
-  .catch((error) => console.error("Error loading user configuration:", error));
+  .catch((error) => {
+    console.error("Error loading user configuration:", error);
+    // Load default file path if user configuration fails
+    loadFile(DEFAULT_FILE_PATH);
+  });
 
 // Function to load the specified file
 const loadFile = (filePath) => {
