@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compy</title>
+    <title>Compy - Command Manager</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
     <link rel="manifest" href="favicon_io/site.webmanifest">
 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="themes.css">
 </head>
@@ -21,8 +22,10 @@
     </header>
 
     <main>
-        <input type="text" id="searchInput" placeholder="Type to search" aria-label="Search commands">
-        <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
+        <div class="container">
+            <input type="text" id="searchInput" placeholder="Search commands..." aria-label="Search commands">
+            <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
+        </div>
     </main>
 
     <div class="toast" id="toast" role="alert" aria-hidden="true">Copied to clipboard!</div>

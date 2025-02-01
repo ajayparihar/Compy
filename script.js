@@ -105,11 +105,11 @@ const createDataElement = (item, description) => {
 
   const maskedItem = maskSensitiveData(item);
   const maskedDescription = maskSensitiveData(description);
-  const originalHTML = `<p><strong>${maskedItem}</strong> - ${maskedDescription}</p>`;
+  const originalHTML = `<p><strong class="command-text">${maskedItem}</strong> - ${maskedDescription}</p>`;
 
   dataElement.innerHTML = originalHTML;
-  dataElement.dataset.originalItem = removeMasking(item);
-  dataElement.dataset.originalDescription = removeMasking(description);
+  dataElement.dataset.originalItem = item; // Store original unmasked item
+  dataElement.dataset.originalDescription = description; // Store original unmasked description
   dataElement.dataset.originalHTML = originalHTML;
   dataElement.onclick = () => copyToClipboard(dataElement.dataset.originalItem);
 
@@ -139,8 +139,23 @@ const copyToClipboard = (text) => {
 
 // Update the highlightText function
 const highlightText = (text, searchValue) => {
-  const regex = new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
+  // Don't highlight if search is empty
+  if (!searchValue.trim()) return maskSensitiveData(text);
+  
+  // Escape special characters and handle multiple spaces
+  const escapedSearch = searchValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*');
+  const regex = new RegExp(`(${escapedSearch})`, 'gi');
+  
+  // Mask sensitive data first, then highlight
+  const maskedText = maskSensitiveData(text);
+  return maskedText.replace(regex, (match) => {
+    // Preserve existing strong tags
+    if (match.startsWith('<strong') && match.endsWith('</strong>')) {
+      return match.replace(/(<strong[^>]*>)(.*?)(<\/strong>)/, 
+        `$1<span class="highlight">$2</span>$3`);
+    }
+    return `<span class="highlight">${match}</span>`;
+  });
 };
 
 // Update the filterData function
@@ -148,8 +163,17 @@ const filterData = (query) => {
   showLoading();
   try {
     const searchValue = query.trim().toLowerCase();
-    const items = document.querySelectorAll(".data-item");
+    
+    // Don't highlight if search is empty
+    if (!searchValue) {
+      document.querySelectorAll(".data-item").forEach(item => {
+        item.style.display = "block";
+        item.innerHTML = item.dataset.originalHTML;
+      });
+      return;
+    }
 
+    const items = document.querySelectorAll(".data-item");
     items.forEach((item) => {
       const originalItem = item.dataset.originalItem.toLowerCase();
       const originalDescription = item.dataset.originalDescription.toLowerCase();
@@ -159,10 +183,10 @@ const filterData = (query) => {
 
       if (matchesSearch) {
         item.style.display = "block";
-        // Rebuild the HTML with highlights
+        // Rebuild the HTML with highlights and masking
         const highlightedItem = highlightText(item.dataset.originalItem, searchValue);
         const highlightedDescription = highlightText(item.dataset.originalDescription, searchValue);
-        item.innerHTML = `<p><strong>${highlightedItem}</strong> - ${highlightedDescription}</p>`;
+        item.innerHTML = `<p><strong class="command-text">${highlightedItem}</strong> - ${highlightedDescription}</p>`;
       } else {
         item.style.display = "none";
       }
@@ -176,7 +200,18 @@ const filterData = (query) => {
 const addEventListeners = () => {
   DOM_ELEMENTS.searchInput.addEventListener("input", (event) => {
     const query = event.target.value;
-    if (query.length > 100) return showAlert("Search query too long", "error");
+    
+    // Clear search if input is empty
+    if (!query.trim()) {
+      filterData('');
+      return;
+    }
+    
+    if (query.length > 100) {
+      showAlert("Search query too long", "error");
+      return;
+    }
+    
     filterData(query);
   });
 
