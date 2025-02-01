@@ -176,7 +176,6 @@ You can run the local server using either VS Code Live Server or the provided ba
 
 ## Styling Details
 
-- **Dark Theme**: A dark color scheme for a comfortable and modern user interface.
 - **Highlighting**: Search matches are highlighted for easy visibility.
 - **Toast Notification**: Simple feedback for user actions like copying to the clipboard.
 
