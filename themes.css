@@ -1,9 +1,7 @@
-/* Dark Themes */
-
 /* Dark theme with Emerald Green (Mystic Forest) */
 :root.d1 {
   --bg: #161b1d;
-  --text: #e0f2f1;
+  --text: #e3f5f4; /* Slightly brighter for better visibility */
   --primary: #00a676;
   --error: #ff5252;
   --card-bg: #1e2426;
@@ -140,12 +138,10 @@
   --input-hover-border: #64dd03;
 }
 
-/* Light Themes */
-
 /* Light theme with Coral (Sunrise) */
 :root.l1 {
   --bg: #fff7f1;
-  --text: #2d1b12;
+  --text: #3d1b12; /* Darker for better readability */
   --primary: #ff7043;
   --error: #d32f2f;
   --card-bg: #ffeee0;
