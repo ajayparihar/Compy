@@ -95,6 +95,13 @@ body.loading > *:not(.loading-overlay) {
 }
 
 /* Header Styles */
+header {
+  padding: 3px 0;
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+}
+
 h1 {
   color: var(--primary);
   font-size: var(--font-header);
@@ -102,6 +109,8 @@ h1 {
   margin: var(--spacing) 0;
   cursor: pointer;
   text-align: center;
+  display: inline-block;
+  padding: 0 10px;
   transition: color var(--transition-duration) var(--transition-ease),
     transform 0.2s var(--transition-ease),
     text-shadow 0.2s var(--transition-ease);
@@ -109,12 +118,10 @@ h1 {
 }
 
 h1:hover {
-  color: var(
-    --primary
-  ); /* Keeps color same on hover (not needed but can be kept) */
+  color: var(--primary);
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transform: scale(1.05);
-  transform: translateY(-3px);
+  /* Remove translateY to prevent scroll bar */
 }
 
 @keyframes fadeIn {
@@ -155,8 +162,9 @@ h1:hover {
 .highlight {
   background-color: var(--primary);
   font-weight: bold;
-  font-size: 1.2rem; /* Slightly larger highlight size */
   color: var(--bg);
+  padding: 2px 4px;
+  border-radius: 3px;
 }
 
 /* Toast Notification Styles */

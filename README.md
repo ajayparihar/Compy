@@ -1,224 +1,86 @@
-# Compy V1.1
+# Compy - Command and Data Manager
 
-[Compy](https://ajayparihar.github.io/Compy)
-
-## Overview
-
-**Compy** is a simple and efficient web-based tool that helps you manage and quickly access your saved data. Whether it’s commands, credentials, short notes, or any other important information, Compy provides an intuitive interface for easy storage and retrieval.
-
----
+Compy is a web-based tool for managing and quickly accessing saved data like commands, credentials, and notes. It provides an intuitive interface with search, copy-to-clipboard, and theme customization features.
 
 ## Features
 
-1. **Dynamic Data Loading**  
-   Easily load your data from an online CSV file or a local file.
+- **Dynamic Data Loading**: Load data from online or local CSV files
+- **Interactive Search**: Live search with highlighted matches
+- **Clipboard Integration**: One-click copy to clipboard
+- **Password Masking**: Secure sensitive data with `##` markers
+- **Theme Support**: Multiple dark and light themes
+- **Responsive Design**: Works on all screen sizes
 
-2. **Customizable Use Cases**  
-   Use Compy for a variety of purposes:
+## Quick Start
 
-   - Saving commands and code snippets.
-   - Storing personal credentials or notes.
-   - Keeping track of tasks, reference points, and more.
-
-3. **Interactive Search**  
-   Instantly search and filter your data with live updates. Matched search terms are highlighted for quick identification.
-
-4. **Copy to Clipboard**  
-   Simply click on any item to copy it to your clipboard. A toast notification confirms the action.
-
-5. **Automatic Updates**  
-   Reload the page to reset filters and fetch updated data.
-
-6. **Highlight Matches**  
-   Matched search terms are dynamically highlighted to make it easier to find relevant data.
-
-7. **Password Masking** **(New)**  
-   **Password Masking** is a feature that hides sensitive data (like passwords, API keys, etc.) by wrapping it in a special masking keyword (e.g., `##Password##`). This ensures that sensitive information is not displayed directly in the interface.
-
-   **Customizable Masking Keyword**: The keyword used for masking data (such as `##`) is now customizable. You can change this keyword to any symbol or word (e.g., `**`) by updating the code. This flexibility allows you to adapt the tool to your security needs and preferences, making it easier to manage sensitive information.
-
-8. **Theme Support** **(New)**  
-   Compy now supports multiple themes. You can choose from a variety of dark and light themes to customize the look and feel of the application.
-
----
-
-## Customizing the Tool
-
-### Clone the Repository
-
-1. Clone the repository to your local system:
-
+1. **Clone the Repository**
    ```bash
    git clone https://github.com/ajayparihar/Compy.git
-   ```
-
-2. Navigate to the project directory:
-   ```bash
    cd Compy
    ```
 
-### Update the Data Source
+2. **Set Up Your Data**
+   - Place your CSV file in the project directory
+   - Update `user_config.json` with your file path:
+     ```json
+     {
+       "file_settings": {
+         "file_path": "path/to/your/file.csv"
+       }
+     }
+     ```
 
-You can load data from either an online CSV file or a local file.
+3. **Run the Application**
+   - **Option 1**: Use VS Code Live Server
+     - Right-click `index.html` → "Open with Live Server"
+   - **Option 2**: Use the included batch file
+     - Double-click `CompyRunner.bat`
 
-#### Option 1: Using an Online CSV File
+4. **Customize Settings**
+   - Change themes in `user_config.json`:
+     ```json
+     {
+       "user_settings": {
+         "display_theme": "root.d4"
+       }
+     }
+     ```
+   - Available themes: `d1` to `d10` (dark), `l1` to `l11` (light)
 
-1. Open `script.js` in a text editor.
-2. Locate the following line:
-   ```javascript
-   const response = await fetch("https://your-csv-file-link");
-   ```
-3. Replace the URL with the link to your CSV file.
+## CSV Format
 
-#### Option 2: Using a Local CSV File
+Your CSV file should have two columns:
+```
+Command, Description
+ls, List directory contents
+git status, Show the working tree status
+```
 
-1. Place your CSV file in the project directory.
-2. Update the `fetch` call in `script.js` to reference the local file, like this:
-   ```javascript
-   const response = await fetch("./path-to-your-file.csv");
-   ```
+## Password Masking
 
-### Update the Masking Keyword
+Wrap sensitive data with `##` markers:
+```
+##password##, Database password
+```
 
-To customize the password masking keyword (e.g., change `##` to `**`):
+## Keyboard Shortcuts
 
-1. Open `script.js`.
-2. Locate the `config` object:
-   ```javascript
-   const config = {
-     passwordMaskingKeyword: "##", // Change this to '**' or any other keyword
-   };
-   ```
-3. Update `passwordMaskingKeyword` to your preferred keyword, such as `**`.
+- **Type anywhere**: Focus search input
+- **Click header**: Refresh the page
+- **Click item**: Copy to clipboard
 
-### Update the Theme
+## Troubleshooting
 
-To customize the theme:
-
-1. Open `user_config.json`.
-2. Locate the `display_theme` property:
-   ```json
-   "display_theme": "root.d4"
-   ```
-3. Update `display_theme` to your preferred theme. Available themes are listed below.
-
-### Running the Local Server
-
-You can run the local server using either VS Code Live Server or the provided batch file.
-
-#### Method 1: Using VS Code Live Server
-
-1. Open the project directory in VS Code.
-2. Install the Live Server extension if you haven't already.
-   - Go to the Extensions view by clicking the Extensions icon in the Activity Bar on the side of the window or by pressing `Ctrl+Shift+X`.
-   - Search for "Live Server" and install it.
-3. Right-click on `index.html` and select "Open with Live Server".
-4. The application will open in your default browser at `http://localhost:5500`.
-
-#### Method 2: Using the Batch File
-
-1. Open `CompyRunner.bat` in a text editor.
-2. Set the `HTML_DIRECTORY` variable to the path where your HTML files are located. Ensure this path is correct.
-3. Optionally, set the `PORT` variable to your desired port number (default is 8000).
-4. Save the changes and close the text editor.
-5. Double-click `CompyRunner.bat` to start the local server and open the application in your default browser.
-
----
-
-## Available Themes
-
-### Dark Themes
-
-1. **Mystic Forest**: `root.d1`
-2. **Crimson Night**: `root.d2`
-3. **Royal Elegance**: `root.d3`
-4. **Galactic Blue**: `root.d4`
-5. **Twilight Dream**: `root.d5`
-6. **Deep Ocean**: `root.d6`
-7. **Cyber Night**: `root.d7`
-8. **Molten Core**: `root.d8`
-9. **Neon Pulse**: `root.d9`
-10. **Toxic Night**: `root.d10`
-
-### Light Themes
-
-1. **Sunrise**: `root.l1`
-2. **Soft Glow**: `root.l2`
-3. **Floral Breeze**: `root.l3`
-4. **Ocean Breeze**: `root.l4`
-5. **Golden Sands**: `root.l5`
-6. **Mint Grove**: `root.l6`
-7. **Sky Dusk**: `root.l7`
-8. **Autumn Leaves**: `root.l8`
-9. **Citrus Burst**: `root.l9`
-10. **Rose Petal**: `root.l10`
-11. **Lavender Mist**: `root.l11`
-
----
+- **No data showing**: Check your CSV file path in `user_config.json`
+- **Search not working**: Ensure CSV format is correct
+- **Themes not applying**: Verify theme name in `user_config.json`
 
 ## Technologies Used
 
-1. **HTML**  
-   Provides the structure of the application.
+- HTML, CSS, JavaScript
+- SheetJS for CSV parsing
+- Modern Web APIs (Clipboard, Fetch)
 
-2. **CSS**  
-   Styles the interface for a clean and responsive design.
+## License
 
-3. **JavaScript**
-
-   - Fetches data dynamically using the SheetJS library.
-   - Handles search and clipboard functionality.
-
-4. **External Libraries**
-   - **SheetJS**: A library to read and parse spreadsheet data.
-
----
-
-## Styling Details
-
-- **Highlighting**: Search matches are highlighted for easy visibility.
-- **Toast Notification**: Simple feedback for user actions like copying to the clipboard.
-
----
-
-## Supported Browsers
-
-- Modern browsers such as Chrome, Firefox, Edge, and Safari are fully supported.
-
----
-
-Compy makes it easy to save, organize, and retrieve important information quickly. You can test the live version here: [Compy](https://ajayparihar.github.io/Compy).
-
----
-
-In this version (V1.1), the **Password Masking** feature has been introduced, allowing sensitive information to be hidden with a customizable keyword. This improves both security and flexibility, making it easier to manage private data within the application.
-
----
-
-## Data Security Report
-
-### Overview
-
-This report evaluates the security of a local web application running on **VS Code Live Server**, processing local CSV data and ensuring sensitive information is masked.
-
-### Code Security & Data Handling
-
-- **Local Data Fetching**: The app fetches local CSV data, with no external network requests, ensuring no data leakage.
-- **Password Masking**: Sensitive data is masked with a customizable keyword (e.g., `##Password##`), keeping original data secure in memory.
-- **Clipboard Access**: Unmasked data is copied to the clipboard locally, with minimal risk of external access unless the machine is compromised.
-- **XSS Protection**: Data is sourced locally (CSV file), minimizing XSS risk. Inputs should be sanitized for future external sources.
-
-### Live Server Configuration
-
-- **Local Hosting**: Runs locally on `localhost`, ensuring it’s inaccessible externally unless reconfigured.
-- **Port Accessibility**: Live Server binds to local ports, minimizing external exposure.
-
-### Recommendations
-
-1. **Minimize Sensitive Data in DOM**: Use in-memory storage for unmasked data.
-2. **Clipboard Access**: Limit clipboard access for sensitive data to reduce exposure risk.
-3. **Ensure Local Hosting**: Verify **Live Server** is bound to `localhost` only.
-
-### Conclusion
-
-The app is secure for local use. With physical access control and best practices (e.g., limiting exposed data), security remains strong.
+MIT License - Free for personal and commercial use

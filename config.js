@@ -47,16 +47,22 @@ const applyUserName = (userName) => {
 
 // Function to apply theme
 const applyTheme = (theme) => {
-  // Remove the 'root.' part from the theme name if it exists
   const themeClass = theme.startsWith("root.") ? theme.substring(5) : theme;
+  
+  // Save to localStorage
+  localStorage.setItem('theme', themeClass);
 
-  // Remove any existing theme class from <html>
-  document.documentElement.className =
-    document.documentElement.className.replace(
-      /(?:dark|light)-\S+/g,
-      "" // This regex matches the theme classes (e.g., dark-ocean_vibes, light-blue_horizon)
-    );
+  // Remove existing theme classes
+  document.documentElement.className = 
+    document.documentElement.className
+      .split(' ')
+      .filter(cls => !cls.startsWith('d') && !cls.startsWith('l'))
+      .join(' ');
 
   // Add the correct theme class
   document.documentElement.classList.add(themeClass);
 };
+
+// On page load, check for saved theme
+const savedTheme = localStorage.getItem('theme') || 'd4';
+applyTheme(savedTheme);

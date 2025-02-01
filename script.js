@@ -2,8 +2,7 @@
 /* Version: 1.1 */
 /* Date: 09-11-2023 */
 
-const COMMANDS_API_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
+const COMMANDS_API_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
 
 // Configuration for app settings
 const config = {
@@ -18,6 +17,11 @@ const DOM_ELEMENTS = {
   loadingOverlay: document.querySelector(".loading-overlay"),
   toast: document.getElementById("toast"),
 };
+
+// Validate DOM elements
+Object.entries(DOM_ELEMENTS).forEach(([key, element]) => {
+  if (!element) console.error(`Element not found: ${key}`);
+});
 
 // Utility functions
 const showLoading = () => {
@@ -35,21 +39,20 @@ const hideLoading = () => {
 };
 
 const showAlert = (message, type) => {
-  if (DOM_ELEMENTS.toast) {
-    const toast = DOM_ELEMENTS.toast;
-    toast.classList.remove("show", "hide", "success", "error");
-    toast.classList.add(type);
-    toast.textContent = message;
+  const toast = DOM_ELEMENTS.toast;
+  if (!toast) return;
 
-    // Show the toast
-    setTimeout(() => toast.classList.add("show"), 10);
+  toast.classList.remove("show", "hide", "success", "error");
+  toast.classList.add(type);
+  toast.textContent = message;
 
-    // Hide the toast after 2.3 seconds
+  setTimeout(() => {
+    toast.classList.add("show");
     setTimeout(() => {
       toast.classList.remove("show");
       toast.classList.add("hide");
     }, 2300);
-  }
+  }, 10);
 };
 
 // Mask data wrapped in the configured keyword (default: '##')
@@ -58,10 +61,7 @@ const maskSensitiveData = (text) => {
     `${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`,
     "g"
   );
-  return text.replace(
-    regex,
-    `${config.passwordMaskingKeyword}SensitiveData${config.passwordMaskingKeyword}`
-  );
+  return text.replace(regex, `${config.passwordMaskingKeyword}SensitiveData${config.passwordMaskingKeyword}`);
 };
 
 // Data functions
@@ -72,13 +72,9 @@ const fetchData = async (filePath) => {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.text();
-    console.log("Data fetched successfully:", data);
-
     const workbook = XLSX.read(data, { type: "string" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const items = XLSX.utils.sheet_to_json(sheet, {
-      header: ["item", "description"],
-    });
+    const items = XLSX.utils.sheet_to_json(sheet, { header: ["item", "description"] });
 
     renderData(items);
   } catch (error) {
@@ -90,19 +86,16 @@ const fetchData = async (filePath) => {
 };
 
 const renderData = (items) => {
-  DOM_ELEMENTS.dataDiv.innerHTML = "";
-  if (items.length === 0) {
-    DOM_ELEMENTS.dataDiv.innerHTML = "<p>No data available.</p>";
-    return;
-  }
-
+  DOM_ELEMENTS.dataDiv.innerHTML = items.length ? "" : "<p>No data available.</p>";
   const fragment = document.createDocumentFragment();
+
   items.forEach(({ item, description }) => {
     if (item && description) {
       const dataElement = createDataElement(item, description);
       fragment.appendChild(dataElement);
     }
   });
+
   DOM_ELEMENTS.dataDiv.appendChild(fragment);
 };
 
@@ -112,18 +105,14 @@ const createDataElement = (item, description) => {
 
   const maskedItem = maskSensitiveData(item);
   const maskedDescription = maskSensitiveData(description);
-
-  const originalItem = removeMasking(item);
-  const originalDescription = removeMasking(description);
-
   const originalHTML = `<p><strong>${maskedItem}</strong> - ${maskedDescription}</p>`;
+
   dataElement.innerHTML = originalHTML;
-
-  dataElement.dataset.originalItem = originalItem;
-  dataElement.dataset.originalDescription = originalDescription;
+  dataElement.dataset.originalItem = removeMasking(item);
+  dataElement.dataset.originalDescription = removeMasking(description);
   dataElement.dataset.originalHTML = originalHTML;
+  dataElement.onclick = () => copyToClipboard(dataElement.dataset.originalItem);
 
-  dataElement.onclick = () => copyToClipboard(originalItem);
   return dataElement;
 };
 
@@ -138,60 +127,63 @@ const removeMasking = (text) => {
 
 // Copy to clipboard
 const copyToClipboard = (text) => {
-  navigator.clipboard
-    .writeText(text)
+  if (!text) return showAlert("No text to copy", "error");
+  
+  navigator.clipboard.writeText(text)
     .then(() => showAlert("Copied to clipboard!", "success"))
     .catch((error) => {
       console.error("Failed to copy:", error);
-      showAlert("Failed to copy data.", "error");
+      showAlert("Failed to copy data. Please try again.", "error");
     });
 };
 
-// Filter data based on search input
-const filterData = (query) => {
-  const searchValue = query.trim().toLowerCase();
-  const items = document.querySelectorAll(".data-item");
-
-  items.forEach((item) => {
-    const originalItemHTML = item.dataset.originalHTML;
-    const originalItem = item.dataset.originalItem;
-    const originalDescription = item.dataset.originalDescription;
-
-    const matchesSearch =
-      originalItem.toLowerCase().includes(searchValue) ||
-      originalDescription.toLowerCase().includes(searchValue);
-
-    if (matchesSearch) {
-      item.style.display = "block";
-      item.innerHTML = searchValue
-        ? highlightText(originalItemHTML, searchValue)
-        : originalItemHTML;
-    } else {
-      item.style.display = "none";
-    }
-  });
+// Update the highlightText function
+const highlightText = (text, searchValue) => {
+  const regex = new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, (match) => `<span class="highlight">${match}</span>`);
 };
 
-// Highlight text logic (same as before)
-const highlightText = (text, searchValue) => {
-  const regex = new RegExp(`(${searchValue})`, "gi");
-  return text.replace(
-    regex,
-    (match) => `<span class="highlight">${match}</span>`
-  );
+// Update the filterData function
+const filterData = (query) => {
+  showLoading();
+  try {
+    const searchValue = query.trim().toLowerCase();
+    const items = document.querySelectorAll(".data-item");
+
+    items.forEach((item) => {
+      const originalItem = item.dataset.originalItem.toLowerCase();
+      const originalDescription = item.dataset.originalDescription.toLowerCase();
+      const matchesSearch = 
+        originalItem.includes(searchValue) ||
+        originalDescription.includes(searchValue);
+
+      if (matchesSearch) {
+        item.style.display = "block";
+        // Rebuild the HTML with highlights
+        const highlightedItem = highlightText(item.dataset.originalItem, searchValue);
+        const highlightedDescription = highlightText(item.dataset.originalDescription, searchValue);
+        item.innerHTML = `<p><strong>${highlightedItem}</strong> - ${highlightedDescription}</p>`;
+      } else {
+        item.style.display = "none";
+      }
+    });
+  } finally {
+    hideLoading();
+  }
 };
 
 // Event listeners
 const addEventListeners = () => {
-  DOM_ELEMENTS.searchInput.addEventListener("input", (event) =>
-    filterData(event.target.value)
-  );
+  DOM_ELEMENTS.searchInput.addEventListener("input", (event) => {
+    const query = event.target.value;
+    if (query.length > 100) return showAlert("Search query too long", "error");
+    filterData(query);
+  });
+
   DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
 
-  // New event listener to focus on search input when typing
   document.addEventListener("keydown", (event) => {
-    const isCharacterKey = event.key.length === 1;
-    if (isCharacterKey && document.activeElement !== DOM_ELEMENTS.searchInput) {
+    if (event.key.length === 1 && document.activeElement !== DOM_ELEMENTS.searchInput) {
       DOM_ELEMENTS.searchInput.focus();
     }
   });
@@ -199,17 +191,14 @@ const addEventListeners = () => {
 
 // Initialization function
 const initializeApp = async () => {
-  await fetch("user_config.json")
-    .then((response) => response.json())
-    .then((config) => {
-      const filePath = config.file_settings?.file_path || COMMANDS_API_URL;
-      fetchData(filePath);
-    })
-    .catch((error) => {
-      console.error("Error loading user configuration:", error);
-      // Load default file path if user configuration fails
-      fetchData(COMMANDS_API_URL);
-    });
+  try {
+    const config = await fetch("user_config.json").then(response => response.json());
+    const filePath = config.file_settings?.file_path || COMMANDS_API_URL;
+    await fetchData(filePath);
+  } catch (error) {
+    console.error("Error loading user configuration:", error);
+    await fetchData(COMMANDS_API_URL);
+  }
   addEventListeners();
 };
 
