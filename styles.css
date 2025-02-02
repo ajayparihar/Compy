@@ -130,15 +130,16 @@ body.loading > *:not(.loading-overlay) {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(var(--card-bg-rgb), 0.9);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 9999;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
 }
 
 .spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  border: 4px solid rgba(var(--primary-rgb), 0.2);
   border-top: 4px solid var(--primary);
   border-radius: 50%;
   width: 40px;
@@ -180,46 +181,21 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
+  gap: 1rem;
 }
 
-h1 {
-  font-size: var(--font-size-h1);
-  font-weight: 700;
-  color: var(--primary);
-  margin: 0;
-  padding: 0;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  position: relative;
-  display: inline-block;
-  cursor: default;
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
 }
 
-h1::before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 3px;
-  background-color: var(--primary);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
-}
-
-h1:hover::before {
-  width: 100%;
-}
-
-/* Search Container */
 .search-container {
+  width: 50%;
+  max-width: 600px;
   position: relative;
-  width: 50%; /* Initial width */
-  max-width: 600px; /* Adjust max-width as needed */
-  margin: 0 auto;
-  transition: width 0.3s ease; /* Smooth width transition */
 }
 
 /* Main Content Area */
@@ -759,9 +735,9 @@ main {
   right: 0.5rem;
   opacity: 0; /* Hidden by default */
   transition: opacity 0.3s ease;
-  color: var(--primary); /* Use theme color */
+  color: var(--primary);
   cursor: pointer;
-  background-color: transparent; /* Remove background */
+  background-color: transparent;
   padding: 0.25rem;
   border-radius: 50%;
   width: 1.5rem;
@@ -769,16 +745,104 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.data-item .copy-icon svg {
-  width: 1rem;
-  height: 1rem;
-  fill: currentColor; /* Inherit color from parent */
+  pointer-events: none; /* Prevent interference with click event */
 }
 
 .data-item:hover .copy-icon {
   opacity: 1; /* Show on hover */
+  pointer-events: auto; /* Enable interaction when visible */
+}
+
+/* Ripple Effect */
+.data-item.copied::after {
+  content: '';
+  position: absolute;
+  top: var(--mouse-y);
+  left: var(--mouse-x);
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.2) 10%, transparent 10.01%);
+  transform: translate(-50%, -50%);
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+@keyframes ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 200%;
+    height: 200%;
+    opacity: 0;
+  }
+}
+
+/* Header Controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-selector {
+  position: relative;
+}
+
+#themeSelect {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#themeSelect:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+}
+
+#themeSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+  padding: 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+
+h1::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+h1:hover::before {
+  width: 100%;
 }
 
 /* Clear Icon */
@@ -817,21 +881,4 @@ main {
 /* Hover effect for clear icon */
 .clear-icon:hover {
   color: var(--text); /* Change to text color on hover */
-}
-
-/* Add a pulse effect to the data item */
-.data-item.copied {
-  animation: pulseEffect 0.5s ease;
-}
-
-@keyframes pulseEffect {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
 }

@@ -14,6 +14,7 @@
   --input-focus: #304545;
   --input-border: #00a676;
   --input-hover-border: #008b5e;
+  --primary-rgb: 0, 166, 118;
 }
 
 /* Dark theme with Deep Red (Crimson Night) */
@@ -34,6 +35,7 @@
   --error-bg: rgba(244, 67, 54, 0.9);
   --error-text: #fff;
   --error-border: #F44336;
+  --primary-rgb: 215, 38, 56;
 }
 
 /* Dark theme with Gold (Royal Elegance) */
@@ -48,6 +50,7 @@
   --input-focus: #45342d;
   --input-border: #c19a6b;
   --input-hover-border: #a87d50;
+  --primary-rgb: 193, 154, 107;
 }
 
 /* Dark theme with Royal Blue (Galactic Blue) */
@@ -68,6 +71,7 @@
   --error-bg: rgba(198, 40, 40, 0.9);
   --error-text: #fff;
   --error-border: #C62828;
+  --primary-rgb: 27, 152, 224;
 }
 
 /* Dark theme with Purple (Twilight Dream) */
@@ -82,6 +86,7 @@
   --input-focus: #4b2470;
   --input-border: #9b5de5;
   --input-hover-border: #7a48b5;
+  --primary-rgb: 155, 93, 229;
 }
 
 /* Dark theme with Teal (Deep Ocean) */
@@ -96,6 +101,7 @@
   --input-focus: #3b5259;
   --input-border: #00838f;
   --input-hover-border: #006978;
+  --primary-rgb: 0, 131, 143;
 }
 
 /* Dark theme with Cyan (Cyber Night) */
@@ -110,6 +116,7 @@
   --input-focus: #233644;
   --input-border: #00bcd4;
   --input-hover-border: #008ba3;
+  --primary-rgb: 0, 188, 212;
 }
 
 /* Dark theme with Orange (Molten Core) */
@@ -124,6 +131,7 @@
   --input-focus: #444444;
   --input-border: #ff9800;
   --input-hover-border: #e68900;
+  --primary-rgb: 255, 87, 34;
 }
 
 /* Dark theme with Magenta (Neon Pulse) */
@@ -138,6 +146,7 @@
   --input-focus: #520052;
   --input-border: #e100ff;
   --input-hover-border: #b800cc;
+  --primary-rgb: 255, 0, 255;
 }
 
 /* Dark theme with Lime (Toxic Night) */
@@ -152,6 +161,7 @@
   --input-focus: #2b442b;
   --input-border: #76ff03;
   --input-hover-border: #64dd03;
+  --primary-rgb: 76, 175, 80;
 }
 
 /* Light theme with Coral (Sunrise) */
@@ -166,6 +176,7 @@
   --input-focus: #ffe5d5;
   --input-border: #ff7043;
   --input-hover-border: #e65b37;
+  --primary-rgb: 255, 193, 7;
 }
 
 /* Light theme with Peach (Soft Glow) */
@@ -180,6 +191,7 @@
   --input-focus: #ffdfcc;
   --input-border: #ffab91;
   --input-hover-border: #e69a83;
+  --primary-rgb: 255, 152, 0;
 }
 
 /* Light theme with Lavender (Floral Breeze) */
@@ -194,6 +206,7 @@
   --input-focus: #e6d5f3;
   --input-border: #ba68c8;
   --input-hover-border: #9c4dac;
+  --primary-rgb: 156, 39, 176;
 }
 
 /* Light theme with Ocean Breeze */
@@ -208,6 +221,7 @@
   --input-focus: #80deea;
   --input-border: #00897b;
   --input-hover-border: #00796b;
+  --primary-rgb: 0, 137, 123;
 }
 
 /* Light theme with Golden Sands */
@@ -222,6 +236,7 @@
   --input-focus: #ffec7a;
   --input-border: #ffcc00;
   --input-hover-border: #ffb300;
+  --primary-rgb: 255, 204, 0;
 }
 
 /* Light theme with Mint Grove */
@@ -236,6 +251,7 @@
   --input-focus: #a5d6a7;
   --input-border: #66bb6a;
   --input-hover-border: #388e3c;
+  --primary-rgb: 102, 187, 106;
 }
 
 /* Light theme with Sky Dusk */
@@ -250,6 +266,7 @@
   --input-focus: #90caf9;
   --input-border: #1976d2;
   --input-hover-border: #1565c0;
+  --primary-rgb: 25, 118, 210;
 }
 
 /* Light theme with Autumn Leaves */
@@ -264,6 +281,7 @@
   --input-focus: #ffcc80;
   --input-border: #ff7043;
   --input-hover-border: #f4511e;
+  --primary-rgb: 255, 112, 67;
 }
 
 /* Light theme with Citrus Burst */
@@ -278,6 +296,7 @@
   --input-focus: #fff176;
   --input-border: #ffeb3b;
   --input-hover-border: #fbc02d;
+  --primary-rgb: 255, 235, 59;
 }
 
 /* Light theme with Rose Petal */
@@ -292,6 +311,7 @@
   --input-focus: #e1bee7;
   --input-border: #f06292;
   --input-hover-border: #d81b60;
+  --primary-rgb: 240, 98, 146;
 }
 
 /* Light theme with Lavender Mist */
@@ -306,4 +326,5 @@
   --input-focus: #d1c4e9;
   --input-border: #ab47bc;
   --input-hover-border: #8e24aa;
+  --primary-rgb: 171, 71, 188;
 }

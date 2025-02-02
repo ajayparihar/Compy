@@ -71,23 +71,22 @@ const maskSensitiveData = (text) => {
 };
 
 // Data functions
-const fetchData = async (filePath) => {
+const fetchDataWithTimeout = async (url, timeout = 10000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
   try {
-    showLoading();
-    const response = await fetch(filePath);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
 
-    const data = await response.text();
-    const workbook = XLSX.read(data, { type: "string" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const items = XLSX.utils.sheet_to_json(sheet, { header: ["item", "description"] });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    renderData(items);
+    return await response.text();
   } catch (error) {
-    console.error("Error fetching data:", error);
-    DOM_ELEMENTS.dataDiv.innerHTML = `<p class="error-message">Failed to load data. Error: ${error.message}</p>`;
-  } finally {
-    hideLoading();
+    clearTimeout(timeoutId);
+    throw error;
   }
 };
 
@@ -109,7 +108,11 @@ const createDataElement = (item, description) => {
   const dataElement = document.createElement("div");
   dataElement.classList.add("data-item");
   
-  // Add a container for better layout control
+  // Add click handler to the entire item
+  dataElement.addEventListener('click', (event) => {
+    copyToClipboard(item, dataElement, event);
+  });
+
   const contentWrapper = document.createElement("div");
   contentWrapper.classList.add("data-item-content");
   
@@ -117,7 +120,7 @@ const createDataElement = (item, description) => {
   const maskedDescription = maskSensitiveData(description);
   contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong> - ${maskedDescription}</p>`;
   
-  // Add copy icon (SVG from Material Icons)
+  // Add copy icon
   const copyIcon = document.createElement("div");
   copyIcon.classList.add("copy-icon");
   copyIcon.innerHTML = `
@@ -125,7 +128,6 @@ const createDataElement = (item, description) => {
       <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
     </svg>
   `;
-  copyIcon.onclick = () => copyToClipboard(item, dataElement);
   
   dataElement.appendChild(contentWrapper);
   dataElement.appendChild(copyIcon);
@@ -146,21 +148,31 @@ const removeMasking = (text) => {
 };
 
 // Copy to clipboard
-const copyToClipboard = (text, element) => {
+const copyToClipboard = (text, element, event) => {
   if (!text) return;
+
+  // Get click position relative to the element
+  const rect = element.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  // Set CSS variables for ripple origin
+  element.style.setProperty('--mouse-x', `${x}px`);
+  element.style.setProperty('--mouse-y', `${y}px`);
 
   const cleanedText = removeMasking(text);
   navigator.clipboard.writeText(cleanedText)
     .then(() => {
-      // Add the copied class to the item
+      // Add the copied class to trigger the ripple animation
       element.classList.add("copied");
       // Remove the class after the animation ends
       setTimeout(() => {
         element.classList.remove("copied");
-      }, 500); // Match the animation duration
+      }, 600);
     })
     .catch((error) => {
       console.error("Failed to copy:", error);
+      showAlert("Failed to copy to clipboard. Please try again.", "error");
     });
 };
 
@@ -195,7 +207,8 @@ const filterData = (query) => {
     if (!searchValue) {
       document.querySelectorAll(".data-item").forEach(item => {
         item.style.display = "block";
-        item.innerHTML = item.dataset.originalHTML;
+        // Restore original content while preserving event listeners
+        item.querySelector('.data-item-content').innerHTML = item.dataset.originalHTML;
       });
       return;
     }
@@ -210,10 +223,13 @@ const filterData = (query) => {
 
       if (matchesSearch) {
         item.style.display = "block";
-        // Rebuild the HTML with highlights and masking
-        const highlightedItem = highlightText(item.dataset.originalItem, searchValue);
-        const highlightedDescription = highlightText(item.dataset.originalDescription, searchValue);
-        item.innerHTML = `<p><strong class="command-text">${highlightedItem}</strong> - ${highlightedDescription}</p>`;
+        // Update only the content, not the entire item
+        const content = item.querySelector('.data-item-content');
+        if (content) {
+          const highlightedItem = highlightText(item.dataset.originalItem, searchValue);
+          const highlightedDescription = highlightText(item.dataset.originalDescription, searchValue);
+          content.innerHTML = `<p><strong class="command-text">${highlightedItem}</strong> - ${highlightedDescription}</p>`;
+        }
       } else {
         item.style.display = "none";
       }
@@ -223,78 +239,267 @@ const filterData = (query) => {
   }
 };
 
-// Update the event listener
+// Add event listeners
 const addEventListeners = () => {
-  DOM_ELEMENTS.searchInput.addEventListener("input", (event) => {
-    const query = event.target.value;
-    
-    // Clear search if input is empty
-    if (!query.trim()) {
-      filterData('');
-      return;
-    }
-    
-    if (query.length > 100) {
-      showAlert("Search query too long", "error");
-      return;
-    }
-    
-    filterData(query);
-  });
+  const searchInput = document.getElementById("searchInput");
+  const clearSearch = document.getElementById("clearSearch");
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      filterData(e.target.value);
+      if (clearSearch) {
+        clearSearch.style.display = e.target.value ? "block" : "none";
+      }
+    });
+  }
+
+  if (clearSearch) {
+    clearSearch.addEventListener("click", () => {
+      if (searchInput) {
+        searchInput.value = "";
+        filterData("");
+        clearSearch.style.display = "none";
+      }
+    });
+  }
+
+  DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
 
   // Add keydown listener for initial focus
   document.addEventListener("keydown", (event) => {
     // Only focus if it's a printable character and not already focused
     if (event.key.length === 1 && 
         !['Control', 'Shift', 'Alt', 'Meta'].includes(event.key) &&
-        document.activeElement !== DOM_ELEMENTS.searchInput) {
+        document.activeElement !== DOM_ELEMENTS.searchInput &&
+        !event.target.isContentEditable) {
       DOM_ELEMENTS.searchInput.focus();
     }
   });
+};
 
-  DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
+// Theme names mapped from themes.css comments
+const THEME_NAMES = {
+  d1: "Mystic Forest (Dark)",
+  d2: "Crimson Night (Dark)",
+  d3: "Royal Elegance (Dark)",
+  d4: "Galactic Blue (Dark)",
+  d5: "Twilight Dream (Dark)",
+  d6: "Deep Ocean (Dark)",
+  d7: "Cyber Night (Dark)",
+  d8: "Molten Core (Dark)",
+  d9: "Neon Pulse (Dark)",
+  d10: "Toxic Night (Dark)",
+  l1: "Sunrise (Light)",
+  l2: "Soft Glow (Light)",
+  l3: "Floral Breeze (Light)",
+  l4: "Ocean Breeze (Light)",
+  l5: "Golden Sands (Light)",
+  l6: "Mint Grove (Light)",
+  l7: "Sky Dusk (Light)",
+  l8: "Autumn Leaves (Light)",
+  l9: "Citrus Burst (Light)",
+  l10: "Rose Petal (Light)",
+  l11: "Lavender Mist (Light)"
+};
 
-  // Add event listener for clear search button
-  const clearSearch = document.getElementById("clearSearch");
-  if (clearSearch) {
-    clearSearch.addEventListener("click", () => {
-      DOM_ELEMENTS.searchInput.value = ""; // Clear the input
-      filterData(""); // Reset the filtered data
-      DOM_ELEMENTS.searchInput.focus(); // Keep focus on the input
+// Helper functions for cookies
+const setCookie = (name, value, days = 365) => {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+};
+
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+};
+
+// Save data to a local file
+const saveToFile = async (data, fileName) => {
+  try {
+    // Request permission to save the file
+    const handle = await window.showSaveFilePicker({
+      suggestedName: fileName,
+      types: [{
+        description: 'Text Files',
+        accept: {'text/plain': ['.txt']},
+      }],
     });
-  }
 
-  const searchInput = DOM_ELEMENTS.searchInput;
-  const clearSearchButton = document.getElementById("clearSearch");
+    // Create a writable stream
+    const writable = await handle.createWritable();
+    await writable.write(data);
+    await writable.close();
 
-  // Initialize cross icon visibility based on search bar's initial state
-  if (searchInput && clearSearchButton) {
-    if (searchInput.value.trim() === "") {
-      clearSearchButton.style.display = "none";
-    } else {
-      clearSearchButton.style.display = "block";
-    }
-
-    // Update cross icon visibility on input
-    searchInput.addEventListener("input", () => {
-      if (searchInput.value.trim() === "") {
-        clearSearchButton.style.display = "none";
-      } else {
-        clearSearchButton.style.display = "block";
-      }
-    });
+    console.log('File saved successfully');
+  } catch (error) {
+    console.error('Error saving file:', error);
   }
 };
 
-// Initialization function
+// Example usage
+const saveThemeToFile = async (theme) => {
+  const data = JSON.stringify({ theme }, null, 2);
+  await saveToFile(data, 'theme_config.txt');
+};
+
+// Update theme
+const updateTheme = async (theme) => {
+  try {
+    // Save theme to localStorage
+    localStorage.setItem('theme', theme);
+    // Apply the theme
+    applyTheme(theme);
+
+    // Update theme in user_config.json
+    const response = await fetch("user_config.json");
+    const config = await response.json();
+    config.user_settings.theme = theme;
+
+    // Save updated config
+    await fetch("user_config.json", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(config),
+    });
+  } catch (error) {
+    console.error("Error updating theme:", error);
+    showAlert("Failed to update theme. Please try again.", "error");
+  }
+};
+
+// Initialize theme selector
+const initThemeSelector = (initialTheme) => {
+  const themeSelect = document.getElementById("themeSelect");
+  if (!themeSelect) return;
+
+  // Add theme options
+  Object.entries(THEME_NAMES).forEach(([value, name]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    // Remove (Dark) and (Light) from the name but keep the theme code
+    option.textContent = `${name.replace(/ \(Dark\)| \(Light\)/g, '')} (${value})`;
+    themeSelect.appendChild(option);
+  });
+
+  // Set current theme from localStorage or config
+  const savedTheme = localStorage.getItem('theme') || initialTheme;
+  themeSelect.value = savedTheme;
+
+  // Handle theme change
+  themeSelect.addEventListener("change", (e) => {
+    const selectedTheme = e.target.value;
+    if (selectedTheme) {
+      // Save the selected theme to localStorage
+      localStorage.setItem('theme', selectedTheme);
+      // Apply the theme immediately
+      applyTheme(selectedTheme);
+    }
+  });
+};
+
+// Apply theme
+const applyTheme = (theme) => {
+  // Remove existing theme classes
+  document.documentElement.className = 
+    document.documentElement.className
+      .split(' ')
+      .filter(cls => !cls.startsWith('d') && !cls.startsWith('l'))
+      .join(' ');
+
+  // Add the correct theme class
+  document.documentElement.classList.add(theme);
+
+  // Update spinner colors
+  const spinner = document.querySelector('.spinner');
+  if (spinner) {
+    spinner.style.borderColor = `rgba(var(--primary-rgb), 0.2)`;
+    spinner.style.borderTopColor = `var(--primary)`;
+  }
+};
+
+// Function to apply user name
+const applyUserName = (userName) => {
+  const pageTitle = document.getElementById("pageTitle");
+  if (pageTitle) {
+    pageTitle.textContent = userName ? `${userName}'s COMPY` : "COMPY";
+  }
+};
+
+// Process the fetched data
+const processData = (data) => {
+  try {
+    const workbook = XLSX.read(data, { type: "string" });
+    if (!workbook.SheetNames.length) {
+      throw new Error("No sheets found in the file");
+    }
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const items = XLSX.utils.sheet_to_json(sheet, { header: ["item", "description"] });
+    if (!items.length) {
+      throw new Error("No data found in the sheet");
+    }
+    renderData(items);
+  } catch (error) {
+    console.error("Error processing data:", error);
+    showAlert("Failed to process the data file. Please check the file format.", "error");
+    throw error;
+  }
+};
+
+// Check for theme changes in config
+const checkForThemeChanges = async () => {
+  try {
+    const response = await fetch("user_config.json");
+    const config = await response.json();
+    const currentTheme = config.user_settings?.theme;
+
+    // Get the current applied theme
+    const appliedTheme = document.documentElement.classList.value.match(/d\d+|l\d+/)?.[0];
+
+    // If the theme has changed, apply the new theme
+    if (currentTheme && currentTheme !== appliedTheme) {
+      applyTheme(currentTheme);
+      const themeSelect = document.getElementById("themeSelect");
+      if (themeSelect) {
+        themeSelect.value = currentTheme;
+      }
+    }
+  } catch (error) {
+    console.error("Error checking for theme changes:", error);
+  }
+};
+
+// Add to initialization
 const initializeApp = async () => {
   try {
+    showLoading();
+
     const config = await fetch("user_config.json").then(response => response.json());
-    const filePath = config.file_settings?.file_path || COMMANDS_API_URL;
-    await fetchData(filePath);
+    const filePath = config.file_settings?.file_path;
+    
+    if (!filePath) {
+      throw new Error("No file path specified in config");
+    }
+
+    // Apply theme from localStorage or config
+    const savedTheme = localStorage.getItem('theme') || config.user_settings?.theme || 'd4';
+    applyTheme(savedTheme);
+    initThemeSelector(savedTheme); // Initialize with saved theme
+
+    applyUserName(config.user_settings?.user_name || "");
+
+    const data = await fetchDataWithTimeout(filePath);
+    processData(data);
+
+    setInterval(checkForThemeChanges, 5000);
   } catch (error) {
-    console.error("Error loading user configuration:", error);
-    await fetchData(COMMANDS_API_URL);
+    console.error("Error loading data:", error);
+    showAlert("An unexpected error occurred. Please try again.", "error");
+  } finally {
+    hideLoading();
   }
   addEventListeners();
 };
