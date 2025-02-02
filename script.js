@@ -42,16 +42,22 @@ const showAlert = (message, type) => {
   const toast = DOM_ELEMENTS.toast;
   if (!toast) return;
 
+  // Remove existing classes
   toast.classList.remove("show", "hide", "success", "error");
+
+  // Add the appropriate class based on the type
   toast.classList.add(type);
+
+  // Set the message
   toast.textContent = message;
 
+  // Show the toast
   setTimeout(() => {
     toast.classList.add("show");
     setTimeout(() => {
       toast.classList.remove("show");
       toast.classList.add("hide");
-    }, 2300);
+    }, 2300); // Hide after 2.3 seconds
   }, 10);
 };
 
@@ -102,17 +108,31 @@ const renderData = (items) => {
 const createDataElement = (item, description) => {
   const dataElement = document.createElement("div");
   dataElement.classList.add("data-item");
-
+  
+  // Add a container for better layout control
+  const contentWrapper = document.createElement("div");
+  contentWrapper.classList.add("data-item-content");
+  
   const maskedItem = maskSensitiveData(item);
   const maskedDescription = maskSensitiveData(description);
-  const originalHTML = `<p><strong class="command-text">${maskedItem}</strong> - ${maskedDescription}</p>`;
-
-  dataElement.innerHTML = originalHTML;
-  dataElement.dataset.originalItem = item; // Store original unmasked item
-  dataElement.dataset.originalDescription = description; // Store original unmasked description
-  dataElement.dataset.originalHTML = originalHTML;
-  dataElement.onclick = () => copyToClipboard(dataElement.dataset.originalItem);
-
+  contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong> - ${maskedDescription}</p>`;
+  
+  // Add copy icon (SVG from Material Icons)
+  const copyIcon = document.createElement("div");
+  copyIcon.classList.add("copy-icon");
+  copyIcon.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+      <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
+    </svg>
+  `;
+  copyIcon.onclick = () => copyToClipboard(item, dataElement);
+  
+  dataElement.appendChild(contentWrapper);
+  dataElement.appendChild(copyIcon);
+  dataElement.dataset.originalItem = item;
+  dataElement.dataset.originalDescription = description;
+  dataElement.dataset.originalHTML = contentWrapper.innerHTML;
+  
   return dataElement;
 };
 
@@ -126,14 +146,21 @@ const removeMasking = (text) => {
 };
 
 // Copy to clipboard
-const copyToClipboard = (text) => {
-  if (!text) return showAlert("No text to copy", "error");
-  
-  navigator.clipboard.writeText(text)
-    .then(() => showAlert("Copied to clipboard!", "success"))
+const copyToClipboard = (text, element) => {
+  if (!text) return;
+
+  const cleanedText = removeMasking(text);
+  navigator.clipboard.writeText(cleanedText)
+    .then(() => {
+      // Add the copied class to the item
+      element.classList.add("copied");
+      // Remove the class after the animation ends
+      setTimeout(() => {
+        element.classList.remove("copied");
+      }, 500); // Match the animation duration
+    })
     .catch((error) => {
       console.error("Failed to copy:", error);
-      showAlert("Failed to copy data. Please try again.", "error");
     });
 };
 
@@ -196,7 +223,7 @@ const filterData = (query) => {
   }
 };
 
-// Event listeners
+// Update the event listener
 const addEventListeners = () => {
   DOM_ELEMENTS.searchInput.addEventListener("input", (event) => {
     const query = event.target.value;
@@ -215,13 +242,48 @@ const addEventListeners = () => {
     filterData(query);
   });
 
-  DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
-
+  // Add keydown listener for initial focus
   document.addEventListener("keydown", (event) => {
-    if (event.key.length === 1 && document.activeElement !== DOM_ELEMENTS.searchInput) {
+    // Only focus if it's a printable character and not already focused
+    if (event.key.length === 1 && 
+        !['Control', 'Shift', 'Alt', 'Meta'].includes(event.key) &&
+        document.activeElement !== DOM_ELEMENTS.searchInput) {
       DOM_ELEMENTS.searchInput.focus();
     }
   });
+
+  DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
+
+  // Add event listener for clear search button
+  const clearSearch = document.getElementById("clearSearch");
+  if (clearSearch) {
+    clearSearch.addEventListener("click", () => {
+      DOM_ELEMENTS.searchInput.value = ""; // Clear the input
+      filterData(""); // Reset the filtered data
+      DOM_ELEMENTS.searchInput.focus(); // Keep focus on the input
+    });
+  }
+
+  const searchInput = DOM_ELEMENTS.searchInput;
+  const clearSearchButton = document.getElementById("clearSearch");
+
+  // Initialize cross icon visibility based on search bar's initial state
+  if (searchInput && clearSearchButton) {
+    if (searchInput.value.trim() === "") {
+      clearSearchButton.style.display = "none";
+    } else {
+      clearSearchButton.style.display = "block";
+    }
+
+    // Update cross icon visibility on input
+    searchInput.addEventListener("input", () => {
+      if (searchInput.value.trim() === "") {
+        clearSearchButton.style.display = "none";
+      } else {
+        clearSearchButton.style.display = "block";
+      }
+    });
+  }
 };
 
 // Initialization function

@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compy - Command Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Compy</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
@@ -17,24 +17,31 @@
 </head>
 
 <body>
-    <header>
-        <h1 id="pageTitle">COMPY</h1>
-    </header>
+    <div class="header-section">
+        <header>
+            <h1 id="pageTitle">COMPY</h1>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Type to search..." aria-label="Search commands">
+                <div id="clearSearch" class="clear-icon" aria-label="Clear search" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                        <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                    </svg>
+                </div>
+            </div>
+        </header>
+    </div>
 
     <main>
-        <div class="container">
-            <input type="text" id="searchInput" placeholder="Search commands..." aria-label="Search commands">
-            <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
-        </div>
+        <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
     </main>
 
-    <div class="toast" id="toast" role="alert" aria-hidden="true">Copied to clipboard!</div>
+    <div class="toast" id="toast" role="alert" aria-hidden="true"></div>
     <div class="loading-overlay">
         <div class="spinner"></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
     <script src="config.js"></script>
 </body>
 

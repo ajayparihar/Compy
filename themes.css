@@ -28,6 +28,12 @@
   --input-focus: #502d2d;
   --input-border: #d72638;
   --input-hover-border: #a61e2a;
+  --success-bg: rgba(76, 175, 80, 0.9);
+  --success-text: #fff;
+  --success-border: #4CAF50;
+  --error-bg: rgba(244, 67, 54, 0.9);
+  --error-text: #fff;
+  --error-border: #F44336;
 }
 
 /* Dark theme with Gold (Royal Elegance) */
@@ -56,6 +62,12 @@
   --input-focus: #2a3e56;
   --input-border: #1b98e0;
   --input-hover-border: #1478b0;
+  --success-bg: rgba(46, 125, 50, 0.9);
+  --success-text: #fff;
+  --success-border: #2E7D32;
+  --error-bg: rgba(198, 40, 40, 0.9);
+  --error-text: #fff;
+  --error-border: #C62828;
 }
 
 /* Dark theme with Purple (Twilight Dream) */
