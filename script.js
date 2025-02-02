@@ -90,18 +90,20 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
   }
 };
 
-const renderData = (items) => {
-  DOM_ELEMENTS.dataDiv.innerHTML = items.length ? "" : "<p>No data available.</p>";
-  const fragment = document.createDocumentFragment();
+const displayData = (data) => {
+  const dataDiv = DOM_ELEMENTS.dataDiv;
+  if (!dataDiv) return;
 
-  items.forEach(({ item, description }) => {
-    if (item && description) {
-      const dataElement = createDataElement(item, description);
-      fragment.appendChild(dataElement);
+  // Clear existing content
+  dataDiv.innerHTML = '';
+
+  // Create and append new data items
+  data.forEach(item => {
+    if (item && item.command) {
+      const dataElement = createDataElement(item.command, item.description);
+      dataDiv.appendChild(dataElement);
     }
   });
-
-  DOM_ELEMENTS.dataDiv.appendChild(fragment);
 };
 
 const createDataElement = (item, description) => {
@@ -117,7 +119,7 @@ const createDataElement = (item, description) => {
   contentWrapper.classList.add("data-item-content");
   
   const maskedItem = maskSensitiveData(item);
-  const maskedDescription = maskSensitiveData(description);
+  const maskedDescription = description === "undefined" ? "undefined" : maskSensitiveData(description);
   contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong> - ${maskedDescription}</p>`;
   
   // Add copy icon
@@ -433,19 +435,26 @@ const applyUserName = (userName) => {
 const processData = (data) => {
   try {
     const workbook = XLSX.read(data, { type: "string" });
-    if (!workbook.SheetNames.length) {
-      throw new Error("No sheets found in the file");
-    }
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const items = XLSX.utils.sheet_to_json(sheet, { header: ["item", "description"] });
-    if (!items.length) {
-      throw new Error("No data found in the sheet");
-    }
-    renderData(items);
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    const processedData = json.map(row => {
+      // Skip empty rows
+      if (!row || row.length === 0) return null;
+      
+      // Handle single column data
+      if (row.length === 1) {
+        return { command: row[0], description: "undefined" };
+      }
+      return { command: row[0], description: row[1] || "undefined" };
+    }).filter(item => item !== null); // Remove null entries
+
+    // Store and display the data
+    allData = processedData;
+    displayData(processedData);
   } catch (error) {
     console.error("Error processing data:", error);
-    showAlert("Failed to process the data file. Please check the file format.", "error");
-    throw error;
+    showAlert("Error processing data. Please check the file format.", "error");
   }
 };
 

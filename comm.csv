@@ -1,7 +1,7 @@
 Command,Description
 ls -al,List files and directories in the current directory with detailed information.
 cd /path/to/directory,Change the current directory to the specified path.
-pwd,Print the current working directory.
+pwd
 mkdir new_folder,Create a new directory named 'new_folder'.
 rmdir old_folder,Remove an empty directory named 'old_folder'.
 cp file1.txt file2.txt,Copy the contents of 'file1.txt' to 'file2.txt'.
