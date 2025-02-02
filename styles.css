@@ -15,15 +15,15 @@
   --text: #f0f0f0; /* Primary text color */
   --primary: #4a90e2; /* Primary accent color */
   --error: #ff4d4d; /* Error/alert color */
-  
+
   /* Card Styling */
   --card-bg: #1e1e1e; /* Card background */
   --card-hover: #333; /* Card hover state */
-  
+
   /* Input Styling */
   --input-bg: #2a2a2a; /* Input background */
   --input-focus: #3a3a3a; /* Input focus state */
-  
+
   /* Spacing and Sizing */
   --spacing: 1.5rem; /* Base spacing unit */
   --font-base: 1rem; /* Base font size */
@@ -374,10 +374,10 @@ main {
     white-space: nowrap;
     position: relative;
     padding-bottom: 0.25rem;
-    
+
     /* Animated underline */
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       left: 0;
       bottom: 0;
@@ -387,7 +387,7 @@ main {
       transform: scaleX(0);
       transition: transform 0.3s ease;
     }
-    
+
     /* Hover effect */
     &:hover::after {
       transform: scaleX(1);
@@ -487,10 +487,15 @@ main {
 
   /* Main Content Area */
   main {
-    margin-top: calc(var(--header-height) + var(--search-height) + (2 * var(--gap-base)));
+    margin-top: calc(
+      var(--header-height) + var(--search-height) + (2 * var(--gap-base))
+    );
     padding: var(--content-padding);
     width: 100%;
-    height: calc(100vh - var(--header-height) - var(--search-height) - (2 * var(--gap-base)));
+    height: calc(
+      100vh - var(--header-height) - var(--search-height) -
+        (2 * var(--gap-base))
+    );
   }
 
   /* Data Container */
@@ -603,7 +608,7 @@ main {
     main {
       padding-bottom: calc(8px + env(safe-area-inset-bottom));
     }
-    
+
     .header-section {
       padding-top: env(safe-area-inset-top);
       height: calc(60px + env(safe-area-inset-top));
@@ -668,7 +673,7 @@ body {
 #searchInput:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
-              0 0 10px rgba(var(--primary-rgb), 0.2);
+    0 0 10px rgba(var(--primary-rgb), 0.2);
 }
 
 /* Add click feedback */
@@ -856,7 +861,7 @@ main {
 #searchInput:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
-              0 0 10px rgba(var(--primary-rgb), 0.2);
+    0 0 10px rgba(var(--primary-rgb), 0.2);
 }
 
 /* Custom Scrollbar */
@@ -912,13 +917,17 @@ main {
 
 /* Ripple Effect */
 .data-item.copied::after {
-  content: '';
+  content: "";
   position: absolute;
   top: var(--mouse-y);
   left: var(--mouse-x);
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.2) 10%, transparent 10.01%);
+  background: radial-gradient(
+    circle,
+    rgba(var(--primary-rgb), 0.2) 10%,
+    transparent 10.01%
+  );
   transform: translate(-50%, -50%);
   animation: ripple 0.6s ease-out;
   pointer-events: none;

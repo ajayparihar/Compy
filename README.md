@@ -3,13 +3,16 @@
 ![COMPY Logo](favicon_io/apple-touch-icon.png)
 
 ## Overview
+
 COMPY is a secure, cross-platform tool for managing and quickly accessing various types of text-based data, including:
+
 - Command-line commands
 - Personal credentials
 - Frequently used phrases
 - Sentence templates
 
 ## Key Features
+
 - **Secure Storage**: Password masking for sensitive data
 - **Instant Search**: Real-time search across all entries
 - **Multi-Purpose**: Manage commands, credentials, and templates
@@ -18,6 +21,7 @@ COMPY is a secure, cross-platform tool for managing and quickly accessing variou
 - **Responsive**: Optimized for desktop and mobile
 
 ## Quick Start
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/compy.git
@@ -33,18 +37,22 @@ COMPY is a secure, cross-platform tool for managing and quickly accessing variou
    ```
 
 ## Data Types
+
 - **Technical Commands**: Store and access command-line operations
 - **Sensitive Information**: Securely manage login credentials and API keys
 - **Common Phrases**: Save frequently used text snippets
 - **Message Templates**: Maintain reusable email and document templates
 
 ## How to Use
+
 1. **Add Data**:
+
    - Open your data CSV file
    - Add entries in the format: `Entry,Description`
    - Wrap sensitive data with `##` (e.g., `##password##`)
 
 2. **Search & Access**:
+
    - Launch COMPY in your browser
    - Use the search bar to find entries
    - Click any item to copy it to your clipboard
@@ -54,7 +62,9 @@ COMPY is a secure, cross-platform tool for managing and quickly accessing variou
    - Modify settings in `user_config.json`
 
 ## Configuration
+
 Edit `user_config.json` to customize:
+
 ```json
 {
   "file_settings": {
@@ -68,19 +78,46 @@ Edit `user_config.json` to customize:
 ```
 
 ## Themes
+
 Choose from 10 dark and 11 light themes, including:
+
 - Galactic Blue (d4)
 - Sunrise (l1)
 - Cyber Night (d7)
 - Lavender Mist (l11)
 
 ## Contributing
+
 We welcome contributions! Please follow our [contribution guidelines](CONTRIBUTING.md).
 
 ## License
+
 MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
 **Version**: 1.1.1  
-**Maintainer**: Bheb Developer 
+**Maintainer**: Bheb Developer
+
+## Updating the Application
+
+To update the application while preserving your configuration files, run the following command:
+
+```bash
+git clone --no-checkout https://github.com/your-repo/compy.git tmp-app && \
+cd tmp-app && \
+git sparse-checkout init --cone && \
+git sparse-checkout set index.html script.js styles.css favicon.ico && \
+mv index.html script.js styles.css favicon.ico ../ && \
+cd .. && \
+rm -rf tmp-app
+```
+
+This command will:
+
+1. Clone the repository without checking out files
+2. Set up a sparse checkout for only the files we want to update
+3. Move the updated files to your application directory
+4. Clean up the temporary clone
+
+Your `user_config.json`, `CompyRunner.bat`, and `README.md` files will remain unchanged.

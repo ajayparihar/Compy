@@ -1,6 +1,6 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const PORT = 3000;
@@ -9,18 +9,18 @@ const PORT = 3000;
 app.use(express.json());
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Endpoint to update theme
-app.put('/user_config.json', (req, res) => {
+app.put("/user_config.json", (req, res) => {
   const { theme } = req.body;
 
   // Read the current config
-  const configPath = path.join(__dirname, 'user_config.json');
-  fs.readFile(configPath, 'utf8', (err, data) => {
+  const configPath = path.join(__dirname, "user_config.json");
+  fs.readFile(configPath, "utf8", (err, data) => {
     if (err) {
-      console.error('Error reading config file:', err);
-      return res.status(500).send('Error reading config file');
+      console.error("Error reading config file:", err);
+      return res.status(500).send("Error reading config file");
     }
 
     // Update the theme in the config
@@ -30,11 +30,11 @@ app.put('/user_config.json', (req, res) => {
     // Write the updated config back to the file
     fs.writeFile(configPath, JSON.stringify(config, null, 2), (err) => {
       if (err) {
-        console.error('Error writing config file:', err);
-        return res.status(500).send('Error writing config file');
+        console.error("Error writing config file:", err);
+        return res.status(500).send("Error writing config file");
       }
 
-      res.send('Theme updated successfully');
+      res.send("Theme updated successfully");
     });
   });
 });
@@ -42,4 +42,4 @@ app.put('/user_config.json', (req, res) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
-}); 
+});
