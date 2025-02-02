@@ -107,8 +107,8 @@ To update the application while preserving your configuration files, run the fol
 git clone --no-checkout https://github.com/your-repo/compy.git tmp-app && \
 cd tmp-app && \
 git sparse-checkout init --cone && \
-git sparse-checkout set index.html script.js styles.css favicon.ico && \
-mv index.html script.js styles.css favicon.ico ../ && \
+git sparse-checkout set index.html script.js styles.css favicon.ico themes.css config.js && \
+mv index.html script.js styles.css favicon.ico themes.css config.js ../ && \
 cd .. && \
 rm -rf tmp-app
 ```
