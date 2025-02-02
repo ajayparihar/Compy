@@ -180,24 +180,51 @@ const copyToClipboard = (text, element, event) => {
     });
 };
 
-// Update the highlightText function
-const highlightText = (text, searchValue) => {
-  // Don't highlight if search is empty
-  if (!searchValue.trim()) return maskSensitiveData(text);
+// Improved highlight function that excludes sensitive data
+const highlightText = (text, searchTerm) => {
+  if (!searchTerm) return text;
   
-  // Escape special characters and handle multiple spaces
-  const escapedSearch = searchValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*');
-  const regex = new RegExp(`(${escapedSearch})`, 'gi');
-  
-  // Mask sensitive data first, then highlight
+  // Mask sensitive data first
   const maskedText = maskSensitiveData(text);
-  return maskedText.replace(regex, (match) => {
-    // Preserve existing strong tags
-    if (match.startsWith('<strong') && match.endsWith('</strong>')) {
-      return match.replace(/(<strong[^>]*>)(.*?)(<\/strong>)/, 
-        `$1<span class="highlight">$2</span>$3`);
+  
+  // Create regex pattern for highlighting
+  const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  
+  // Split text into parts, only highlight non-sensitive parts
+  return maskedText.split(/(\[SENSITIVE\])/).map(part => {
+    // Don't highlight the [SENSITIVE] placeholder
+    if (part === '[SENSITIVE]') {
+      return part;
     }
-    return `<span class="highlight">${match}</span>`;
+    // Highlight matches in non-sensitive parts
+    return part.replace(regex, '<span class="highlight">$1</span>');
+  }).join('');
+};
+
+// Update search function
+const performSearch = () => {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  const dataItems = document.querySelectorAll('.data-item');
+  
+  dataItems.forEach(item => {
+    const command = item.dataset.command.toLowerCase();
+    const description = item.dataset.description.toLowerCase();
+    
+    // Highlight matches in non-sensitive data
+    const commandHTML = highlightText(item.dataset.command, searchTerm);
+    const descriptionHTML = highlightText(item.dataset.description, searchTerm);
+    
+    // Update content
+    item.querySelector('strong').innerHTML = commandHTML;
+    item.querySelector('p').innerHTML = descriptionHTML;
+    
+    // Show/hide based on match (excluding sensitive data)
+    const visibleText = `${command} ${description}`.replace(/\[SENSITIVE\]/g, '');
+    if (visibleText.includes(searchTerm)) {
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
   });
 };
 

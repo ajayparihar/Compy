@@ -257,11 +257,66 @@ main {
   margin-bottom: calc(var(--gap-base) * 0.5);
 }
 
+/* Improved Highlight Styles */
 .highlight {
-  background-color: rgba(var(--primary-rgb), 0.2);
+  background-color: rgba(var(--primary-rgb), 0.3);
   padding: 0.1em 0.2em;
   border-radius: 0.25em;
-  font-weight: 500;
+  font-weight: normal;
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.highlight:hover {
+  background-color: rgba(var(--primary-rgb), 0.4);
+  transform: scale(1.02);
+}
+
+/* For dark themes */
+:root.d1 .highlight,
+:root.d2 .highlight,
+:root.d3 .highlight,
+:root.d4 .highlight,
+:root.d5 .highlight,
+:root.d6 .highlight,
+:root.d7 .highlight,
+:root.d8 .highlight,
+:root.d9 .highlight,
+:root.d10 .highlight {
+  background-color: rgba(var(--primary-rgb), 0.3);
+  color: var(--text);
+}
+
+/* For light themes */
+:root.l1 .highlight,
+:root.l2 .highlight,
+:root.l3 .highlight,
+:root.l4 .highlight,
+:root.l5 .highlight,
+:root.l6 .highlight,
+:root.l7 .highlight,
+:root.l8 .highlight,
+:root.l9 .highlight,
+:root.l10 .highlight,
+:root.l11 .highlight {
+  background-color: rgba(var(--primary-rgb), 0.2);
+  color: var(--text);
+}
+
+/* Sensitive data styling */
+.sensitive {
+  color: var(--error);
+  font-style: italic;
+  cursor: not-allowed;
+  user-select: none;
+}
+
+/* Ensure sensitive data isn't highlighted */
+.sensitive .highlight {
+  background-color: transparent !important;
+  color: inherit !important;
+  font-weight: normal !important;
 }
 
 /* Responsive Adjustments */
