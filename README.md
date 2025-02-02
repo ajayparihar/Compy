@@ -1,6 +1,6 @@
 # COMPY - Secure Data Manager
 
-![COMPY Logo](favicon_io/apple-touch-icon.png)
+![COMPY Logo](favicon_io/favicon.ico)
 
 ## Overview
 
@@ -97,7 +97,6 @@ MIT License - See [LICENSE](LICENSE) for details.
 ---
 
 **Version**: 1.1.1  
-**Maintainer**: Bheb Developer
 
 ## Updating the Application
 
