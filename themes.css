@@ -1,77 +1,65 @@
 /* Author: Ajay Singh */
-/* Version: 1.1 */
+/* Version: 1.1.1 */
 /* Date: 09-11-2023 */
 
-/* Dark theme with Emerald Green (Mystic Forest) */
+/* Improved Dark theme with Emerald Green (Mystic Forest) */
 :root.d1 {
-  --bg: #161b1d;
-  --text: #e3f5f4; /* Slightly brighter for better visibility */
-  --primary: #00a676;
+  --bg: #0d1a13;
+  --text: #e0f0e8;
+  --primary: #00c853;
   --error: #ff5252;
-  --card-bg: #1e2426;
-  --card-hover: #2b3335;
-  --input-bg: #253031;
-  --input-focus: #304545;
-  --input-border: #00a676;
-  --input-hover-border: #008b5e;
-  --primary-rgb: 0, 166, 118;
+  --card-bg: #1a2a21;
+  --card-hover: #2a3d32;
+  --input-bg: #22352b;
+  --input-focus: #334d40;
+  --input-border: #00c853;
+  --input-hover-border: #009624;
+  --primary-rgb: 0, 200, 83;
 }
 
-/* Dark theme with Deep Red (Crimson Night) */
+/* Improved Dark theme with Deep Red (Crimson Night) */
 :root.d2 {
-  --bg: #1a0d0d;
-  --text: #f8e1e1;
-  --primary: #d72638;
-  --error: #ff1744;
-  --card-bg: #2e1a1a;
-  --card-hover: #442626;
+  --bg: #1a0a0a;
+  --text: #ffe6e6;
+  --primary: #ff1744;
+  --error: #ff6e40;
+  --card-bg: #2a1414;
+  --card-hover: #3d1e1e;
   --input-bg: #3a2020;
-  --input-focus: #502d2d;
-  --input-border: #d72638;
-  --input-hover-border: #a61e2a;
-  --success-bg: rgba(76, 175, 80, 0.9);
-  --success-text: #fff;
-  --success-border: #4CAF50;
-  --error-bg: rgba(244, 67, 54, 0.9);
-  --error-text: #fff;
-  --error-border: #F44336;
-  --primary-rgb: 215, 38, 56;
+  --input-focus: #4d2a2a;
+  --input-border: #ff1744;
+  --input-hover-border: #d50000;
+  --primary-rgb: 255, 23, 68;
 }
 
-/* Dark theme with Gold (Royal Elegance) */
+/* Improved Dark theme with Gold (Royal Elegance) */
 :root.d3 {
-  --bg: #14110f;
-  --text: #f7e6c4;
-  --primary: #c19a6b;
-  --error: #ff3d00;
-  --card-bg: #1f1a17;
-  --card-hover: #332822;
-  --input-bg: #2c211d;
-  --input-focus: #45342d;
-  --input-border: #c19a6b;
-  --input-hover-border: #a87d50;
-  --primary-rgb: 193, 154, 107;
+  --bg: #1a140d;
+  --text: #f8f2e6;
+  --primary: #ffc107;
+  --error: #ff5252;
+  --card-bg: #2a2217;
+  --card-hover: #3d3222;
+  --input-bg: #3a2e1d;
+  --input-focus: #4d3e28;
+  --input-border: #ffc107;
+  --input-hover-border: #ffa000;
+  --primary-rgb: 255, 193, 7;
 }
 
-/* Dark theme with Royal Blue (Galactic Blue) */
+/* Improved Dark theme with Royal Blue (Galactic Blue) */
 :root.d4 {
-  --bg: #0d1b2a;
-  --text: #e0e8f0;
-  --primary: #1b98e0;
-  --error: #d32f2f;
-  --card-bg: #142736;
-  --card-hover: #1c3c56;
-  --input-bg: #1c2733;
-  --input-focus: #2a3e56;
-  --input-border: #1b98e0;
-  --input-hover-border: #1478b0;
-  --success-bg: rgba(46, 125, 50, 0.9);
-  --success-text: #fff;
-  --success-border: #2E7D32;
-  --error-bg: rgba(198, 40, 40, 0.9);
-  --error-text: #fff;
-  --error-border: #C62828;
-  --primary-rgb: 27, 152, 224;
+  --bg: #0a1420;
+  --text: #e6f0ff;
+  --primary: #2979ff;
+  --error: #ff5252;
+  --card-bg: #1a2536;
+  --card-hover: #2a3a4d;
+  --input-bg: #2a3a4d;
+  --input-focus: #3d4f66;
+  --input-border: #2979ff;
+  --input-hover-border: #2962ff;
+  --primary-rgb: 41, 121, 255;
 }
 
 /* Dark theme with Purple (Twilight Dream) */
@@ -164,19 +152,19 @@
   --primary-rgb: 76, 175, 80;
 }
 
-/* Light theme with Coral (Sunrise) */
+/* Improved Light theme with Coral (Sunrise) */
 :root.l1 {
-  --bg: #fff7f1;
-  --text: #3d1b12; /* Darker for better readability */
-  --primary: #ff7043;
+  --bg: #fff5f0;
+  --text: #3e2723;
+  --primary: #ff6f61;
   --error: #d32f2f;
-  --card-bg: #ffeee0;
-  --card-hover: #ffd5b5;
-  --input-bg: #fff3e6;
-  --input-focus: #ffe5d5;
-  --input-border: #ff7043;
-  --input-hover-border: #e65b37;
-  --primary-rgb: 255, 193, 7;
+  --card-bg: #ffe5dd;
+  --card-hover: #ffd5c5;
+  --input-bg: #fff0e8;
+  --input-focus: #ffe0d0;
+  --input-border: #ff6f61;
+  --input-hover-border: #ff3b2f;
+  --primary-rgb: 255, 111, 97;
 }
 
 /* Light theme with Peach (Soft Glow) */
@@ -194,19 +182,19 @@
   --primary-rgb: 255, 152, 0;
 }
 
-/* Light theme with Lavender (Floral Breeze) */
+/* Improved Light theme with Lavender (Floral Breeze) */
 :root.l3 {
-  --bg: #f8f0ff;
+  --bg: #f8f4ff;
   --text: #2b1b3d;
-  --primary: #ba68c8;
+  --primary: #9575cd;
   --error: #d32f2f;
-  --card-bg: #f3e5f5;
-  --card-hover: #e1bee7;
-  --input-bg: #f8e6ff;
-  --input-focus: #e6d5f3;
-  --input-border: #ba68c8;
-  --input-hover-border: #9c4dac;
-  --primary-rgb: 156, 39, 176;
+  --card-bg: #ede7f6;
+  --card-hover: #d1c4e9;
+  --input-bg: #f3e5f5;
+  --input-focus: #e1bee7;
+  --input-border: #9575cd;
+  --input-hover-border: #7e57c2;
+  --primary-rgb: 149, 117, 205;
 }
 
 /* Light theme with Ocean Breeze */
@@ -239,19 +227,19 @@
   --primary-rgb: 255, 204, 0;
 }
 
-/* Light theme with Mint Grove */
+/* Improved Light theme with Mint Grove */
 :root.l6 {
-  --bg: #e8f5e9;
+  --bg: #f0f9f0;
   --text: #1b5e20;
-  --primary: #66bb6a;
-  --error: #e53935;
-  --card-bg: #a5d6a7;
-  --card-hover: #81c784;
-  --input-bg: #c8e6c9;
-  --input-focus: #a5d6a7;
-  --input-border: #66bb6a;
+  --primary: #4caf50;
+  --error: #d32f2f;
+  --card-bg: #dcedc8;
+  --card-hover: #c5e1a5;
+  --input-bg: #e8f5e9;
+  --input-focus: #c8e6c9;
+  --input-border: #4caf50;
   --input-hover-border: #388e3c;
-  --primary-rgb: 102, 187, 106;
+  --primary-rgb: 76, 175, 80;
 }
 
 /* Light theme with Sky Dusk */
