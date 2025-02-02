@@ -1,7 +1,8 @@
 /* Author: Ajay Singh */
-/* Version: 1.1 */
+/* Version: 1.1.1 */
 /* Date: 09-11-2023 */
 
+// Configuration constants
 const COMMANDS_API_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
 
 // Configuration for app settings
@@ -9,13 +10,14 @@ const config = {
   passwordMaskingKeyword: "##", // Centralized password masking keyword (can be changed to '**' or any other)
 };
 
-// DOM Elements
+// DOM Elements cache
 const DOM_ELEMENTS = {
   dataDiv: document.getElementById("data"),
   searchInput: document.getElementById("searchInput"),
   title: document.getElementById("pageTitle"),
   loadingOverlay: document.querySelector(".loading-overlay"),
   toast: document.getElementById("toast"),
+  clearSearch: document.getElementById("clearSearch"),
 };
 
 // Validate DOM elements
@@ -241,41 +243,36 @@ const filterData = (query) => {
   }
 };
 
-// Add event listeners
+// Clean up and optimize event listeners
 const addEventListeners = () => {
-  const searchInput = document.getElementById("searchInput");
-  const clearSearch = document.getElementById("clearSearch");
-
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      filterData(e.target.value);
-      if (clearSearch) {
-        clearSearch.style.display = e.target.value ? "block" : "none";
-      }
-    });
-  }
-
-  if (clearSearch) {
-    clearSearch.addEventListener("click", () => {
-      if (searchInput) {
-        searchInput.value = "";
-        filterData("");
-        clearSearch.style.display = "none";
-      }
-    });
-  }
-
-  DOM_ELEMENTS.title.addEventListener("click", () => location.reload(true));
-
-  // Add keydown listener for initial focus
+  // Auto-focus on search when typing
   document.addEventListener("keydown", (event) => {
-    // Only focus if it's a printable character and not already focused
     if (event.key.length === 1 && 
         !['Control', 'Shift', 'Alt', 'Meta'].includes(event.key) &&
-        document.activeElement !== DOM_ELEMENTS.searchInput &&
-        !event.target.isContentEditable) {
+        document.activeElement !== DOM_ELEMENTS.searchInput) {
       DOM_ELEMENTS.searchInput.focus();
     }
+  });
+
+  // Search input handling
+  DOM_ELEMENTS.searchInput?.addEventListener('input', (e) => {
+    const searchValue = e.target.value;
+    filterData(searchValue);
+    DOM_ELEMENTS.clearSearch.style.display = searchValue ? "block" : "none";
+  });
+
+  // Clear search handling
+  DOM_ELEMENTS.clearSearch?.addEventListener('click', () => {
+    DOM_ELEMENTS.searchInput.value = "";
+    filterData("");
+    DOM_ELEMENTS.clearSearch.style.display = "none";
+    DOM_ELEMENTS.searchInput.focus();
+  });
+
+  // Refresh functionality
+  DOM_ELEMENTS.title.addEventListener("click", () => {
+    window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
+    window.location.reload(true);
   });
 };
 

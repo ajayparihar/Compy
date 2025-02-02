@@ -1,32 +1,39 @@
 /* Author: Ajay Singh */
-/* Version: 1.1 */
+/* Version: 1.1.1 */
 /* Date: 09-11-2023 */
 
 /* Import Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Itim&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
-/* Theme Colors */
+/* ==================== */
+/* Global Configuration */
+/* ==================== */
 :root {
-  --bg: #121212;
-  --text: #f0f0f0;
-  --primary: #4a90e2;
-  --error: #ff4d4d;
-  --card-bg: #1e1e1e;
-  --card-hover: #333;
-  --input-bg: #2a2a2a;
-  --input-focus: #3a3a3a;
-  --input-border: #4a90e2;
-  --input-hover-border: #357ab8;
-  --spacing: 1.5rem;
-  --font-base: 1rem;
+  /* Color Scheme */
+  --bg: #121212; /* Background color */
+  --text: #f0f0f0; /* Primary text color */
+  --primary: #4a90e2; /* Primary accent color */
+  --error: #ff4d4d; /* Error/alert color */
+  
+  /* Card Styling */
+  --card-bg: #1e1e1e; /* Card background */
+  --card-hover: #333; /* Card hover state */
+  
+  /* Input Styling */
+  --input-bg: #2a2a2a; /* Input background */
+  --input-focus: #3a3a3a; /* Input focus state */
+  
+  /* Spacing and Sizing */
+  --spacing: 1.5rem; /* Base spacing unit */
+  --font-base: 1rem; /* Base font size */
   --font-header: 2.5rem;
   --font-command: 1.1rem;
-  --border-radius: 15px;
+  --border-radius: 8px; /* Default border radius */
   --max-width: 100%;
   --transition-duration: 0.3s;
   --transition-ease: ease;
-  --header-height: 80px;
+  --header-height: 60px; /* Fixed header height */
   --search-height: 60px;
   --content-padding: 2rem;
   --max-content-width: 1400px;
@@ -163,7 +170,7 @@ body.loading > *:not(.loading-overlay) {
   top: 0;
   left: 0;
   width: 100%;
-  height: var(--header-height);
+  height: 60px;
   z-index: 100;
   background-color: var(--card-bg);
   display: flex;
@@ -171,7 +178,7 @@ body.loading > *:not(.loading-overlay) {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0 var(--content-padding);
+  padding: 0.5rem 1rem;
   backdrop-filter: blur(8px);
 }
 
@@ -251,12 +258,10 @@ main {
 }
 
 .highlight {
-  background-color: var(--primary);
-  font-weight: bold;
-  color: var(--bg);
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-size: inherit;
+  background-color: rgba(var(--primary-rgb), 0.2);
+  padding: 0.1em 0.2em;
+  border-radius: 0.25em;
+  font-weight: 500;
 }
 
 /* Responsive Adjustments */
@@ -299,43 +304,52 @@ main {
 }
 
 @media (max-width: 768px) {
+  /* Header Section */
   .header-section {
-    height: auto;
-    padding: 1rem;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    height: var(--header-height);
   }
 
-  header {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
+  /* Main Heading */
   h1 {
-    text-align: center;
-    order: 0;
-    margin: 0;
-    font-size: 1.6rem;
-    padding: 0.5rem 0;
+    font-size: 1.5rem;
+    white-space: nowrap;
+    position: relative;
+    padding-bottom: 0.25rem;
+    
+    /* Animated underline */
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background-color: var(--primary);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    
+    /* Hover effect */
+    &:hover::after {
+      transform: scaleX(1);
+    }
   }
 
-  .header-controls {
-    flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-  }
-
+  /* Search Container */
   .search-container {
-    width: 100%;
-    order: 1;
+    flex: 1;
+    max-width: 400px;
+    margin: 0 0.5rem;
   }
 
+  /* Search Input */
   #searchInput {
-    padding: 0.8rem 1rem;
-    font-size: 1rem;
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    font-size: 0.9rem;
   }
 
   .theme-selector {
@@ -448,6 +462,19 @@ main {
 }
 
 @media (max-width: 480px) {
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  .search-container {
+    margin: 0 0.25rem;
+  }
+
+  #searchInput {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
   /* Mobile header */
   .header-section {
     position: fixed;
@@ -455,7 +482,7 @@ main {
     left: 0;
     right: 0;
     height: 60px;
-    padding: 0 16px;
+    padding: 0.25rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -491,15 +518,6 @@ main {
     position: relative;
     max-width: 80%; /* Increased width */
     margin: 0 auto; /* Center the search bar */
-  }
-
-  #searchInput {
-    width: 100%;
-    padding: 10px 16px;
-    font-size: 1rem;
-    border-radius: 8px;
-    background-color: var(--input-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* Mobile clear icon */
@@ -578,9 +596,9 @@ body {
 /* Improve search input visibility */
 #searchInput {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem; /* Add left padding for the cross icon */
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   background-color: var(--card-bg);
   color: var(--text);
   font-size: 1rem;
@@ -593,9 +611,9 @@ body {
 }
 
 #searchInput:focus {
-  width: 100%; /* Expand to full width */
-  box-shadow: 0 0 0 3px var(--primary), /* Use theme's primary color */
-    0 0 20px var(--primary); /* Use theme's primary color */
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
+              0 0 10px rgba(var(--primary-rgb), 0.2);
 }
 
 /* Add click feedback */
@@ -705,7 +723,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: var(--header-height);
+  height: 60px;
   z-index: 100;
   background-color: var(--card-bg);
   display: flex;
@@ -713,7 +731,7 @@ body {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0 var(--content-padding);
+  padding: 0.5rem 1rem;
   backdrop-filter: blur(8px);
 }
 
@@ -766,9 +784,9 @@ main {
 /* Optimized Search Input */
 #searchInput {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem; /* Add left padding for the cross icon */
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   background-color: var(--card-bg);
   color: var(--text);
   font-size: 1rem;
@@ -781,9 +799,9 @@ main {
 }
 
 #searchInput:focus {
-  width: 100%; /* Expand to full width */
-  box-shadow: 0 0 0 3px var(--primary), /* Use theme's primary color */
-    0 0 20px var(--primary); /* Use theme's primary color */
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
+              0 0 10px rgba(var(--primary-rgb), 0.2);
 }
 
 /* Custom Scrollbar */
@@ -931,39 +949,30 @@ h1:hover::before {
 /* Clear Icon */
 .clear-icon {
   position: absolute;
-  left: 0.75rem; /* Position to the left */
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0; /* Hidden by default */
-  transition: opacity 0.3s ease, color 0.3s ease;
   cursor: pointer;
-  color: var(--primary); /* Start with primary color */
+  color: var(--text);
   background-color: transparent;
-  border: none;
-  padding: 0.25rem;
-  border-radius: 50%;
+  padding: 0;
   width: 1.5rem;
   height: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-}
+  transition: color 0.2s ease;
 
-.clear-icon svg {
-  width: 1rem;
-  height: 1rem;
-  fill: currentColor;
+  /* Hover State */
+  &:hover {
+    color: var(--text);
+  }
 }
 
 /* Show clear icon when search input is focused or has value */
 #searchInput:focus ~ .clear-icon,
 #searchInput:not(:placeholder-shown) ~ .clear-icon {
   opacity: 1;
-}
-
-/* Hover effect for clear icon */
-.clear-icon:hover {
-  color: var(--text); /* Change to text color on hover */
 }
 
 /* Keep PC styles intact */

@@ -1,9 +1,16 @@
 /* Author: Ajay Singh */
-/* Version: 1.1 */
+/* Version: 1.1.1 */
 /* Date: 09-11-2023 */
 
 const DEFAULT_FILE_PATH =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
+
+// Theme configuration and management
+const THEME_NAMES = {
+  d1: "Mystic Forest (Dark)",
+  d2: "Crimson Night (Dark)",
+  // ... other themes ...
+};
 
 // Fetch user configuration
 fetch("user_config.json")
@@ -45,24 +52,18 @@ const applyUserName = (userName) => {
   }
 };
 
-// Function to apply theme
+// Theme application logic
 const applyTheme = (theme) => {
-  const themeClass = theme.startsWith("root.") ? theme.substring(5) : theme;
-  
-  // Save to localStorage
-  localStorage.setItem('theme', themeClass);
-
   // Remove existing theme classes
-  document.documentElement.className = 
-    document.documentElement.className
-      .split(' ')
-      .filter(cls => !cls.startsWith('d') && !cls.startsWith('l'))
-      .join(' ');
+  document.documentElement.className = document.documentElement.className
+    .split(" ")
+    .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
+    .join(" ");
 
-  // Add the correct theme class
-  document.documentElement.classList.add(themeClass);
+  // Add new theme class
+  document.documentElement.classList.add(theme);
 };
 
 // On page load, check for saved theme
-const savedTheme = localStorage.getItem('theme') || 'd4';
+const savedTheme = localStorage.getItem("theme") || "d4";
 applyTheme(savedTheme);

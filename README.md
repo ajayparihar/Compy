@@ -1,86 +1,86 @@
-# Compy - Command and Data Manager
+# COMPY - Secure Data Manager
 
-Compy is a web-based tool for managing and quickly accessing saved data like commands, credentials, and notes. It provides an intuitive interface with search, copy-to-clipboard, and theme customization features.
+![COMPY Logo](favicon_io/apple-touch-icon.png)
 
-## Features
+## Overview
+COMPY is a secure, cross-platform tool for managing and quickly accessing various types of text-based data, including:
+- Command-line commands
+- Personal credentials
+- Frequently used phrases
+- Sentence templates
 
-- **Dynamic Data Loading**: Load data from online or local CSV files
-- **Interactive Search**: Live search with highlighted matches
+## Key Features
+- **Secure Storage**: Password masking for sensitive data
+- **Instant Search**: Real-time search across all entries
+- **Multi-Purpose**: Manage commands, credentials, and templates
 - **Clipboard Integration**: One-click copy to clipboard
-- **Password Masking**: Secure sensitive data with `##` markers
-- **Theme Support**: Multiple dark and light themes
-- **Responsive Design**: Works on all screen sizes
+- **Customizable**: Multiple light and dark themes
+- **Responsive**: Optimized for desktop and mobile
 
 ## Quick Start
-
-1. **Clone the Repository**
+1. Clone the repository:
    ```bash
-   git clone https://github.com/ajayparihar/Compy.git
-   cd Compy
+   git clone https://github.com/yourusername/compy.git
+   cd compy
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the application:
+   ```bash
+   npm start
    ```
 
-2. **Set Up Your Data**
-   - Place your CSV file in the project directory
-   - Update `user_config.json` with your file path:
-     ```json
-     {
-       "file_settings": {
-         "file_path": "path/to/your/file.csv"
-       }
-     }
-     ```
+## Data Types
+- **Technical Commands**: Store and access command-line operations
+- **Sensitive Information**: Securely manage login credentials and API keys
+- **Common Phrases**: Save frequently used text snippets
+- **Message Templates**: Maintain reusable email and document templates
 
-3. **Run the Application**
-   - **Option 1**: Use VS Code Live Server
-     - Right-click `index.html` → "Open with Live Server"
-   - **Option 2**: Use the included batch file
-     - Double-click `CompyRunner.bat`
+## How to Use
+1. **Add Data**:
+   - Open your data CSV file
+   - Add entries in the format: `Entry,Description`
+   - Wrap sensitive data with `##` (e.g., `##password##`)
 
-4. **Customize Settings**
-   - Change themes in `user_config.json`:
-     ```json
-     {
-       "user_settings": {
-         "display_theme": "root.d4"
-       }
-     }
-     ```
-   - Available themes: `d1` to `d10` (dark), `l1` to `l11` (light)
+2. **Search & Access**:
+   - Launch COMPY in your browser
+   - Use the search bar to find entries
+   - Click any item to copy it to your clipboard
 
-## CSV Format
+3. **Customize**:
+   - Change themes via the theme selector
+   - Modify settings in `user_config.json`
 
-Your CSV file should have two columns:
-```
-Command, Description
-ls, List directory contents
-git status, Show the working tree status
+## Configuration
+Edit `user_config.json` to customize:
+```json
+{
+  "file_settings": {
+    "file_path": "data.csv"
+  },
+  "user_settings": {
+    "user_name": "",
+    "theme": "d4"
+  }
+}
 ```
 
-## Password Masking
+## Themes
+Choose from 10 dark and 11 light themes, including:
+- Galactic Blue (d4)
+- Sunrise (l1)
+- Cyber Night (d7)
+- Lavender Mist (l11)
 
-Wrap sensitive data with `##` markers:
-```
-##password##, Database password
-```
-
-## Keyboard Shortcuts
-
-- **Type anywhere**: Focus search input
-- **Click header**: Refresh the page
-- **Click item**: Copy to clipboard
-
-## Troubleshooting
-
-- **No data showing**: Check your CSV file path in `user_config.json`
-- **Search not working**: Ensure CSV format is correct
-- **Themes not applying**: Verify theme name in `user_config.json`
-
-## Technologies Used
-
-- HTML, CSS, JavaScript
-- SheetJS for CSV parsing
-- Modern Web APIs (Clipboard, Fetch)
+## Contributing
+We welcome contributions! Please follow our [contribution guidelines](CONTRIBUTING.md).
 
 ## License
+MIT License - See [LICENSE](LICENSE) for details.
 
-MIT License - Free for personal and commercial use
+---
+
+**Version**: 1.1.1  
+**Maintainer**: Bheb Developer 
