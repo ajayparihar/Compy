@@ -5,12 +5,13 @@
 /* Improved Dark theme with Emerald Green (Mystic Forest) */
 :root.d1 {
   --bg: #0d1a13;
-  --text: #e0f0e8;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #00c853;
   --error: #ff5252;
-  --card-bg: #1a2a21;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #2a3d32;
-  --input-bg: #22352b;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #334d40;
   --input-border: #00c853;
   --input-hover-border: #009624;
@@ -20,12 +21,13 @@
 /* Improved Dark theme with Deep Red (Crimson Night) */
 :root.d2 {
   --bg: #1a0a0a;
-  --text: #ffe6e6;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #ff1744;
   --error: #ff6e40;
-  --card-bg: #2a1414;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #3d1e1e;
-  --input-bg: #3a2020;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #4d2a2a;
   --input-border: #ff1744;
   --input-hover-border: #d50000;
@@ -35,12 +37,13 @@
 /* Improved Dark theme with Gold (Royal Elegance) */
 :root.d3 {
   --bg: #1a140d;
-  --text: #f8f2e6;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #ffc107;
   --error: #ff5252;
-  --card-bg: #2a2217;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #3d3222;
-  --input-bg: #3a2e1d;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #4d3e28;
   --input-border: #ffc107;
   --input-hover-border: #ffa000;
@@ -50,12 +53,13 @@
 /* Improved Dark theme with Royal Blue (Galactic Blue) */
 :root.d4 {
   --bg: #0a1420;
-  --text: #e6f0ff;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #2979ff;
   --error: #ff5252;
-  --card-bg: #1a2536;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #2a3a4d;
-  --input-bg: #2a3a4d;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #3d4f66;
   --input-border: #2979ff;
   --input-hover-border: #2962ff;
@@ -65,12 +69,13 @@
 /* Dark theme with Purple (Twilight Dream) */
 :root.d5 {
   --bg: #1b1030;
-  --text: #e6d5ff;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #9b5de5;
   --error: #ff1744;
-  --card-bg: #281543;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #3a1f5d;
-  --input-bg: #321a4d;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #4b2470;
   --input-border: #9b5de5;
   --input-hover-border: #7a48b5;
@@ -80,12 +85,13 @@
 /* Dark theme with Teal (Deep Ocean) */
 :root.d6 {
   --bg: #102027;
-  --text: #e0f7fa;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #00838f;
   --error: #d32f2f;
-  --card-bg: #1b2a30;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #264048;
-  --input-bg: #2a3c42;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #3b5259;
   --input-border: #00838f;
   --input-hover-border: #006978;
@@ -95,12 +101,13 @@
 /* Dark theme with Cyan (Cyber Night) */
 :root.d7 {
   --bg: #0a0f14;
-  --text: #cdd6e0;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #00bcd4;
   --error: #ff5252;
-  --card-bg: #121a22;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #1b2a33;
-  --input-bg: #182530;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #233644;
   --input-border: #00bcd4;
   --input-hover-border: #008ba3;
@@ -110,12 +117,13 @@
 /* Dark theme with Orange (Molten Core) */
 :root.d8 {
   --bg: #1b1b1b;
-  --text: #f6e6d6;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #ff9800;
   --error: #ff3d00;
-  --card-bg: #2a2a2a;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #3b3b3b;
-  --input-bg: #333333;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #444444;
   --input-border: #ff9800;
   --input-hover-border: #e68900;
@@ -125,12 +133,13 @@
 /* Dark theme with Magenta (Neon Pulse) */
 :root.d9 {
   --bg: #1a001a;
-  --text: #f2e6ff;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #e100ff;
   --error: #ff1744;
-  --card-bg: #2d002d;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #440044;
-  --input-bg: #3a003a;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #520052;
   --input-border: #e100ff;
   --input-hover-border: #b800cc;
@@ -140,12 +149,13 @@
 /* Dark theme with Lime (Toxic Night) */
 :root.d10 {
   --bg: #0f1b0f;
-  --text: #e6ffe6;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
   --primary: #76ff03;
   --error: #ff1744;
-  --card-bg: #162616;
+  --card-bg: rgba(30, 30, 30, 0.95);
   --card-hover: #223322;
-  --input-bg: #1c331c;
+  --input-bg: rgba(40, 40, 40, 0.9);
   --input-focus: #2b442b;
   --input-border: #76ff03;
   --input-hover-border: #64dd03;
@@ -155,12 +165,13 @@
 /* Improved Light theme with Coral (Sunrise) */
 :root.l1 {
   --bg: #fff5f0;
-  --text: #3e2723;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #ff6f61;
   --error: #d32f2f;
-  --card-bg: #ffe5dd;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #ffd5c5;
-  --input-bg: #fff0e8;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #ffe0d0;
   --input-border: #ff6f61;
   --input-hover-border: #ff3b2f;
@@ -170,12 +181,13 @@
 /* Light theme with Peach (Soft Glow) */
 :root.l2 {
   --bg: #fff0e6;
-  --text: #3d2b1f;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #ffab91;
   --error: #e64a19;
-  --card-bg: #ffe5d5;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #ffccb5;
-  --input-bg: #fff0e0;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #ffdfcc;
   --input-border: #ffab91;
   --input-hover-border: #e69a83;
@@ -185,12 +197,13 @@
 /* Improved Light theme with Lavender (Floral Breeze) */
 :root.l3 {
   --bg: #f8f4ff;
-  --text: #2b1b3d;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #9575cd;
   --error: #d32f2f;
-  --card-bg: #ede7f6;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #d1c4e9;
-  --input-bg: #f3e5f5;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #e1bee7;
   --input-border: #9575cd;
   --input-hover-border: #7e57c2;
@@ -200,12 +213,13 @@
 /* Light theme with Ocean Breeze */
 :root.l4 {
   --bg: #e0f7fa;
-  --text: #004d40;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #00897b;
   --error: #d32f2f;
-  --card-bg: #b2dfdb;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #80cbc4;
-  --input-bg: #b2ebf2;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #80deea;
   --input-border: #00897b;
   --input-hover-border: #00796b;
@@ -215,12 +229,13 @@
 /* Light theme with Golden Sands */
 :root.l5 {
   --bg: #fff9e6;
-  --text: #4e2a84;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #ffcc00;
   --error: #c62828;
-  --card-bg: #fff3b0;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #ffec8b;
-  --input-bg: #fff9d9;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #ffec7a;
   --input-border: #ffcc00;
   --input-hover-border: #ffb300;
@@ -230,12 +245,13 @@
 /* Improved Light theme with Mint Grove */
 :root.l6 {
   --bg: #f0f9f0;
-  --text: #1b5e20;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #4caf50;
   --error: #d32f2f;
-  --card-bg: #dcedc8;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #c5e1a5;
-  --input-bg: #e8f5e9;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #c8e6c9;
   --input-border: #4caf50;
   --input-hover-border: #388e3c;
@@ -245,12 +261,13 @@
 /* Light theme with Sky Dusk */
 :root.l7 {
   --bg: #e3f2fd;
-  --text: #0d47a1;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #1976d2;
   --error: #d32f2f;
-  --card-bg: #bbdefb;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #90caf9;
-  --input-bg: #bbdefb;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #90caf9;
   --input-border: #1976d2;
   --input-hover-border: #1565c0;
@@ -260,12 +277,13 @@
 /* Light theme with Autumn Leaves */
 :root.l8 {
   --bg: #fff3e0;
-  --text: #3e2723;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #ff7043;
   --error: #d32f2f;
-  --card-bg: #ffccbc;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #ffab91;
-  --input-bg: #ffe0b2;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #ffcc80;
   --input-border: #ff7043;
   --input-hover-border: #f4511e;
@@ -275,12 +293,13 @@
 /* Light theme with Citrus Burst */
 :root.l9 {
   --bg: #fff8e1;
-  --text: #c2185b;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #ffeb3b;
   --error: #c62828;
-  --card-bg: #fff59d;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #fff176;
-  --input-bg: #fff9c4;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #fff176;
   --input-border: #ffeb3b;
   --input-hover-border: #fbc02d;
@@ -290,12 +309,13 @@
 /* Light theme with Rose Petal */
 :root.l10 {
   --bg: #fce4ec;
-  --text: #880e4f;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #f06292;
   --error: #d32f2f;
-  --card-bg: #f8bbd0;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #f48fb1;
-  --input-bg: #f3e5f5;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #e1bee7;
   --input-border: #f06292;
   --input-hover-border: #d81b60;
@@ -305,12 +325,13 @@
 /* Light theme with Lavender Mist */
 :root.l11 {
   --bg: #f3e5f5;
-  --text: #6a1b9a;
+  --text: rgba(0, 0, 0, 0.95);
+  --text-secondary: rgba(0, 0, 0, 0.7);
   --primary: #ab47bc;
   --error: #c62828;
-  --card-bg: #e1bee7;
+  --card-bg: rgba(255, 255, 255, 0.95);
   --card-hover: #ce93d8;
-  --input-bg: #ede7f6;
+  --input-bg: rgba(245, 245, 245, 0.9);
   --input-focus: #d1c4e9;
   --input-border: #ab47bc;
   --input-hover-border: #8e24aa;

@@ -127,7 +127,7 @@ const createDataElement = (item, description) => {
   const maskedItem = maskSensitiveData(item);
   const maskedDescription =
     description === "undefined" ? "undefined" : maskSensitiveData(description);
-  contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong> - ${maskedDescription}</p>`;
+  contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong>  ${maskedDescription}</p>`;
 
   // Add copy icon
   const copyIcon = document.createElement("div");
