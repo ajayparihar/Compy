@@ -398,20 +398,50 @@ const saveThemeToFile = async (theme) => {
   await saveToFile(data, "theme_config.txt");
 };
 
-// Update theme
-const updateTheme = async (theme) => {
-  try {
-    // Save theme to localStorage
-    localStorage.setItem("theme", theme);
-    // Apply the theme
-    applyTheme(theme);
+// Theme persistence functions
+const saveThemeToLocalStorage = (theme) => {
+  localStorage.setItem('selectedTheme', theme);
+};
 
-    // Update theme in user_config.json
+const loadThemeFromLocalStorage = () => {
+  return localStorage.getItem('selectedTheme') || 'd4'; // Default to d4 if no theme saved
+};
+
+// Initialize theme selector
+const initThemeSelector = () => {
+  const themeSelect = document.getElementById("themeSelect");
+  if (!themeSelect) return;
+
+  // Add theme options
+  Object.entries(THEME_NAMES).forEach(([value, name]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    // Remove (Dark), (Light), and don't add the theme code
+    option.textContent = name.replace(/ \(Dark\)| \(Light\)/g, "");
+    themeSelect.appendChild(option);
+  });
+
+  // Set initial theme from localStorage
+  const savedTheme = loadThemeFromLocalStorage();
+  themeSelect.value = savedTheme;
+  applyTheme(savedTheme);
+
+  // Handle theme change
+  themeSelect.addEventListener("change", (e) => {
+    const selectedTheme = e.target.value;
+    applyTheme(selectedTheme);
+    // Update the theme in user_config.json
+    updateUserConfig(selectedTheme);
+  });
+};
+
+// Update user config with new theme
+const updateUserConfig = async (theme) => {
+  try {
     const response = await fetch("user_config.json");
     const config = await response.json();
     config.user_settings.theme = theme;
 
-    // Save updated config
     await fetch("user_config.json", {
       method: "PUT",
       headers: {
@@ -420,45 +450,11 @@ const updateTheme = async (theme) => {
       body: JSON.stringify(config),
     });
   } catch (error) {
-    console.error("Error updating theme:", error);
-    showAlert("Failed to update theme. Please try again.", "error");
+    console.error("Error updating user config:", error);
   }
 };
 
-// Initialize theme selector
-const initThemeSelector = (initialTheme) => {
-  const themeSelect = document.getElementById("themeSelect");
-  if (!themeSelect) return;
-
-  // Add theme options
-  Object.entries(THEME_NAMES).forEach(([value, name]) => {
-    const option = document.createElement("option");
-    option.value = value;
-    // Remove (Dark) and (Light) from the name but keep the theme code
-    option.textContent = `${name.replace(
-      / \(Dark\)| \(Light\)/g,
-      ""
-    )} (${value})`;
-    themeSelect.appendChild(option);
-  });
-
-  // Set current theme from localStorage or config
-  const savedTheme = localStorage.getItem("theme") || initialTheme;
-  themeSelect.value = savedTheme;
-
-  // Handle theme change
-  themeSelect.addEventListener("change", (e) => {
-    const selectedTheme = e.target.value;
-    if (selectedTheme) {
-      // Save the selected theme to localStorage
-      localStorage.setItem("theme", selectedTheme);
-      // Apply the theme immediately
-      applyTheme(selectedTheme);
-    }
-  });
-};
-
-// Apply theme
+// Theme application logic
 const applyTheme = (theme) => {
   // Remove existing theme classes
   document.documentElement.className = document.documentElement.className
@@ -466,7 +462,7 @@ const applyTheme = (theme) => {
     .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
     .join(" ");
 
-  // Add the correct theme class
+  // Add new theme class
   document.documentElement.classList.add(theme);
 
   // Update spinner colors
@@ -475,7 +471,15 @@ const applyTheme = (theme) => {
     spinner.style.borderColor = `rgba(var(--primary-rgb), 0.2)`;
     spinner.style.borderTopColor = `var(--primary)`;
   }
+
+  // Save theme to localStorage
+  saveThemeToLocalStorage(theme);
 };
+
+// Initialize theme on page load
+document.addEventListener('DOMContentLoaded', () => {
+  initThemeSelector();
+});
 
 // Function to apply user name
 const applyUserName = (userName) => {
@@ -514,31 +518,7 @@ const processData = (data) => {
   }
 };
 
-// Check for theme changes in config
-const checkForThemeChanges = async () => {
-  try {
-    const response = await fetch("user_config.json");
-    const config = await response.json();
-    const currentTheme = config.user_settings?.theme;
-
-    // Get the current applied theme
-    const appliedTheme =
-      document.documentElement.classList.value.match(/d\d+|l\d+/)?.[0];
-
-    // If the theme has changed, apply the new theme
-    if (currentTheme && currentTheme !== appliedTheme) {
-      applyTheme(currentTheme);
-      const themeSelect = document.getElementById("themeSelect");
-      if (themeSelect) {
-        themeSelect.value = currentTheme;
-      }
-    }
-  } catch (error) {
-    console.error("Error checking for theme changes:", error);
-  }
-};
-
-// Add to initialization
+// Modify initializeApp to use the new theme management
 const initializeApp = async () => {
   try {
     showLoading();
@@ -552,18 +532,11 @@ const initializeApp = async () => {
       throw new Error("No file path specified in config");
     }
 
-    // Apply theme from localStorage or config
-    const savedTheme =
-      localStorage.getItem("theme") || config.user_settings?.theme || "d4";
-    applyTheme(savedTheme);
-    initThemeSelector(savedTheme); // Initialize with saved theme
-
+    // Apply user name
     applyUserName(config.user_settings?.user_name || "");
 
     const data = await fetchDataWithTimeout(filePath);
     processData(data);
-
-    setInterval(checkForThemeChanges, 5000);
   } catch (error) {
     console.error("Error loading data:", error);
     showAlert("An unexpected error occurred. Please try again.", "error");

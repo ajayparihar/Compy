@@ -173,7 +173,8 @@ body.loading > *:not(.loading-overlay) {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  width: 100%;
+  height: 60px;
   z-index: 100;
   background: linear-gradient(
     to bottom,
@@ -218,8 +219,10 @@ main {
   padding: var(--content-padding);
   width: 100%;
   max-width: var(--max-content-width);
-  margin: 0 auto;
-  min-height: calc(100vh - var(--header-height));
+  margin-left: auto;
+  margin-right: auto;
+  height: auto; /* Remove fixed height */
+  min-height: calc(100vh - var(--header-height)); /* Ensure it fills the viewport */
 }
 
 #data {
@@ -699,7 +702,7 @@ body {
 /* Clear Icon */
 .clear-icon {
   position: absolute;
-  right: 0.5rem; /* Reduced spacing */
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
@@ -731,11 +734,8 @@ body {
 }
 
 /* Add smooth scrolling */
-html, body {
-  height: 100%;
-  overflow: auto;
-  margin: 0;
-  padding: 0;
+html {
+  scroll-behavior: smooth;
 }
 
 /* Add subtle animation to loading spinner */
@@ -821,7 +821,6 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 /* Optimized Header Section */
@@ -829,7 +828,8 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  width: 100%;
+  height: 60px;
   z-index: 100;
   background: linear-gradient(
     to bottom,
@@ -1100,6 +1100,4 @@ button:disabled {
 html, body {
   height: 100%;
   overflow: auto;
-  margin: 0;
-  padding: 0;
 }
