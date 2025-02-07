@@ -184,10 +184,51 @@ body.loading > *:not(.loading-overlay) {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
   padding: 0.5rem 1rem;
   backdrop-filter: blur(8px);
+}
+
+/* Light theme header adjustments */
+:root.l1 .header-section,
+:root.l2 .header-section,
+:root.l3 .header-section,
+:root.l4 .header-section,
+:root.l5 .header-section,
+:root.l6 .header-section,
+:root.l7 .header-section,
+:root.l8 .header-section,
+:root.l9 .header-section,
+:root.l10 .header-section,
+:root.l11 .header-section {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.85)
+  );
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(var(--primary-rgb), 0.15);
+}
+
+/* Dark theme header adjustments */
+:root.d1 .header-section,
+:root.d2 .header-section,
+:root.d3 .header-section,
+:root.d4 .header-section,
+:root.d5 .header-section,
+:root.d6 .header-section,
+:root.d7 .header-section,
+:root.d8 .header-section,
+:root.d9 .header-section,
+:root.d10 .header-section {
+  background: linear-gradient(
+    to bottom,
+    rgba(30, 30, 30, 0.95),
+    rgba(30, 30, 30, 0.85)
+  );
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 header {
@@ -842,7 +883,7 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);
   padding: 0.5rem 1rem;
   backdrop-filter: blur(8px);
 }

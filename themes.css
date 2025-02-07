@@ -294,16 +294,16 @@
 :root.l9 {
   --bg: #fff8e1;
   --text: rgba(0, 0, 0, 0.95);
-  --text-secondary: rgba(0, 0, 0, 0.7);
-  --primary: #ffeb3b;
+  --text-secondary: rgba(0, 0, 0, 0.8);
+  --primary: #ffa000;
   --error: #c62828;
   --card-bg: rgba(255, 255, 255, 0.95);
-  --card-hover: #fff176;
+  --card-hover: #fff3c4;
   --input-bg: rgba(245, 245, 245, 0.9);
-  --input-focus: #fff176;
-  --input-border: #ffeb3b;
-  --input-hover-border: #fbc02d;
-  --primary-rgb: 255, 235, 59;
+  --input-focus: #fff3c4;
+  --input-border: #ffa000;
+  --input-hover-border: #ff8f00;
+  --primary-rgb: 255, 160, 0;
 }
 
 /* Light theme with Rose Petal */
