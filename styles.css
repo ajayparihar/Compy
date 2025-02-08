@@ -1,5 +1,5 @@
 /* Author: Ajay Singh */
-/* Version: 1.1.1 */
+/* Version: 1.1 */
 /* Date: 09-11-2023 */
 
 /* Import Google Fonts */
@@ -934,36 +934,70 @@ main {
   transform: translateY(-2px);
 }
 
-/* Custom scrollbar with hover animation */
+/* Custom scrollbar with active animation */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 16px;  /* Increased width */
+  position: absolute;
+  right: 0;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(var(--primary-rgb), 0.1);
-  border-radius: 4px;
+  background: var(--bg);
+  border-radius: 0;  /* Removed border radius for track */
+  border-left: 1px solid rgba(var(--primary-rgb), 0.1);  /* Subtle border */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(var(--primary-rgb), 0.3);
-  border-radius: 4px;
+  background: var(--card-hover);
+  border-radius: 0;  /* Removed border radius for thumb */
+  border: 3px solid var(--bg);
+  min-height: 40px;  /* Minimum height for better visibility */
   transition: all 0.3s ease;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--primary-rgb), 0.5);
-  transform: scale(1.1);
+::-webkit-scrollbar-thumb:active {
+  background: var(--primary);
+  border: 2px solid var(--bg);
 }
 
 /* For Firefox */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(var(--primary-rgb), 0.3) rgba(var(--primary-rgb), 0.1);
+  scrollbar-width: auto;  /* Changed from thin to auto for larger width */
+  scrollbar-color: var(--card-hover) var(--bg);
 }
 
-*:hover {
-  scrollbar-color: rgba(var(--primary-rgb), 0.5) rgba(var(--primary-rgb), 0.1);
+*::-webkit-scrollbar-thumb:active {
+  background: var(--primary);
+  border: 2px solid var(--bg);
+}
+
+/* Light theme scrollbar adjustments */
+:root.l1 ::-webkit-scrollbar-track,
+:root.l2 ::-webkit-scrollbar-track,
+:root.l3 ::-webkit-scrollbar-track,
+:root.l4 ::-webkit-scrollbar-track,
+:root.l5 ::-webkit-scrollbar-track,
+:root.l6 ::-webkit-scrollbar-track,
+:root.l7 ::-webkit-scrollbar-track,
+:root.l8 ::-webkit-scrollbar-track,
+:root.l9 ::-webkit-scrollbar-track,
+:root.l10 ::-webkit-scrollbar-track,
+:root.l11 ::-webkit-scrollbar-track {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Dark theme scrollbar adjustments */
+:root.d1 ::-webkit-scrollbar-track,
+:root.d2 ::-webkit-scrollbar-track,
+:root.d3 ::-webkit-scrollbar-track,
+:root.d4 ::-webkit-scrollbar-track,
+:root.d5 ::-webkit-scrollbar-track,
+:root.d6 ::-webkit-scrollbar-track,
+:root.d7 ::-webkit-scrollbar-track,
+:root.d8 ::-webkit-scrollbar-track,
+:root.d9 ::-webkit-scrollbar-track,
+:root.d10 ::-webkit-scrollbar-track {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Copy Icon */
