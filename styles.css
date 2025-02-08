@@ -1,6 +1,13 @@
-/* Author: Ajay Singh */
-/* Version: 1.1 */
-/* Date: 09-11-2023 */
+/* 
+ * Command Management System - Main Stylesheet
+ * Author: Ajay Singh
+ * Version: 1.1
+ * Original Date: 11-09-2023
+ * Updated Date: 19-03-2024
+ *
+ * This stylesheet contains all the styling for the Command Management System
+ * including themes, responsive design, and component-specific styles.
+ */
 
 /* Import Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Itim&display=swap");
@@ -316,20 +323,15 @@ main {
   text-shadow: 0 0 12px rgba(var(--primary-rgb), 0.4);
 }
 
-/* Improved Highlight Styles */
+/* Simplified Highlight Styles */
 .highlight {
-  background-color: rgba(var(--primary-rgb), 0.3);
-  padding: 0.1em 0.2em;
-  border-radius: 0.25em;
-  font-weight: normal;
+  background-color: rgba(var(--primary-rgb), 0.15);
   color: var(--text);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .highlight:hover {
-  background-color: rgba(var(--primary-rgb), 0.4);
-  transform: scale(1.02);
+  background-color: rgba(var(--primary-rgb), 0.2);
 }
 
 /* For dark themes */
@@ -343,8 +345,7 @@ main {
 :root.d8 .highlight,
 :root.d9 .highlight,
 :root.d10 .highlight {
-  background-color: rgba(var(--primary-rgb), 0.3);
-  color: var(--text);
+  background-color: rgba(var(--primary-rgb), 0.2);
 }
 
 /* For light themes */
@@ -359,8 +360,7 @@ main {
 :root.l9 .highlight,
 :root.l10 .highlight,
 :root.l11 .highlight {
-  background-color: rgba(var(--primary-rgb), 0.2);
-  color: var(--text);
+  background-color: rgba(var(--primary-rgb), 0.12);
 }
 
 /* Sensitive data styling */
@@ -716,7 +716,7 @@ body {
 #searchInput {
   width: 100%; /* Take full width of container */
   padding: 0.75rem 2.5rem 0.75rem 1rem; /* Right padding for clear icon */
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
   border-radius: 8px;
   background-color: var(--card-bg);
   color: var(--text);
@@ -732,13 +732,17 @@ body {
 #searchInput:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
-    0 0 10px rgba(var(--primary-rgb), 0.2);
+    0 0 10px rgba(var(--primary-rgb), 0.2),
+    0 0 15px rgba(var(--primary-rgb), 0.1),
+    inset 0 0 2px rgba(var(--primary-rgb), 0.05);
+  outline: none;
+  background-color: var(--input-bg);
 }
 
 #searchInput:not(:focus):hover {
   transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  border-color: rgba(var(--primary-rgb), 0.3);
+  box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.15);
+  border-color: var(--primary);
 }
 
 /* Clear Icon */

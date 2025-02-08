@@ -1,6 +1,13 @@
-/* Author: Ajay Singh */
-/* Version: 1.1 */
-/* Date: 09-11-2023 */
+/* 
+ * Command Management System - Theme Definitions
+ * Author: Ajay Singh
+ * Version: 1.1
+ * Original Date: 11-09-2023
+ * Updated Date: 19-03-2024
+ *
+ * This file contains all theme definitions for the Command Management System,
+ * including both dark and light themes with various color schemes.
+ */
 
 /* Improved Dark theme with Emerald Green (Mystic Forest) */
 :root.d1 {

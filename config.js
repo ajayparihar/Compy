@@ -1,6 +1,13 @@
-/* Author: Ajay Singh */
-/* Version: 1.1 */
-/* Date: 09-11-2023 */
+/**
+ * @fileoverview Command Management System - Configuration
+ * @author Ajay Singh
+ * @version 1.1
+ * @created 11-09-2023
+ * @updated 19-03-2024
+ * 
+ * This file contains configuration settings and theme management
+ * for the Command Management System.
+ */
 
 const DEFAULT_FILE_PATH =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";

@@ -2,6 +2,11 @@
 
 ![COMPY Logo](favicon_io/favicon.ico)
 
+**Original Date:** 11-09-2023  
+**Updated Date:** 19-03-2024  
+**Version:** 1.1  
+**Author:** Ajay Singh
+
 ## Overview
 
 COMPY is a secure, cross-platform tool for managing and quickly accessing various types of text-based data, including:
@@ -95,8 +100,6 @@ We welcome contributions! Please follow our [contribution guidelines](CONTRIBUTI
 MIT License - See [LICENSE](LICENSE) for details.
 
 ---
-
-**Version**: 1.1.1  
 
 ## Updating the Application
 

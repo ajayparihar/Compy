@@ -1,17 +1,35 @@
+/**
+ * @fileoverview Command Management System - Main Client-side Script
+ * @author Ajay Singh
+ * @version 1.1
+ * @created 11-09-2023
+ * @updated 19-03-2024
+ * 
+ * This file contains the client-side functionality for the Command Management System.
+ * It handles data fetching, display, search, clipboard operations, and theme management.
+ * The system supports sensitive data masking and real-time search filtering.
+ */
+
 /* Author: Ajay Singh */
 /* Version: 1.1 */
-/* Date: 09-11-2023 */
+/* Date: 11-09-2023 */
 
 // Configuration constants
 const COMMANDS_API_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
 
-// Configuration for app settings
+/**
+ * Configuration object for the application settings
+ * @constant {Object}
+ */
 const config = {
-  passwordMaskingKeyword: "##", // Centralized password masking keyword (can be changed to '**' or any other)
+  passwordMaskingKeyword: "##", // Keyword used to identify and mask sensitive data
 };
 
-// DOM Elements cache
+/**
+ * Cache of DOM elements to avoid repeated querySelector calls
+ * @constant {Object}
+ */
 const DOM_ELEMENTS = {
   dataDiv: document.getElementById("data"),
   searchInput: document.getElementById("searchInput"),
@@ -26,7 +44,10 @@ Object.entries(DOM_ELEMENTS).forEach(([key, element]) => {
   if (!element) console.error(`Element not found: ${key}`);
 });
 
-// Utility functions
+/**
+ * Shows the loading overlay to indicate background operations
+ * @function showLoading
+ */
 const showLoading = () => {
   document.body.classList.add("loading");
   if (DOM_ELEMENTS.loadingOverlay) {
@@ -34,6 +55,10 @@ const showLoading = () => {
   }
 };
 
+/**
+ * Hides the loading overlay when operations are complete
+ * @function hideLoading
+ */
 const hideLoading = () => {
   document.body.classList.remove("loading");
   if (DOM_ELEMENTS.loadingOverlay) {
@@ -41,6 +66,12 @@ const hideLoading = () => {
   }
 };
 
+/**
+ * Displays a toast notification to the user
+ * @function showAlert
+ * @param {string} message - The message to display
+ * @param {string} type - The type of alert ('success' or 'error')
+ */
 const showAlert = (message, type) => {
   const toast = DOM_ELEMENTS.toast;
   if (!toast) return;
@@ -64,19 +95,39 @@ const showAlert = (message, type) => {
   }, 10);
 };
 
-// Mask data wrapped in the configured keyword (default: '##')
+/**
+ * Masks sensitive data in text by replacing content between masking keywords
+ * @function maskSensitiveData
+ * @param {string} text - The text to process
+ * @returns {string} The text with sensitive data masked
+ */
 const maskSensitiveData = (text) => {
+  if (!text) return text;
+  
+  // Escape special characters in the masking keyword
+  const escapedKeyword = config.passwordMaskingKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  
+  // Create regex that matches content between keywords, handling special characters
   const regex = new RegExp(
-    `${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`,
-    "g"
+    `${escapedKeyword}([^]*?)${escapedKeyword}`,
+    'g'
   );
+  
   return text.replace(
     regex,
     `${config.passwordMaskingKeyword}SensitiveData${config.passwordMaskingKeyword}`
   );
 };
 
-// Data functions
+/**
+ * Fetches data from the API with a timeout
+ * @async
+ * @function fetchDataWithTimeout
+ * @param {string} url - The URL to fetch data from
+ * @param {number} [timeout=10000] - Timeout in milliseconds
+ * @returns {Promise<string>} The fetched data
+ * @throws {Error} If the fetch fails or times out
+ */
 const fetchDataWithTimeout = async (url, timeout = 10000) => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -96,6 +147,11 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
   }
 };
 
+/**
+ * Displays the data in the DOM
+ * @function displayData
+ * @param {Array<Object>} data - Array of command objects to display
+ */
 const displayData = (data) => {
   const dataDiv = DOM_ELEMENTS.dataDiv;
   if (!dataDiv) return;
@@ -112,6 +168,13 @@ const displayData = (data) => {
   });
 };
 
+/**
+ * Creates a DOM element for a single data item
+ * @function createDataElement
+ * @param {string} item - The command text
+ * @param {string} description - The command description
+ * @returns {HTMLElement} The created DOM element
+ */
 const createDataElement = (item, description) => {
   const dataElement = document.createElement("div");
   dataElement.classList.add("data-item");
@@ -127,7 +190,7 @@ const createDataElement = (item, description) => {
   const maskedItem = maskSensitiveData(item);
   const maskedDescription =
     description === "undefined" ? "undefined" : maskSensitiveData(description);
-  contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong>  ${maskedDescription}</p>`;
+  contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong> ${maskedDescription}</p>`;
 
   // Add copy icon
   const copyIcon = document.createElement("div");
@@ -147,16 +210,34 @@ const createDataElement = (item, description) => {
   return dataElement;
 };
 
-// Remove the masking (i.e., get the original item and description)
+/**
+ * Removes masking from sensitive data
+ * @function removeMasking
+ * @param {string} text - The masked text
+ * @returns {string} The unmasked text
+ */
 const removeMasking = (text) => {
+  if (!text) return text;
+  
+  // Escape special characters in the masking keyword
+  const escapedKeyword = config.passwordMaskingKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  
+  // Create regex that matches content between keywords, handling special characters
   const regex = new RegExp(
-    `${config.passwordMaskingKeyword}([^${config.passwordMaskingKeyword}]+)${config.passwordMaskingKeyword}`,
-    "g"
+    `${escapedKeyword}([^]*?)${escapedKeyword}`,
+    'g'
   );
-  return text.replace(regex, "$1");
+  
+  return text.replace(regex, '$1');
 };
 
-// Copy to clipboard
+/**
+ * Copies text to clipboard with visual feedback
+ * @function copyToClipboard
+ * @param {string} text - The text to copy
+ * @param {HTMLElement} element - The element that triggered the copy
+ * @param {MouseEvent} event - The click event
+ */
 const copyToClipboard = (text, element, event) => {
   if (!text) return;
 
@@ -186,7 +267,13 @@ const copyToClipboard = (text, element, event) => {
     });
 };
 
-// Improved highlight function that excludes sensitive data
+/**
+ * Highlights search terms in text while preserving sensitive data masking
+ * @function highlightText
+ * @param {string} text - The text to highlight
+ * @param {string} searchTerm - The term to highlight
+ * @returns {string} HTML string with highlighted terms
+ */
 const highlightText = (text, searchTerm) => {
   if (!searchTerm) return text;
 
@@ -213,7 +300,10 @@ const highlightText = (text, searchTerm) => {
     .join("");
 };
 
-// Update search function
+/**
+ * Performs real-time search filtering on the displayed data
+ * @function performSearch
+ */
 const performSearch = () => {
   const searchTerm = searchInput.value.trim().toLowerCase();
   const dataItems = document.querySelectorAll(".data-item");
@@ -282,7 +372,7 @@ const filterData = (query) => {
             item.dataset.originalDescription,
             searchValue
           );
-          content.innerHTML = `<p><strong class="command-text">${highlightedItem}</strong> - ${highlightedDescription}</p>`;
+          content.innerHTML = `<p><strong class="command-text">${highlightedItem}</strong> ${highlightedDescription}</p>`;
         }
       } else {
         item.style.display = "none";
