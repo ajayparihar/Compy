@@ -19,12 +19,19 @@ COMPY is your personal data assistant that helps you securely store and quickly 
 - 🔄 **Quick Copy**: One-click to clipboard
 - ⚙️ **Fully Customizable**: Adapt it to your workflow
 
+## Prerequisites
+
+- Node.js (version 12 or higher)
+- Modern web browser (Chrome, Firefox, Edge recommended)
+- Windows operating system
+
 ## Getting Started
 
 1. Download and extract COMPY to your preferred location
-2. Double-click `CompyRunner.bat` to start
-3. The application will open in your default browser
-4. Start adding your data or import existing CSV files
+2. Configure `CompyRunner.bat` if needed (see Customizing CompyRunner section)
+3. Double-click `CompyRunner.bat` to start
+4. The application will open in your default browser
+5. Start adding your data or import existing CSV files
 
 ## How to Use COMPY
 
@@ -36,20 +43,38 @@ COMPY is your personal data assistant that helps you securely store and quickly 
    git status,Check git repository status
    ##mypassword##,Login for example.com
    ```
+   Tips for better organization:
    - Use `##` to mask sensitive information
    - Keep descriptions clear and searchable
+   - Group similar commands together
+   - Add tags in description for easier searching
+   - Use consistent formatting for similar entries
 
 ### Daily Usage
 1. Launch COMPY using `CompyRunner.bat`
 2. Type in the search bar to find entries
 3. Click any item to copy it instantly
-4. Use keyboard shortcuts for faster navigation:
-   - `↑`/`↓`: Navigate items
-   - `Enter`: Copy selected item
-   - `Esc`: Clear search
-   - `Ctrl + L`: Focus search bar
 
 ## Customization Guide
+
+### CompyRunner Settings
+The `CompyRunner.bat` file can be customized to match your setup:
+
+1. Open `CompyRunner.bat` in any text editor
+2. Modify these variables at the top of the file:
+   ```batch
+   :: HTML files location (where COMPY is installed)
+   set "HTML_DIRECTORY=C:\Users\username\path\to\compy"
+
+   :: Server port number (if 8000 is already in use)
+   set "PORT=8000"
+   ```
+3. Common customizations:
+   - Change `HTML_DIRECTORY` to your COMPY installation path
+   - Modify `PORT` if port 8000 is already in use
+   - Save changes and run CompyRunner as usual
+
+Note: If you change the port, remember to access COMPY using the new port number in your browser (e.g., `http://localhost:9000` if you set PORT=9000)
 
 ### Theme Selection
 1. Click the theme icon in the top-right corner
@@ -70,7 +95,7 @@ Edit `user_config.json` to personalize:
     "file_path": "comm.csv"  // Your data file location
   },
   "user_settings": {
-    "user_name": "",         // Your name (optional)
+    "user_name": "",         // Your name
     "theme": "d4"           // Your preferred theme
   }
 }
@@ -97,22 +122,22 @@ Your personal files (`user_config.json`, `comm.csv`, and custom configurations) 
 
 1. **Application won't start**
    - Ensure Node.js is installed
-   - Check if port 3000 is available
+   - Check if port 8000 is available
    - Run `npm install` in the application directory
+   - Verify HTML_DIRECTORY path in CompyRunner.bat
 
 2. **Data not showing**
    - Verify `comm.csv` exists and has correct format
    - Check file path in `user_config.json`
+   - Ensure file has read permissions
 
 3. **Theme not applying**
    - Clear browser cache
    - Verify theme name in `user_config.json`
 
-## Need Help?
-
-- Check the [Issues](https://github.com/your-repo/compy/issues) section
-- Create a new issue for bug reports
-- Join our community discussions
+4. **Copy not working**
+   - Allow clipboard access in browser
+   - Try using keyboard shortcut (Enter)
 
 ## License
 
