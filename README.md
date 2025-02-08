@@ -1,125 +1,122 @@
-# COMPY - Secure Data Manager
+# COMPY - Your Personal Data Assistant
 
 ![COMPY Logo](favicon_io/favicon.ico)
 
-**Original Date:** 11-09-2023  
-**Updated Date:** 19-03-2024  
-**Version:** 1.1  
-**Author:** Ajay Singh
+## What is COMPY?
 
-## Overview
+COMPY is your personal data assistant that helps you securely store and quickly access:
+- Commands you frequently use but often forget
+- Sensitive credentials that need secure storage
+- Commonly used text snippets and templates
+- Any text-based information you need quick access to
 
-COMPY is a secure, cross-platform tool for managing and quickly accessing various types of text-based data, including:
+## Why Use COMPY?
 
-- Command-line commands
-- Personal credentials
-- Frequently used phrases
-- Sentence templates
+- 🔒 **Security First**: Your sensitive data is masked and secure
+- ⚡ **Lightning Fast**: Instant search across all your entries
+- 🎨 **Personalized Experience**: Choose from 21 beautiful themes
+- 📱 **Use Anywhere**: Works on desktop and mobile browsers
+- 🔄 **Quick Copy**: One-click to clipboard
+- ⚙️ **Fully Customizable**: Adapt it to your workflow
 
-## Key Features
+## Getting Started
 
-- **Secure Storage**: Password masking for sensitive data
-- **Instant Search**: Real-time search across all entries
-- **Multi-Purpose**: Manage commands, credentials, and templates
-- **Clipboard Integration**: One-click copy to clipboard
-- **Customizable**: Multiple light and dark themes
-- **Responsive**: Optimized for desktop and mobile
+1. Download and extract COMPY to your preferred location
+2. Double-click `CompyRunner.bat` to start
+3. The application will open in your default browser
+4. Start adding your data or import existing CSV files
 
-## Quick Start
+## How to Use COMPY
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/compy.git
-   cd compy
+### Adding Your Data
+1. Open your data file (default: `comm.csv`)
+2. Add entries in this format:
    ```
-2. Install dependencies:
-   ```bash
-   npm install
+   Command/Text,Description
+   git status,Check git repository status
+   ##mypassword##,Login for example.com
    ```
-3. Start the application:
-   ```bash
-   npm start
-   ```
+   - Use `##` to mask sensitive information
+   - Keep descriptions clear and searchable
 
-## Data Types
+### Daily Usage
+1. Launch COMPY using `CompyRunner.bat`
+2. Type in the search bar to find entries
+3. Click any item to copy it instantly
+4. Use keyboard shortcuts for faster navigation:
+   - `↑`/`↓`: Navigate items
+   - `Enter`: Copy selected item
+   - `Esc`: Clear search
+   - `Ctrl + L`: Focus search bar
 
-- **Technical Commands**: Store and access command-line operations
-- **Sensitive Information**: Securely manage login credentials and API keys
-- **Common Phrases**: Save frequently used text snippets
-- **Message Templates**: Maintain reusable email and document templates
+## Customization Guide
 
-## How to Use
+### Theme Selection
+1. Click the theme icon in the top-right corner
+2. Choose from:
+   - 10 Dark themes (d1-d10)
+   - 11 Light themes (l1-l11)
+   - Popular choices:
+     - Galactic Blue (d4) - Dark modern
+     - Sunrise (l1) - Light professional
+     - Cyber Night (d7) - High contrast
+     - Lavender Mist (l11) - Soft light
 
-1. **Add Data**:
-
-   - Open your data CSV file
-   - Add entries in the format: `Entry,Description`
-   - Wrap sensitive data with `##` (e.g., `##password##`)
-
-2. **Search & Access**:
-
-   - Launch COMPY in your browser
-   - Use the search bar to find entries
-   - Click any item to copy it to your clipboard
-
-3. **Customize**:
-   - Change themes via the theme selector
-   - Modify settings in `user_config.json`
-
-## Configuration
-
-Edit `user_config.json` to customize:
-
+### Configuration Settings
+Edit `user_config.json` to personalize:
 ```json
 {
   "file_settings": {
-    "file_path": "data.csv"
+    "file_path": "comm.csv"  // Your data file location
   },
   "user_settings": {
-    "user_name": "",
-    "theme": "d4"
+    "user_name": "",         // Your name (optional)
+    "theme": "d4"           // Your preferred theme
   }
 }
 ```
 
-## Themes
+## Technology Stack
+- Frontend: HTML5, CSS3, JavaScript (Vanilla)
+- Backend: Node.js
+- Data Storage: CSV format
+- Security: Client-side password masking
+- Server: Local Node.js server
 
-Choose from 10 dark and 11 light themes, including:
+## Updating COMPY
 
-- Galactic Blue (d4)
-- Sunrise (l1)
-- Cyber Night (d7)
-- Lavender Mist (l11)
+To update to the latest version while keeping your personal data:
 
-## Contributing
+```bash
+git pull https://github.com/your-repo/compy.git main --no-rebase
+```
 
-We welcome contributions! Please follow our [contribution guidelines](CONTRIBUTING.md).
+Your personal files (`user_config.json`, `comm.csv`, and custom configurations) will remain unchanged.
+
+## Troubleshooting
+
+1. **Application won't start**
+   - Ensure Node.js is installed
+   - Check if port 3000 is available
+   - Run `npm install` in the application directory
+
+2. **Data not showing**
+   - Verify `comm.csv` exists and has correct format
+   - Check file path in `user_config.json`
+
+3. **Theme not applying**
+   - Clear browser cache
+   - Verify theme name in `user_config.json`
+
+## Need Help?
+
+- Check the [Issues](https://github.com/your-repo/compy/issues) section
+- Create a new issue for bug reports
+- Join our community discussions
 
 ## License
 
 MIT License - See [LICENSE](LICENSE) for details.
 
 ---
-
-## Updating the Application
-
-To update the application while preserving your configuration files, run the following command:
-
-```bash
-git clone --no-checkout https://github.com/your-repo/compy.git tmp-app && \
-cd tmp-app && \
-git sparse-checkout init --cone && \
-git sparse-checkout set index.html script.js styles.css favicon.ico themes.css config.js && \
-mv index.html script.js styles.css favicon.ico themes.css config.js ../ && \
-cd .. && \
-rm -rf tmp-app
-```
-
-This command will:
-
-1. Clone the repository without checking out files
-2. Set up a sparse checkout for only the files we want to update
-3. Move the updated files to your application directory
-4. Clean up the temporary clone
-
-Your `user_config.json`, `CompyRunner.bat`, and `README.md` files will remain unchanged.
+Made with ❤️ for productivity enthusiasts
