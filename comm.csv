@@ -1,7 +1,7 @@
 Command,Description
 ls -al,List files and directories in the current directory with detailed information.
 cd /path/to/directory,Change the current directory to the specified path.
-##Pass#1##,Password
+##Pass#1"##,Password
 pwd
 mkdir new_folder,Create a new directory named 'new_folder'.
 rmdir old_folder,Remove an empty directory named 'old_folder'.
@@ -29,7 +29,8 @@ ps aux | grep 'process_name',Show all running processes matching the specified '
 chmod 755 script.sh,"Change the file permissions of 'script.sh' to read, write, and execute for the owner, and read and execute for others."
 chown user:group file.txt,Change the owner and group of the file 'file.txt' to 'user' and 'group'.
 "Meeting at 10 AM tomorrow. 
-Location: Conference Room 2.",A note about a meeting scheduled for 10 AM tomorrow in Conference Room 2.
+Location: 
+Conference Room 2.",A note about a meeting scheduled for 10 AM tomorrow in Conference Room 2.
 "Newsletter available for download. 
 Check the latest updates on our website.",A reminder about the availability of a downloadable newsletter with updates.
 admin@website.net,Example of an admin email address for a website.
