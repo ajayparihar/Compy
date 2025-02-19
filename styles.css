@@ -122,18 +122,6 @@ body {
   line-height: 1.6;
   padding: 0 var(--spacing);
   transition: background-color var(--transition-duration) var(--transition-ease);
-  background-image: linear-gradient(
-    to bottom right,
-    rgba(255, 255, 255, 0.02) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.02) 50%,
-    rgba(255, 255, 255, 0.02) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 20px 20px;
-  overflow: hidden;
 }
 
 /* Hide content when loading */
@@ -683,21 +671,6 @@ main {
 
 .toast:hover {
   transform: translateX(-50%) translateY(-10px) scale(1.05);
-}
-
-/* Add subtle background pattern */
-body {
-  background-image: linear-gradient(
-    to bottom right,
-    rgba(255, 255, 255, 0.02) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.02) 50%,
-    rgba(255, 255, 255, 0.02) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 20px 20px;
 }
 
 /* Improve data item visibility */
