@@ -44,6 +44,12 @@
                 </div>
             </div>
             <div class="header-controls">
+                <button id="importButton" class="import-btn" aria-label="Import CSV">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+                        <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+                    </svg>
+                    Import
+                </button>
                 <div class="theme-selector">
                     <select id="themeSelect" aria-label="Select theme">
                         <!-- Options will be populated by JavaScript -->
@@ -65,6 +71,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="script.js"></script>
     <script src="config.js"></script>
+
+    <!-- Add Entry FAB -->
+    <button id="addEntryFab" class="fab" aria-label="Add new entry">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+            <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+        </svg>
+    </button>
+
+    <!-- Add Entry Modal -->
+    <div id="addEntryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Entry</h2>
+                <button class="close-modal" aria-label="Close modal">&times;</button>
+            </div>
+            <form id="addEntryForm">
+                <div class="form-group">
+                    <label for="commandInput">Command/Text*</label>
+                    <input type="text" id="commandInput" required>
+                </div>
+                <div class="form-group">
+                    <label for="descriptionInput">Description*</label>
+                    <textarea id="descriptionInput" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="categoryInput">Category</label>
+                    <input type="text" id="categoryInput">
+                </div>
+                <div class="form-group">
+                    <label for="tagsInput">Tags (comma separated)</label>
+                    <input type="text" id="tagsInput" placeholder="git, docker, etc">
+                </div>
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="isSensitiveInput">
+                    <label for="isSensitiveInput">Mask as sensitive data</label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="primary">Save</button>
+                    <button type="button" class="secondary close-modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import CSV Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import CSV</h2>
+                <button class="close-modal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="import-area">
+                <div id="dropZone" class="drop-zone">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="currentColor">
+                        <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+                    </svg>
+                    <p>Drag & drop your CSV file here<br>or</p>
+                    <button type="button" id="filePickerButton" class="secondary">Choose File</button>
+                    <input type="file" id="fileInput" accept=".csv" hidden>
+                </div>
+                <div id="previewArea" class="preview-area" hidden>
+                    <h3>Preview</h3>
+                    <div id="previewContent"></div>
+                    <div class="form-actions">
+                        <button type="button" id="importConfirm" class="primary">Import</button>
+                        <button type="button" class="secondary close-modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -10,6 +10,9 @@ Welcome to COMPY, your personal data assistant designed to help you securely sto
 
 - **Security**: Your data is masked and secure, ensuring your privacy is maintained at all times.
 - **Speed**: Instant search capabilities allow you to find entries lightning fast.
+- **Local Storage**: All data is stored securely in your browser's local storage.
+- **CSV Import**: Easily import your existing CSV data with drag & drop support.
+- **Rich Data**: Support for categories, tags, and sensitive data masking.
 - **Customization**: Choose from a variety of themes to suit your preferences and workflow.
 - **Portability**: Works seamlessly on both desktop and mobile browsers.
 - **Quick Copy**: One-click access to copy data directly to your clipboard.
@@ -21,7 +24,6 @@ Welcome to COMPY, your personal data assistant designed to help you securely sto
 
 Before you begin, ensure that you have the following installed:
 
-- Node.js (version 12 or higher)
 - A modern web browser like Chrome, Firefox, or Edge.
 - Windows operating system (compatibility note).
 
@@ -30,26 +32,51 @@ Before you begin, ensure that you have the following installed:
 1. **Download and Extract**: Download COMPY from the repository and extract it to your preferred location.
 2. **Configure `CompyRunner.bat`**: If needed, configure this batch file to suit your setup. This is optional but recommended for a smoother experience.
 3. **Run the Application**: Double-click `CompyRunner.bat` to start COMPY. The application will open in your default browser.
-4. **Add Your Data**: Start adding entries or import existing CSV files to get started.
+4. **Add Your Data**: Start adding entries directly through the UI or import existing CSV files.
 
 ## Usage Guide
 
 ### Adding Your Data
 
-1. Open your data file (`comm.csv` by default).
-2. Add entries in the following format:
-   ```
-   Command/Text,Description
-   git status,Check git repository status
-   ##mypassword##,Login for example.com
-   ```
-3. Tips for better organization include using `##` to mask sensitive information and keeping descriptions clear and searchable. Group similar commands together and add tags in the description for easier searching. Maintain a consistent formatting style for similar entries.
+There are two ways to add data to COMPY:
+
+1. **Using the Add Entry Form**:
+   - Click the "+" button in the bottom right corner
+   - Fill in the command/text and description (required fields)
+   - Optionally add a category and tags
+   - Check "Mask as sensitive data" for passwords or sensitive information
+   - Click Save to add the entry
+
+2. **Importing from CSV**:
+   - Click the "Import" button in the header
+   - Drag & drop your CSV file or click to choose file
+   - Review the preview of entries to be imported
+   - Click Import to add the entries
+   - Note: CSV should have the format:
+     ```
+     Command/Text,Description
+     git status,Check git repository status
+     ##mypassword##,Login for example.com
+     ```
+   - Entries with `##` around them will be automatically marked as sensitive
 
 ### Daily Usage
 
 1. Launch COMPY using `CompyRunner.bat`.
 2. Type your query into the search bar to find relevant entries.
-3. Click any item to copy it directly to your clipboard with just one click.
+3. Click any item to copy it directly to your clipboard.
+4. For sensitive data:
+   - Click to reveal the masked content
+   - Content will be automatically hidden after 2 seconds
+   - Click the copy button to copy without revealing
+
+### Data Storage
+
+COMPY now uses your browser's local storage to securely store your data. This means:
+- No files are created on your system
+- Data persists between sessions
+- Data is isolated to the browser you're using
+- Easy to clear data if needed (just clear browser data)
 
 ## Customization Guide
 

@@ -341,12 +341,9 @@ const filterData = (query) => {
 
     // Don't highlight if search is empty
     if (!searchValue) {
-      document.querySelectorAll(".data-item").forEach((item) => {
-        item.style.display = "block";
-        // Restore original content while preserving event listeners
-        item.querySelector(".data-item-content").innerHTML =
-          item.dataset.originalHTML;
-      });
+      // Get fresh entries from storage and display them
+      const entries = getEntries();
+      displayEntries(entries);
       return;
     }
 
@@ -385,11 +382,19 @@ const filterData = (query) => {
 
 // Clean up and optimize event listeners
 const addEventListeners = () => {
-  // Auto-focus on search when typing
+  // Auto-focus on search when typing, but not when in form inputs or modals
   document.addEventListener("keydown", (event) => {
+    const activeElement = document.activeElement;
+    const isModalOpen = document.querySelector('.modal.active');
+    const isFormInput = activeElement.tagName === 'INPUT' || 
+                       activeElement.tagName === 'TEXTAREA' ||
+                       activeElement.isContentEditable;
+    
     if (
       event.key.length === 1 &&
       !["Control", "Shift", "Alt", "Meta"].includes(event.key) &&
+      !isFormInput &&
+      !isModalOpen &&
       document.activeElement !== DOM_ELEMENTS.searchInput
     ) {
       DOM_ELEMENTS.searchInput.focus();
@@ -637,3 +642,348 @@ const initializeApp = async () => {
 };
 
 initializeApp();
+
+// Data Management
+const STORAGE_KEY = 'compy_data';
+
+/**
+ * Entry data structure
+ * @typedef {Object} Entry
+ * @property {string} id - Unique identifier
+ * @property {string} command - The command/text
+ * @property {string} description - Description
+ * @property {boolean} isSensitive - Whether to mask the data
+ * @property {string} category - Optional category
+ * @property {string[]} tags - Optional tags
+ * @property {string} createdAt - ISO date string
+ * @property {string} updatedAt - ISO date string
+ */
+
+/**
+ * Get all entries from localStorage
+ * @returns {Entry[]}
+ */
+function getEntries() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+}
+
+/**
+ * Save entries to localStorage
+ * @param {Entry[]} entries
+ */
+function saveEntries(entries) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+/**
+ * Add a new entry
+ * @param {Entry} entry
+ * @returns {boolean} success
+ */
+function addEntry(entry) {
+    const entries = getEntries();
+    
+    // Check for duplicates
+    if (entries.some(e => e.command === entry.command)) {
+        showToast('An entry with this command already exists');
+        return false;
+    }
+
+    entries.push({
+        ...entry,
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    });
+    
+    saveEntries(entries);
+    displayEntries(entries);
+    return true;
+}
+
+/**
+ * Import entries from CSV
+ * @param {string} csvContent
+ * @returns {Entry[]}
+ */
+function parseCSV(csvContent) {
+    const lines = csvContent.split('\n');
+    return lines.slice(1).map(line => {
+        const [command, description] = line.split(',').map(s => s.trim());
+        const isSensitive = command.startsWith('##') && command.endsWith('##');
+        
+        return {
+            id: crypto.randomUUID(),
+            command: command,
+            description: description || '',
+            isSensitive,
+            category: '',
+            tags: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+    }).filter(entry => entry.command);
+}
+
+/**
+ * Display entries in the UI
+ * @param {Entry[]} entries
+ */
+function displayEntries(entries) {
+    const dataDiv = document.getElementById('data');
+    dataDiv.innerHTML = '';
+
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const filteredEntries = entries.filter(entry => {
+        const searchString = `${entry.command} ${entry.description} ${entry.category} ${entry.tags.join(' ')}`.toLowerCase();
+        return searchString.includes(searchTerm);
+    });
+
+    filteredEntries.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = `data-item${entry.isSensitive ? ' sensitive' : ''}`;
+        
+        const commandText = entry.isSensitive ? '••••••' : entry.command;
+        
+        // Create the main content
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'data-item-content';
+        
+        // Add command and description
+        contentDiv.innerHTML = `
+            <strong>${commandText}</strong>
+            <p>${entry.description}</p>
+        `;
+        
+        // Add category if exists
+        if (entry.category) {
+            const categorySpan = document.createElement('span');
+            categorySpan.className = 'category';
+            categorySpan.textContent = entry.category;
+            contentDiv.appendChild(categorySpan);
+        }
+        
+        // Add tags if they exist
+        if (entry.tags && entry.tags.length > 0) {
+            const tagsDiv = document.createElement('div');
+            tagsDiv.className = 'tags';
+            
+            entry.tags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag';
+                tagSpan.textContent = tag;
+                
+                // Add click handler for tag filtering
+                tagSpan.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent item click
+                    const searchInput = document.getElementById('searchInput');
+                    searchInput.value = tag;
+                    filterData(tag);
+                });
+                
+                tagsDiv.appendChild(tagSpan);
+            });
+            
+            contentDiv.appendChild(tagsDiv);
+        }
+        
+        // Add copy button
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-icon';
+        copyButton.setAttribute('aria-label', 'Copy to clipboard');
+        copyButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
+            </svg>
+        `;
+
+        copyButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(entry.command).then(() => {
+                div.classList.add('copied');
+                setTimeout(() => div.classList.remove('copied'), 2000);
+            });
+        });
+
+        // Add sensitive data handling
+        if (entry.isSensitive) {
+            div.addEventListener('click', () => {
+                const strong = div.querySelector('strong');
+                if (strong.textContent === '••••••') {
+                    strong.textContent = entry.command;
+                    setTimeout(() => strong.textContent = '••••••', 2000);
+                }
+            });
+        }
+
+        div.appendChild(contentDiv);
+        div.appendChild(copyButton);
+        dataDiv.appendChild(div);
+    });
+}
+
+// UI Event Handlers
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize search
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', () => displayEntries(getEntries()));
+    
+    // Initialize clear search
+    const clearSearch = document.getElementById('clearSearch');
+    searchInput.addEventListener('input', () => {
+        clearSearch.style.display = searchInput.value ? 'flex' : 'none';
+    });
+    clearSearch.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearch.style.display = 'none';
+        displayEntries(getEntries());
+    });
+
+    // Add Entry Form
+    const addEntryForm = document.getElementById('addEntryForm');
+    addEntryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const entry = {
+            command: document.getElementById('commandInput').value,
+            description: document.getElementById('descriptionInput').value,
+            category: document.getElementById('categoryInput').value,
+            tags: document.getElementById('tagsInput').value.split(',').map(t => t.trim()).filter(t => t),
+            isSensitive: document.getElementById('isSensitiveInput').checked
+        };
+
+        if (addEntry(entry)) {
+            closeModal('addEntryModal');
+            addEntryForm.reset();
+            showToast('Entry added successfully');
+        }
+    });
+
+    // FAB Button
+    document.getElementById('addEntryFab').addEventListener('click', () => {
+        openModal('addEntryModal');
+    });
+
+    // Import Button
+    document.getElementById('importButton').addEventListener('click', () => {
+        openModal('importModal');
+    });
+
+    // Close Modal Buttons
+    document.querySelectorAll('.close-modal').forEach(button => {
+        button.addEventListener('click', () => {
+            const modal = button.closest('.modal');
+            closeModal(modal.id);
+        });
+    });
+
+    // CSV Import
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const filePickerButton = document.getElementById('filePickerButton');
+    const previewArea = document.getElementById('previewArea');
+    const previewContent = document.getElementById('previewContent');
+    let csvData = null;
+
+    // Drag and drop handlers
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        handleFileSelect(e.dataTransfer.files[0]);
+    });
+
+    filePickerButton.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFileSelect(e.target.files[0]);
+    });
+
+    function handleFileSelect(file) {
+        if (!file || file.type !== 'text/csv') {
+            showToast('Please select a valid CSV file');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            csvData = e.target.result;
+            const entries = parseCSV(csvData);
+            
+            previewContent.innerHTML = `
+                <p>Found ${entries.length} entries</p>
+                <ul>
+                    ${entries.slice(0, 5).map(entry => `
+                        <li>${entry.command} - ${entry.description}</li>
+                    `).join('')}
+                    ${entries.length > 5 ? '<li>...</li>' : ''}
+                </ul>
+            `;
+            
+            dropZone.hidden = true;
+            previewArea.hidden = false;
+        };
+        reader.readAsText(file);
+    }
+
+    // Import Confirm Button
+    document.getElementById('importConfirm').addEventListener('click', () => {
+        if (!csvData) return;
+        
+        const newEntries = parseCSV(csvData);
+        const existingEntries = getEntries();
+        
+        // Merge entries, avoiding duplicates
+        const mergedEntries = [...existingEntries];
+        let added = 0;
+        
+        newEntries.forEach(entry => {
+            if (!existingEntries.some(e => e.command === entry.command)) {
+                mergedEntries.push(entry);
+                added++;
+            }
+        });
+        
+        saveEntries(mergedEntries);
+        displayEntries(mergedEntries);
+        closeModal('importModal');
+        showToast(`Imported ${added} new entries`);
+        
+        // Reset import state
+        csvData = null;
+        dropZone.hidden = false;
+        previewArea.hidden = true;
+        fileInput.value = '';
+    });
+
+    // Display initial data
+    displayEntries(getEntries());
+});
+
+// Modal Helpers
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+// Toast Helper
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
