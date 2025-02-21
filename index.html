@@ -18,10 +18,10 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Compy</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
-    <link rel="manifest" href="favicon_io/site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="/favicon_io/site.webmanifest">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="styles.css">
@@ -29,119 +29,8 @@
 </head>
 
 <body>
-    <div class="header-section">
-        <header>
-            <h1 id="pageTitle">COMPY</h1>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Type to search..." aria-label="Search commands">
-                <div id="clearSearch" class="clear-icon" aria-label="Clear search" role="button" tabindex="0"
-                    style="display: none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"
-                        fill="currentColor">
-                        <path
-                            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="header-controls">
-                <button id="importButton" class="import-btn" aria-label="Import CSV">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-                        <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-                    </svg>
-                    Import
-                </button>
-                <div class="theme-selector">
-                    <select id="themeSelect" aria-label="Select theme">
-                        <!-- Options will be populated by JavaScript -->
-                    </select>
-                </div>
-            </div>
-        </header>
-    </div>
-
-    <main>
-        <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
-    </main>
-
-    <div class="toast" id="toast" role="alert" aria-hidden="true"></div>
-    <div class="loading-overlay">
-        <div class="spinner"></div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
-    <script src="config.js"></script>
-
-    <!-- Add Entry FAB -->
-    <button id="addEntryFab" class="fab" aria-label="Add new entry">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-            <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
-        </svg>
-    </button>
-
-    <!-- Add Entry Modal -->
-    <div id="addEntryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Entry</h2>
-                <button class="close-modal" aria-label="Close modal">&times;</button>
-            </div>
-            <form id="addEntryForm">
-                <div class="form-group">
-                    <label for="commandInput">Command/Text*</label>
-                    <input type="text" id="commandInput" required>
-                </div>
-                <div class="form-group">
-                    <label for="descriptionInput">Description*</label>
-                    <textarea id="descriptionInput" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="categoryInput">Category</label>
-                    <input type="text" id="categoryInput">
-                </div>
-                <div class="form-group">
-                    <label for="tagsInput">Tags (comma separated)</label>
-                    <input type="text" id="tagsInput" placeholder="git, docker, etc">
-                </div>
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="isSensitiveInput">
-                    <label for="isSensitiveInput">Mask as sensitive data</label>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="primary">Save</button>
-                    <button type="button" class="secondary close-modal">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Import CSV Modal -->
-    <div id="importModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Import CSV</h2>
-                <button class="close-modal" aria-label="Close modal">&times;</button>
-            </div>
-            <div class="import-area">
-                <div id="dropZone" class="drop-zone">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="currentColor">
-                        <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-                    </svg>
-                    <p>Drag & drop your CSV file here<br>or</p>
-                    <button type="button" id="filePickerButton" class="secondary">Choose File</button>
-                    <input type="file" id="fileInput" accept=".csv" hidden>
-                </div>
-                <div id="previewArea" class="preview-area" hidden>
-                    <h3>Preview</h3>
-                    <div id="previewContent"></div>
-                    <div class="form-actions">
-                        <button type="button" id="importConfirm" class="primary">Import</button>
-                        <button type="button" class="secondary close-modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>
