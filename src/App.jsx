@@ -1,20 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { Box, Container, useToast } from '@chakra-ui/react'
 import Header from './components/Header'
 import CommandList from './components/CommandList'
 import AddEntryModal from './components/AddEntryModal'
 import ImportModal from './components/ImportModal'
-import Toast from './components/Toast'
 import AddEntryFab from './components/AddEntryFab'
 import { useLocalStorage } from './hooks/useLocalStorage'
-import { useTheme } from './hooks/useTheme'
 
 function App() {
   const [commands, setCommands] = useLocalStorage('commands', [])
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
-  const { theme, setTheme } = useTheme()
+  const toast = useToast()
 
   const filteredCommands = commands.filter(cmd => {
     const searchLower = searchQuery.toLowerCase()
@@ -27,47 +25,55 @@ function App() {
   const handleAddCommand = (newCommand) => {
     setCommands([...commands, { ...newCommand, id: Date.now() }])
     setShowAddModal(false)
-    setToastMessage('Command added successfully')
+    toast({
+      title: 'Success',
+      description: 'Command added successfully',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+      position: 'bottom',
+    })
   }
 
   const handleImportCommands = (importedCommands) => {
     setCommands([...commands, ...importedCommands])
     setShowImportModal(false)
-    setToastMessage('Commands imported successfully')
+    toast({
+      title: 'Success',
+      description: 'Commands imported successfully',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+      position: 'bottom',
+    })
   }
 
   return (
-    <>
+    <Box minH="100vh" bg="chakra-body-bg" color="chakra-body-text">
       <Header 
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onImportClick={() => setShowImportModal(true)}
-        theme={theme}
-        onThemeChange={setTheme}
       />
 
-      <main>
+      <Container maxW="container.xl" py={8}>
         <CommandList commands={filteredCommands} />
-      </main>
+      </Container>
 
       <AddEntryFab onClick={() => setShowAddModal(true)} />
       
-      {showAddModal && (
-        <AddEntryModal
-          onClose={() => setShowAddModal(false)}
-          onSave={handleAddCommand}
-        />
-      )}
+      <AddEntryModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleAddCommand}
+      />
 
-      {showImportModal && (
-        <ImportModal
-          onClose={() => setShowImportModal(false)}
-          onImport={handleImportCommands}
-        />
-      )}
-
-      <Toast message={toastMessage} onClose={() => setToastMessage('')} />
-    </>
+      <ImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImport={handleImportCommands}
+      />
+    </Box>
   )
 }
 

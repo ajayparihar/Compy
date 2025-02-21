@@ -1,27 +1,53 @@
 import { useState, useRef } from 'react'
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,
+  Button,
+  VStack,
+  Box,
+  Text,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  useColorModeValue,
+  Center,
+  Icon,
+} from '@chakra-ui/react'
+import { FiUpload } from 'react-icons/fi'
 import * as XLSX from 'xlsx'
 
-function ImportModal({ onClose, onImport }) {
+function ImportModal({ isOpen, onClose, onImport }) {
   const [preview, setPreview] = useState(null)
   const fileInputRef = useRef(null)
   const dropZoneRef = useRef(null)
 
+  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const hoverBg = useColorModeValue('gray.50', 'gray.700')
+
   const handleDragOver = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    dropZoneRef.current?.classList.add('drag-over')
+    dropZoneRef.current?.style.setProperty('background-color', hoverBg)
   }
 
   const handleDragLeave = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    dropZoneRef.current?.classList.remove('drag-over')
+    dropZoneRef.current?.style.removeProperty('background-color')
   }
 
   const handleDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    dropZoneRef.current?.classList.remove('drag-over')
+    dropZoneRef.current?.style.removeProperty('background-color')
     
     const file = e.dataTransfer.files[0]
     if (file) processFile(file)
@@ -66,81 +92,95 @@ function ImportModal({ onClose, onImport }) {
   }
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Import CSV</h2>
-          <button className="close-modal" onClick={onClose} aria-label="Close modal">&times;</button>
-        </div>
-        <div className="import-area">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Import CSV</ModalHeader>
+        <ModalCloseButton />
+        
+        <ModalBody>
           {!preview ? (
-            <div
+            <Box
               ref={dropZoneRef}
-              className="drop-zone"
+              border="2px"
+              borderStyle="dashed"
+              borderColor={borderColor}
+              borderRadius="lg"
+              p={8}
+              textAlign="center"
+              transition="all 0.2s"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="currentColor">
-                <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-              </svg>
-              <p>Drag & drop your CSV file here<br/>or</p>
-              <button
-                type="button"
-                className="secondary"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Choose File
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx,.xls"
-                onChange={handleFileSelect}
-                hidden
-              />
-            </div>
+              <VStack spacing={4}>
+                <Icon as={FiUpload} boxSize={12} color="gray.500" />
+                <Text>
+                  Drag & drop your CSV file here<br/>or
+                </Text>
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Choose File
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  onChange={handleFileSelect}
+                  hidden
+                />
+              </VStack>
+            </Box>
           ) : (
-            <div className="preview-area">
-              <h3>Preview</h3>
-              <div className="preview-content">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Command</th>
-                      <th>Description</th>
-                      <th>Category</th>
-                      <th>Tags</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+            <VStack align="stretch" spacing={4}>
+              <Text fontWeight="bold" fontSize="lg">
+                Preview
+              </Text>
+              <Box overflowX="auto">
+                <Table variant="simple" size="sm">
+                  <Thead>
+                    <Tr>
+                      <Th>Command</Th>
+                      <Th>Description</Th>
+                      <Th>Category</Th>
+                      <Th>Tags</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
                     {preview.slice(0, 5).map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.command}</td>
-                        <td>{item.description}</td>
-                        <td>{item.category}</td>
-                        <td>{item.tags.join(', ')}</td>
-                      </tr>
+                      <Tr key={index}>
+                        <Td>{item.command}</Td>
+                        <Td>{item.description}</Td>
+                        <Td>{item.category}</Td>
+                        <Td>{item.tags.join(', ')}</Td>
+                      </Tr>
                     ))}
-                  </tbody>
-                </table>
-                {preview.length > 5 && (
-                  <p>...and {preview.length - 5} more items</p>
-                )}
-              </div>
-              <div className="form-actions">
-                <button type="button" className="primary" onClick={handleImport}>
-                  Import
-                </button>
-                <button type="button" className="secondary" onClick={onClose}>
-                  Cancel
-                </button>
-              </div>
-            </div>
+                  </Tbody>
+                </Table>
+              </Box>
+              {preview.length > 5 && (
+                <Text color="gray.500" fontSize="sm">
+                  ...and {preview.length - 5} more items
+                </Text>
+              )}
+            </VStack>
           )}
-        </div>
-      </div>
-    </div>
+        </ModalBody>
+
+        <ModalFooter gap={3}>
+          {preview && (
+            <Button variant="primary" onClick={handleImport}>
+              Import
+            </Button>
+          )}
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   )
 }
 

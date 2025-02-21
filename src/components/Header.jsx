@@ -1,66 +1,119 @@
-import { useState } from 'react'
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Input,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  useColorMode,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react'
+import { CloseIcon, ChevronDownIcon, SunIcon, MoonIcon, SettingsIcon } from '@chakra-ui/icons'
+import { FiUpload } from 'react-icons/fi'
 
-function Header({ searchQuery, onSearchChange, onImportClick, theme, onThemeChange }) {
-  const [showClearSearch, setShowClearSearch] = useState(false)
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value
-    onSearchChange(value)
-    setShowClearSearch(!!value)
-  }
-
-  const handleClearSearch = () => {
-    onSearchChange('')
-    setShowClearSearch(false)
-  }
+function Header({ searchQuery, onSearchChange, onImportClick }) {
+  const { colorMode, toggleColorMode } = useColorMode()
 
   return (
-    <div className="header-section">
-      <header>
-        <h1 id="pageTitle">COMPY</h1>
-        <div className="search-container">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Type to search..."
-            aria-label="Search commands"
-          />
-          {showClearSearch && (
-            <div
-              className="clear-icon"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
-              role="button"
-              tabIndex={0}
+    <Box
+      as="header"
+      position="sticky"
+      top={0}
+      zIndex={100}
+      bg="chakra-body-bg"
+      borderBottom="1px"
+      borderColor="chakra-border-color"
+      boxShadow="sm"
+      py={4}
+    >
+      <Container maxW="container.xl">
+        <Flex align="center" gap={4}>
+          <Heading
+            as="h1"
+            size="lg"
+            color="brand.primary"
+            flexShrink={0}
+          >
+            COMPY
+          </Heading>
+
+          <InputGroup maxW="600px" flex={1}>
+            <Input
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Type to search..."
+              variant="filled"
+            />
+            {searchQuery && (
+              <InputRightElement>
+                <IconButton
+                  icon={<CloseIcon />}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onSearchChange('')}
+                  aria-label="Clear search"
+                />
+              </InputRightElement>
+            )}
+          </InputGroup>
+
+          <Flex gap={4} align="center" ml="auto">
+            <Button
+              leftIcon={<FiUpload />}
+              variant="primary"
+              onClick={onImportClick}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-              </svg>
-            </div>
-          )}
-        </div>
-        <div className="header-controls">
-          <button className="import-btn" onClick={onImportClick} aria-label="Import CSV">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-              <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-            </svg>
-            Import
-          </button>
-          <div className="theme-selector">
-            <select
-              value={theme}
-              onChange={(e) => onThemeChange(e.target.value)}
-              aria-label="Select theme"
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System</option>
-            </select>
-          </div>
-        </div>
-      </header>
-    </div>
+              Import
+            </Button>
+
+            <Menu>
+              <MenuButton
+                as={Button}
+                variant="ghost"
+                rightIcon={<ChevronDownIcon />}
+              >
+                Theme
+              </MenuButton>
+              <MenuList>
+                <MenuItem
+                  icon={<SunIcon />}
+                  onClick={() => {
+                    if (colorMode !== 'light') toggleColorMode()
+                  }}
+                >
+                  Light
+                </MenuItem>
+                <MenuItem
+                  icon={<MoonIcon />}
+                  onClick={() => {
+                    if (colorMode !== 'dark') toggleColorMode()
+                  }}
+                >
+                  Dark
+                </MenuItem>
+                <MenuItem
+                  icon={<SettingsIcon />}
+                  onClick={() => {
+                    // Toggle to match system
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+                    if (prefersDark && colorMode !== 'dark') toggleColorMode()
+                    if (!prefersDark && colorMode !== 'light') toggleColorMode()
+                  }}
+                >
+                  System
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
+        </Flex>
+      </Container>
+    </Box>
   )
 }
 

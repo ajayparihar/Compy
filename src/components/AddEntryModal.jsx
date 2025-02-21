@@ -1,6 +1,22 @@
 import { useState } from 'react'
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Checkbox,
+  VStack,
+} from '@chakra-ui/react'
 
-function AddEntryModal({ onClose, onSave }) {
+function AddEntryModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
     command: '',
     description: '',
@@ -26,72 +42,81 @@ function AddEntryModal({ onClose, onSave }) {
   }
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Add New Entry</h2>
-          <button className="close-modal" onClick={onClose} aria-label="Close modal">&times;</button>
-        </div>
-        <form id="addEntryForm" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="command">Command/Text*</label>
-            <input
-              type="text"
-              id="command"
-              name="command"
-              value={formData.command}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="description">Description*</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <input
-              type="text"
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="tags">Tags (comma separated)</label>
-            <input
-              type="text"
-              id="tags"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="git, docker, etc"
-            />
-          </div>
-          <div className="form-group checkbox">
-            <input
-              type="checkbox"
-              id="isSensitive"
-              name="isSensitive"
-              checked={formData.isSensitive}
-              onChange={handleChange}
-            />
-            <label htmlFor="isSensitive">Mask as sensitive data</label>
-          </div>
-          <div className="form-actions">
-            <button type="submit" className="primary">Save</button>
-            <button type="button" className="secondary" onClick={onClose}>Cancel</button>
-          </div>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <ModalOverlay />
+      <ModalContent>
+        <form onSubmit={handleSubmit}>
+          <ModalHeader>Add New Entry</ModalHeader>
+          <ModalCloseButton />
+          
+          <ModalBody>
+            <VStack spacing={4}>
+              <FormControl isRequired>
+                <FormLabel htmlFor="command">Command/Text</FormLabel>
+                <Input
+                  id="command"
+                  name="command"
+                  value={formData.command}
+                  onChange={handleChange}
+                />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  resize="vertical"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel htmlFor="category">Category</FormLabel>
+                <Input
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel htmlFor="tags">Tags (comma separated)</FormLabel>
+                <Input
+                  id="tags"
+                  name="tags"
+                  value={formData.tags}
+                  onChange={handleChange}
+                  placeholder="git, docker, etc"
+                />
+              </FormControl>
+
+              <FormControl>
+                <Checkbox
+                  id="isSensitive"
+                  name="isSensitive"
+                  isChecked={formData.isSensitive}
+                  onChange={handleChange}
+                >
+                  Mask as sensitive data
+                </Checkbox>
+              </FormControl>
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter gap={3}>
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
         </form>
-      </div>
-    </div>
+      </ModalContent>
+    </Modal>
   )
 }
 
