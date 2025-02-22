@@ -1,66 +1,47 @@
-import { useState } from 'react'
+import { AppBar, Toolbar, Typography, IconButton, Box, Autocomplete, TextField } from '@mui/material'
+import { Brightness4, Brightness7, FileUpload } from '@mui/icons-material'
 
-function Header({ searchQuery, onSearchChange, onImportClick, theme, onThemeChange }) {
-  const [showClearSearch, setShowClearSearch] = useState(false)
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value
-    onSearchChange(value)
-    setShowClearSearch(!!value)
-  }
-
-  const handleClearSearch = () => {
-    onSearchChange('')
-    setShowClearSearch(false)
-  }
-
+function Header({ searchQuery, onSearchChange, onImportClick, isDarkMode, onThemeToggle }) {
   return (
-    <div className="header-section">
-      <header>
-        <h1 id="pageTitle">COMPY</h1>
-        <div className="search-container">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Type to search..."
-            aria-label="Search commands"
+    <AppBar position="static" color="default" elevation={1}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+        <Typography variant="h6" component="h1" color="primary" sx={{ flexShrink: 0 }}>
+          Compy
+        </Typography>
+
+        <Box sx={{ flex: 1, maxWidth: 600, mx: 'auto' }}>
+          <Autocomplete
+            freeSolo
+            options={[]}
+            inputValue={searchQuery}
+            onInputChange={(event, newValue) => onSearchChange(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Search commands..."
+                size="small"
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: (theme) => 
+                      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                  }
+                }}
+              />
+            )}
           />
-          {showClearSearch && (
-            <div
-              className="clear-icon"
-              onClick={handleClearSearch}
-              aria-label="Clear search"
-              role="button"
-              tabIndex={0}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-              </svg>
-            </div>
-          )}
-        </div>
-        <div className="header-controls">
-          <button className="import-btn" onClick={onImportClick} aria-label="Import CSV">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-              <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-            </svg>
-            Import
-          </button>
-          <div className="theme-selector">
-            <select
-              value={theme}
-              onChange={(e) => onThemeChange(e.target.value)}
-              aria-label="Select theme"
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System</option>
-            </select>
-          </div>
-        </div>
-      </header>
-    </div>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton onClick={onImportClick} color="primary" title="Import commands">
+            <FileUpload />
+          </IconButton>
+          <IconButton onClick={onThemeToggle} color="primary" title="Toggle theme">
+            {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+          </IconButton>
+        </Box>
+      </Toolbar>
+    </AppBar>
   )
 }
 

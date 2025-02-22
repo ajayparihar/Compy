@@ -1,146 +1,169 @@
-import { useState, useRef } from 'react'
-import * as XLSX from 'xlsx'
+import { useState } from 'react'
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Button,
+  Typography,
+  Box,
+  IconButton,
+  LinearProgress
+} from '@mui/material'
+import { Close, CloudUpload } from '@mui/icons-material'
 
-function ImportModal({ onClose, onImport }) {
-  const [preview, setPreview] = useState(null)
-  const fileInputRef = useRef(null)
-  const dropZoneRef = useRef(null)
+function ImportModal({ open, onClose, onImport }) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [file, setFile] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleDragOver = (e) => {
     e.preventDefault()
-    e.stopPropagation()
-    dropZoneRef.current?.classList.add('drag-over')
+    setIsDragging(true)
   }
 
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dropZoneRef.current?.classList.remove('drag-over')
+  const handleDragLeave = () => {
+    setIsDragging(false)
   }
 
   const handleDrop = (e) => {
     e.preventDefault()
-    e.stopPropagation()
-    dropZoneRef.current?.classList.remove('drag-over')
+    setIsDragging(false)
+    const droppedFile = e.dataTransfer.files[0]
+    handleFileSelection(droppedFile)
+  }
+
+  const handleFileSelection = (selectedFile) => {
+    if (!selectedFile) return
     
-    const file = e.dataTransfer.files[0]
-    if (file) processFile(file)
-  }
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0]
-    if (file) processFile(file)
-  }
-
-  const processFile = (file) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target?.result)
-        const workbook = XLSX.read(data, { type: 'array' })
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-        const jsonData = XLSX.utils.sheet_to_json(firstSheet)
-        
-        const processedData = jsonData.map(row => ({
-          command: row.command || row.Command || '',
-          description: row.description || row.Description || '',
-          category: row.category || row.Category || '',
-          tags: (row.tags || row.Tags || '').split(',').map(tag => tag.trim()).filter(Boolean),
-          isSensitive: row.isSensitive || row.IsSensitive || false,
-          id: Date.now() + Math.random()
-        }))
-
-        setPreview(processedData)
-      } catch (error) {
-        console.error('Error processing file:', error)
-        alert('Error processing file. Please check the format.')
-      }
+    if (!selectedFile.name.endsWith('.csv')) {
+      setError('Please select a CSV file')
+      setFile(null)
+      return
     }
-    reader.readAsArrayBuffer(file)
+
+    setError('')
+    setFile(selectedFile)
   }
 
-  const handleImport = () => {
-    if (preview) {
-      onImport(preview)
+  const handleImport = async () => {
+    if (!file) return
+
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+        const lines = text.split('\n')
+        const headers = lines[0].split(',')
+        
+        const commands = lines.slice(1)
+          .filter(line => line.trim())
+          .map(line => {
+            const values = line.split(',')
+            return {
+              id: Date.now() + Math.random(),
+              command: values[0]?.trim() || '',
+              description: values[1]?.trim() || '',
+              category: values[2]?.trim() || '',
+              tags: values[3]?.split(';').map(tag => tag.trim()).filter(Boolean) || []
+            }
+          })
+          .filter(cmd => cmd.command && cmd.description)
+
+        onImport(commands)
+      }
+
+      reader.readAsText(file)
+    } catch (err) {
+      setError('Error processing file. Please check the format.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Import CSV</h2>
-          <button className="close-modal" onClick={onClose} aria-label="Close modal">&times;</button>
-        </div>
-        <div className="import-area">
-          {!preview ? (
-            <div
-              ref={dropZoneRef}
-              className="drop-zone"
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="currentColor">
-                <path d="M480-320 280-520l56-56 104 104v-288h80v288l104-104 56 56-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
-              </svg>
-              <p>Drag & drop your CSV file here<br/>or</p>
-              <button
-                type="button"
-                className="secondary"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Choose File
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.xlsx,.xls"
-                onChange={handleFileSelect}
-                hidden
-              />
-            </div>
-          ) : (
-            <div className="preview-area">
-              <h3>Preview</h3>
-              <div className="preview-content">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Command</th>
-                      <th>Description</th>
-                      <th>Category</th>
-                      <th>Tags</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {preview.slice(0, 5).map((item, index) => (
-                      <tr key={index}>
-                        <td>{item.command}</td>
-                        <td>{item.description}</td>
-                        <td>{item.category}</td>
-                        <td>{item.tags.join(', ')}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {preview.length > 5 && (
-                  <p>...and {preview.length - 5} more items</p>
-                )}
-              </div>
-              <div className="form-actions">
-                <button type="button" className="primary" onClick={handleImport}>
-                  Import
-                </button>
-                <button type="button" className="secondary" onClick={onClose}>
-                  Cancel
-                </button>
-              </div>
-            </div>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        Import Commands
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+          }}
+        >
+          <Close />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
+        <Box
+          sx={{
+            border: 2,
+            borderRadius: 1,
+            borderStyle: 'dashed',
+            borderColor: isDragging ? 'primary.main' : 'grey.300',
+            p: 3,
+            textAlign: 'center',
+            bgcolor: isDragging ? 'action.hover' : 'background.paper',
+            cursor: 'pointer',
+            '&:hover': {
+              bgcolor: 'action.hover',
+            },
+          }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => document.getElementById('file-input').click()}
+        >
+          <input
+            type="file"
+            id="file-input"
+            accept=".csv"
+            style={{ display: 'none' }}
+            onChange={(e) => handleFileSelection(e.target.files[0])}
+          />
+          <CloudUpload sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h6" gutterBottom>
+            Drag & Drop CSV file here
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            or click to select file
+          </Typography>
+          {file && (
+            <Typography variant="body2" color="primary" sx={{ mt: 2 }}>
+              Selected: {file.name}
+            </Typography>
           )}
-        </div>
-      </div>
-    </div>
+          {error && (
+            <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+        </Box>
+        {isLoading && <LinearProgress sx={{ mt: 2 }} />}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button
+          onClick={handleImport}
+          variant="contained"
+          disabled={!file || isLoading}
+        >
+          Import
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 

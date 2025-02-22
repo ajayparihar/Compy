@@ -1,97 +1,167 @@
 import { useState } from 'react'
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  TextField, 
+  Button,
+  Box,
+  Chip,
+  IconButton,
+  InputAdornment
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 
-function AddEntryModal({ onClose, onSave }) {
-  const [formData, setFormData] = useState({
+function AddEntryModal({ open, onClose, onSave, initialData }) {
+  const [formData, setFormData] = useState(initialData || {
     command: '',
     description: '',
     category: '',
-    tags: '',
-    isSensitive: false
+    tags: []
   })
+  const [newTag, setNewTag] = useState('')
+  const [newCategory, setNewCategory] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSave({
-      ...formData,
-      tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : []
-    })
+    onSave(formData)
   }
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+  const handleAddTag = (e) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      e.preventDefault()
+      if (!formData.tags.includes(newTag.trim())) {
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, newTag.trim()]
+        }))
+      }
+      setNewTag('')
+    }
+  }
+
+  const handleDeleteTag = (tagToDelete) => {
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      tags: prev.tags.filter(tag => tag !== tagToDelete)
     }))
   }
 
+  const handleAddCategory = (e) => {
+    if (e.key === 'Enter' && newCategory.trim()) {
+      e.preventDefault()
+      setFormData(prev => ({
+        ...prev,
+        category: newCategory.trim()
+      }))
+      setNewCategory('')
+    }
+  }
+
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Add New Entry</h2>
-          <button className="close-modal" onClick={onClose} aria-label="Close modal">&times;</button>
-        </div>
-        <form id="addEntryForm" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="command">Command/Text*</label>
-            <input
-              type="text"
-              id="command"
-              name="command"
-              value={formData.command}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="description">Description*</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <input
-              type="text"
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="tags">Tags (comma separated)</label>
-            <input
-              type="text"
-              id="tags"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              placeholder="git, docker, etc"
-            />
-          </div>
-          <div className="form-group checkbox">
-            <input
-              type="checkbox"
-              id="isSensitive"
-              name="isSensitive"
-              checked={formData.isSensitive}
-              onChange={handleChange}
-            />
-            <label htmlFor="isSensitive">Mask as sensitive data</label>
-          </div>
-          <div className="form-actions">
-            <button type="submit" className="primary">Save</button>
-            <button type="button" className="secondary" onClick={onClose}>Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Dialog 
+      open={open} 
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        {initialData ? 'Edit Command' : 'Add New Command'}
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+          }}
+        >
+          <Close />
+        </IconButton>
+      </DialogTitle>
+      <form onSubmit={handleSubmit}>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Command"
+            fullWidth
+            required
+            value={formData.command}
+            onChange={(e) => setFormData(prev => ({ ...prev, command: e.target.value }))}
+            sx={{ mb: 2 }}
+          />
+          
+          <TextField
+            margin="dense"
+            label="Description"
+            fullWidth
+            multiline
+            rows={3}
+            required
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            margin="dense"
+            label="Category"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            onKeyDown={handleAddCategory}
+            fullWidth
+            helperText="Press Enter to set category"
+            sx={{ mb: 2 }}
+            InputProps={{
+              startAdornment: formData.category ? (
+                <InputAdornment position="start">
+                  <Chip
+                    label={formData.category}
+                    size="small"
+                    onDelete={() => setFormData(prev => ({ ...prev, category: '' }))}
+                    color="primary"
+                  />
+                </InputAdornment>
+              ) : null
+            }}
+          />
+
+          <TextField
+            margin="dense"
+            label="Add Tags"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            onKeyDown={handleAddTag}
+            fullWidth
+            helperText="Press Enter to add a tag"
+            InputProps={{
+              startAdornment: formData.tags.length > 0 ? (
+                <InputAdornment position="start">
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {formData.tags.map((tag, index) => (
+                      <Chip
+                        key={index}
+                        label={tag}
+                        size="small"
+                        onDelete={() => handleDeleteTag(tag)}
+                      />
+                    ))}
+                  </Box>
+                </InputAdornment>
+              ) : null
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit" variant="contained">
+            {initialData ? 'Save Changes' : 'Add Command'}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   )
 }
 

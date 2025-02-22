@@ -1,10 +1,20 @@
+import { Fab } from '@mui/material'
+import { Add } from '@mui/icons-material'
+
 function AddEntryFab({ onClick }) {
   return (
-    <button className="fab" onClick={onClick} aria-label="Add new entry">
-      <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-        <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
-      </svg>
-    </button>
+    <Fab
+      color="primary"
+      aria-label="add command"
+      onClick={onClick}
+      sx={{
+        position: 'fixed',
+        bottom: 24,
+        right: 24,
+      }}
+    >
+      <Add />
+    </Fab>
   )
 }
 
