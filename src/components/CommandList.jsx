@@ -1,5 +1,5 @@
-import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button, CardActionArea } from '@mui/material'
-import { ContentCopy, Delete, Edit } from '@mui/icons-material'
+import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button, CardActionArea, Tooltip, Popover } from '@mui/material'
+import { ContentCopy, Delete, Edit, MoreHoriz, Close } from '@mui/icons-material'
 import { useState } from 'react'
 
 function CommandList({ commands, onDelete, onEdit, searchQuery }) {
@@ -9,6 +9,8 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
+  const [tagsAnchorEl, setTagsAnchorEl] = useState(null)
+  const [selectedTags, setSelectedTags] = useState([])
 
   const handleCopy = async (command) => {
     try {
@@ -93,6 +95,18 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
     );
   };
 
+  const handleTagsMoreClick = (event, tags) => {
+    event.stopPropagation();
+    setTagsAnchorEl(event.currentTarget);
+    setSelectedTags(tags);
+  };
+
+  const handleTagsPopoverClose = () => {
+    setTagsAnchorEl(null);
+  };
+
+  const tagsPopoverOpen = Boolean(tagsAnchorEl);
+
   return (
     <>
       <Grid container spacing={2}>
@@ -113,7 +127,12 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   theme.palette.mode === 'dark'
                     ? 'rgba(255, 255, 255, 0.1)'
                     : 'rgba(0, 0, 0, 0.1)',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                position: 'relative',
+                '&:hover .action-buttons': {
+                  opacity: 1,
+                  visibility: 'visible',
+                },
               }}
             >
               <CardActionArea
@@ -136,49 +155,57 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   p: 2,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 1
+                  gap: 1,
+                  position: 'relative'
                 }}>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'flex-start',
-                    gap: 1
-                  }}>
-                    <Typography 
-                      variant="subtitle1" 
-                      component="h2" 
+                  {item.category && (
+                    <Chip
+                      label={highlightText(item.category, searchQuery)}
+                      size="small"
+                      color="primary"
                       sx={{ 
-                        fontFamily: 'monospace',
-                        wordBreak: 'break-word',
-                        flex: 1,
-                        fontWeight: 800,
-                        color: '#4B9CDB',
-                        fontSize: '1.1rem',
-                        letterSpacing: '0.01em',
-                        lineHeight: 1.4
-                      }}
-                    >
-                      {highlightText(item.command, searchQuery)}
-                    </Typography>
-                    {item.category && (
-                      <Chip
-                        label={highlightText(item.category, searchQuery)}
-                        size="small"
-                        color="primary"
-                        sx={{ 
-                          flexShrink: 0,
+                        position: 'absolute',
+                        top: 12,
+                        right: 16,
+                        fontWeight: 700,
+                        background: theme.palette.mode === 'dark'
+                          ? 'rgba(129, 140, 248, 0.4)'
+                          : 'rgba(99, 102, 241, 0.2)',
+                        color: theme.palette.mode === 'dark'
+                          ? theme.palette.primary.light
+                          : theme.palette.primary.main,
+                        borderColor: 'transparent',
+                        height: '28px',
+                        fontSize: '0.85rem',
+                        boxShadow: theme.palette.mode === 'dark'
+                          ? '0 2px 8px rgba(0, 0, 0, 0.2)'
+                          : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        borderRadius: '14px',
+                        '&:hover': {
                           background: theme.palette.mode === 'dark'
-                            ? 'rgba(129, 140, 248, 0.2)'
-                            : 'rgba(99, 102, 241, 0.1)',
-                          color: theme.palette.mode === 'dark'
-                            ? theme.palette.primary.light
-                            : theme.palette.primary.main,
-                          borderColor: 'transparent',
-                          fontWeight: 500,
-                          height: '24px'
-                        }}
-                      />
-                    )}
-                  </Box>
+                            ? 'rgba(129, 140, 248, 0.45)'
+                            : 'rgba(99, 102, 241, 0.25)'
+                        }
+                      }}
+                    />
+                  )}
+                  <Typography 
+                    variant="subtitle1" 
+                    component="h2" 
+                    sx={{ 
+                      fontFamily: 'monospace',
+                      wordBreak: 'break-word',
+                      flex: 1,
+                      fontWeight: 800,
+                      color: theme.palette.primary.main,
+                      fontSize: '1.1rem',
+                      letterSpacing: '0.01em',
+                      lineHeight: 1.4,
+                      pr: item.category ? 8 : 0
+                    }}
+                  >
+                    {highlightText(item.command, searchQuery)}
+                  </Typography>
                   
                   <Typography 
                     variant="body2" 
@@ -193,14 +220,13 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   </Typography>
                 </CardContent>
 
-                <CardActions 
+                <Box
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     p: 2,
                     pt: 1,
-                    gap: 1,
                     borderTop: '1px solid',
                     borderColor: (theme) =>
                       theme.palette.mode === 'dark'
@@ -209,108 +235,180 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                     backgroundColor: (theme) =>
                       theme.palette.mode === 'dark'
                         ? 'rgba(0, 0, 0, 0.2)'
-                        : 'rgba(0, 0, 0, 0.02)'
+                        : 'rgba(0, 0, 0, 0.02)',
                   }}
                 >
-                  {/* Tags section */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    gap: 0.5, 
-                    flex: 1, 
-                    flexWrap: 'wrap',
-                    minWidth: 0 
-                  }}>
-                    {item.tags && item.tags.length > 0 && (
-                      <>
-                        {item.tags.slice(0, 3).map((tag, index) => (
-                          <Chip
-                            key={index}
-                            label={highlightText(tag, searchQuery)}
-                            size="small"
-                            sx={{ 
-                              bgcolor: theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.05)'
-                                : 'rgba(0, 0, 0, 0.05)',
-                              color: 'text.secondary',
-                              height: '20px',
-                              '& .MuiChip-label': {
-                                px: 1,
-                                fontSize: '0.75rem'
-                              }
-                            }}
-                          />
-                        ))}
-                        {item.tags.length > 3 && (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              color: 'text.secondary',
-                              opacity: 0.7,
-                              alignSelf: 'center'
-                            }}
-                          >
-                            +{item.tags.length - 3}
-                          </Typography>
-                        )}
-                      </>
+                  {/* Tags Section */}
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', flex: 1 }}>
+                    {item.tags && item.tags.slice(0, 3).map((tag, index) => (
+                      <Chip
+                        key={index}
+                        label={highlightText(tag, searchQuery)}
+                        size="small"
+                        sx={{ 
+                          background: theme.palette.mode === 'dark'
+                            ? 'rgba(129, 140, 248, 0.15)'
+                            : 'rgba(99, 102, 241, 0.08)',
+                          color: theme.palette.mode === 'dark'
+                            ? theme.palette.primary.light
+                            : theme.palette.primary.main,
+                          borderColor: theme.palette.mode === 'dark'
+                            ? 'rgba(129, 140, 248, 0.3)'
+                            : 'rgba(99, 102, 241, 0.2)',
+                          border: '1px solid',
+                          fontWeight: 400,
+                          height: '24px',
+                          fontSize: '0.8rem',
+                          borderRadius: '4px',
+                          '&:hover': {
+                            background: theme.palette.mode === 'dark'
+                              ? 'rgba(129, 140, 248, 0.2)'
+                              : 'rgba(99, 102, 241, 0.12)',
+                            borderColor: theme.palette.mode === 'dark'
+                              ? 'rgba(129, 140, 248, 0.4)'
+                              : 'rgba(99, 102, 241, 0.3)'
+                          }
+                        }}
+                      />
+                    ))}
+                    {item.tags && item.tags.length > 3 && (
+                      <Chip
+                        icon={<MoreHoriz />}
+                        label={`+${item.tags.length - 3}`}
+                        size="small"
+                        onClick={(e) => handleTagsMoreClick(e, item.tags)}
+                        sx={{ 
+                          cursor: 'pointer',
+                          background: theme.palette.mode === 'dark'
+                            ? 'rgba(129, 140, 248, 0.2)'
+                            : 'rgba(99, 102, 241, 0.1)',
+                          color: theme.palette.mode === 'dark'
+                            ? theme.palette.primary.light
+                            : theme.palette.primary.main,
+                        }}
+                      />
                     )}
                   </Box>
-                  
-                  {/* Action buttons */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    gap: 0.5,
-                    ml: 'auto',
-                    flexShrink: 0,
-                    opacity: { xs: 1, sm: 0 },
-                    transition: 'opacity 0.2s ease-in-out',
-                    '.MuiCard-root:hover &': {
-                      opacity: 1
-                    }
-                  }}>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopy(item.command);
-                      }}
-                      sx={{
-                        color: theme.palette.primary.main
-                      }}
-                    >
-                      <ContentCopy fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(item);
-                      }}
-                      sx={{
-                        color: theme.palette.error.main
-                      }}
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(item);
-                      }}
-                      sx={{
-                        color: theme.palette.info.main
-                      }}
-                    >
-                      <Edit fontSize="small" />
-                    </IconButton>
+
+                  {/* Action Buttons */}
+                  <Box
+                    className="action-buttons"
+                    sx={{
+                      display: 'flex',
+                      gap: 1,
+                      opacity: 0,
+                      visibility: 'hidden',
+                      transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                      ml: 2,
+                    }}
+                  >
+                    <Tooltip title="Copy">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopy(item.command);
+                        }}
+                        sx={{ color: theme.palette.primary.main }}
+                      >
+                        <ContentCopy fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(item);
+                        }}
+                        sx={{ color: theme.palette.error.main }}
+                      >
+                        <Delete fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(item);
+                        }}
+                        sx={{ color: theme.palette.info.main }}
+                      >
+                        <Edit fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
-                </CardActions>
+                </Box>
               </CardActionArea>
             </Card>
           </Grid>
         ))}
       </Grid>
+
+      {/* Tags Popover */}
+      <Popover
+        open={tagsPopoverOpen}
+        anchorEl={tagsAnchorEl}
+        onClose={handleTagsPopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Box sx={{ 
+          p: 2, 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: 1, 
+          maxWidth: '300px',
+          position: 'relative'
+        }}>
+          <IconButton
+            size="small"
+            onClick={handleTagsPopoverClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: theme => theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.7)'
+                : 'rgba(0, 0, 0, 0.5)',
+              '&:hover': {
+                color: theme => theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.9)'
+                  : 'rgba(0, 0, 0, 0.7)',
+              }
+            }}
+          >
+            <Close fontSize="small" />
+          </IconButton>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pt: 2 }}>
+            {selectedTags.map((tag, index) => (
+              <Chip
+                key={index}
+                label={highlightText(tag, searchQuery)}
+                size="small"
+                color="primary"
+                sx={{ 
+                  background: theme.palette.mode === 'dark'
+                    ? 'rgba(129, 140, 248, 0.2)'
+                    : 'rgba(99, 102, 241, 0.1)',
+                  color: theme.palette.mode === 'dark'
+                    ? theme.palette.primary.light
+                    : theme.palette.primary.main,
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
+      </Popover>
+
       <Dialog
         open={deleteConfirmOpen}
         onClose={handleDeleteCancel}

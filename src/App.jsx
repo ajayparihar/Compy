@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react'
-import { ThemeProvider, CssBaseline, Container, Grid } from '@mui/material'
+import { ThemeProvider, CssBaseline, Container, Grid, Box, Autocomplete, TextField, IconButton, InputAdornment, Tooltip } from '@mui/material'
 import Header from './components/Header'
 import CommandList from './components/CommandList'
 import AddEntryModal from './components/AddEntryModal'
 import ImportModal from './components/ImportModal'
-import AddEntryFab from './components/AddEntryFab'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useTheme } from './hooks/useTheme'
 import { getTheme } from './theme'
 import { Snackbar, Alert } from '@mui/material'
 import LoadingSkeleton from './components/LoadingSkeleton'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import { Search, Clear, Add, FileUpload } from '@mui/icons-material'
+import ThemeSelector from './components/ThemeSelector'
 
 function App() {
   // Theme
@@ -78,33 +82,149 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth={false} sx={{ 
-        minHeight: '100vh',
-        pt: { xs: 12, sm: 13, md: 14 },
-        pb: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2
+      <AppBar position="fixed" sx={{
+        background: theme.palette.mode === 'dark' 
+          ? 'rgba(10, 25, 41, 0.7)'
+          : 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid',
+        borderColor: theme.palette.mode === 'dark'
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.1)',
       }}>
-        <Header
+        <Toolbar sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 2,
+          py: 1,
+        }}>
+          
+        <Typography
+          variant="h5"
+          component="h1"
+          color="primary"
+          onClick={() => window.location.reload()}
+          sx={{
+            flexShrink: 0,
+            fontWeight: 600,
+            letterSpacing: '-0.5px',
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+            cursor: 'pointer',
+            position: 'relative',
+            '&:hover': {
+              opacity: 0.8,
+              '&::after': {
+                transform: 'scaleX(1)',
+              },
+            },
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: -2,
+              left: 0,
+              right: 0,
+              margin: '0 auto',
+              width: '100%',
+              height: '2px',
+              backgroundColor: 'primary.main',
+              transform: 'scaleX(0)',
+              transformOrigin: '50% 50%',
+              transition: 'transform 0.3s ease-out',
+            },
+            transition: 'opacity 0.2s ease-in-out',
+          }}
+        >
+          Compy
+        </Typography>
+
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Autocomplete
+              freeSolo
+              fullWidth
+              options={[]}
+              inputValue={searchQuery}
+              onInputChange={(event, newValue) => setSearchQuery(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Search commands..."
+                  size="small"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {searchQuery ? (
+                          <IconButton
+                            size="small"
+                            onClick={() => setSearchQuery('')}
+                          >
+                            <Clear fontSize="small" />
+                          </IconButton>
+                        ) : (
+                          <Search />
+                        )}
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'rgba(0, 0, 0, 0.04)',
+                      '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.06)',
+                      },
+                    },
+                  }}
+                />
+              )}
+            />
+            
+            <Tooltip title="Add new command">
+              <IconButton color="inherit" onClick={() => setShowAddModal(true)}>
+                <Add />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ThemeSelector />
+            <Tooltip title="Import commands">
+              <IconButton color="inherit" onClick={() => setShowImportModal(true)}>
+                <FileUpload />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      
+      <Container 
+        maxWidth="xl"
+        sx={{
+          pt: 10,
+          px: 2,
+        }}
+      >
+        {/* <Header
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onImportClick={() => setShowImportModal(true)}
           commands={commands}
-        />
+          onAddClick={() => setShowAddModal(true)}
+        /> */}
 
         {isLoading ? (
           <LoadingSkeleton />
         ) : (
           <CommandList
-            sx={{ mt: 0 }} // Removed marginTop
+            sx={{ mt: 0 }}
             commands={filteredCommands}
             onDelete={handleDeleteCommand}
             onEdit={setEditingCommand}
           />
         )}
-
-        <AddEntryFab onClick={() => setShowAddModal(true)} />
 
         <AddEntryModal
           open={showAddModal}

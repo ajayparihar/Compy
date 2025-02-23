@@ -70,3 +70,13 @@ body {
 .MuiAppBar-root {
   backdrop-filter: blur(10px);
 }
+
+/* Force immediate theme application */
+:root[data-theme] {
+  color-scheme: light dark;
+}
+
+/* Ensure theme changes are applied immediately */
+:root[data-theme] * {
+  forced-color-adjust: none;
+}

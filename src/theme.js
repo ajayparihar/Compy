@@ -126,3 +126,13 @@ export function getTheme(themeId = 'sunrise') {
 
 export const lightTheme = getTheme('sunrise')
 export const darkTheme = getTheme('mysticForest')
+
+const handleThemeChange = (themeId) => {
+  try {
+    setCurrentTheme(themeId);
+  } catch (error) {
+    console.error('Error changing theme:', error);
+  } finally {
+    handleClose();
+  }
+}

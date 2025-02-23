@@ -10,7 +10,8 @@ import {
   useTheme,
   Popper,
   Paper,
-  InputAdornment
+  InputAdornment,
+  Tooltip
 } from '@mui/material'
 import {
   Brightness4,
@@ -18,7 +19,8 @@ import {
   FileUpload,
   Search,
   History,
-  Clear
+  Clear,
+  Add
 } from '@mui/icons-material'
 import ThemeSelector from './ThemeSelector'
 
@@ -28,6 +30,7 @@ function Header({
   onImportClick,
   isDarkMode,
   onThemeToggle,
+  onAddClick
 }) {
   const theme = useTheme()
   const [searchHistory, setSearchHistory] = useState(() => {
@@ -88,7 +91,7 @@ function Header({
         position: 'fixed',
         top: 0,
         zIndex: 1100,
-        width: '100%',
+        // width: '100%',
         backdropFilter: 'blur(10px)',
         backgroundColor: (theme) => 
           theme.palette.mode === 'dark' 
@@ -151,122 +154,149 @@ function Header({
 
         <Box
           sx={{
-            flex: 1,
-            maxWidth: { xs: '100%', sm: 800, md: 1000, lg: 1200 },
-            mx: 'auto',
             position: 'relative',
           }}
         >
-          <Autocomplete
-            freeSolo
-            options={searchHistory}
-            inputValue={searchQuery}
-            onInputChange={(event, newValue) => onSearchChange(newValue)}
-            onChange={(event, newValue) => handleSearchSubmit(newValue)}
-            PopperComponent={CustomPopper}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="Search commands... (Press '/' to focus)"
-                size="medium"
-                fullWidth
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                InputProps={{
-                  ...params.InputProps,
-                  startAdornment: (
-                    <>
-                      {searchQuery ? (
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSearchChange('');
-                          }}
-                          sx={{
-                            color: 'text.secondary',
-                            ml: 0.5,
-                            '&:hover': {
-                              color: 'text.primary',
-                            },
-                          }}
-                        >
-                          <Clear fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <Search
-                          sx={{
-                            color: 'text.secondary',
-                            ml: 1,
-                            mr: 0.5,
-                          }}
-                        />
-                      )}
-                      {params.InputProps.startAdornment}
-                    </>
-                  ),
-                  endAdornment: (
-                    <>
-                      {searchHistory.length > 0 && (
-                        <InputAdornment position="end">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+            }}
+          >
+            <Autocomplete
+              freeSolo
+              fullWidth
+              sx={{
+                width: { xs: '90%', sm: '70vw' },
+              }}
+              options={searchHistory}
+              inputValue={searchQuery}
+              onInputChange={(event, newValue) => onSearchChange(newValue)}
+              onChange={(event, newValue) => handleSearchSubmit(newValue)}
+              PopperComponent={CustomPopper}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Search commands... (Press '/' to focus)"
+                  fullWidth
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => setIsSearchFocused(false)}
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <> 
+                        {searchQuery ? (
                           <IconButton
                             size="small"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSearchHistory([]);
+                              onSearchChange('');
                             }}
-                            title="Clear search history"
+                            sx={{
+                              color: 'text.secondary',
+                              ml: 0.5,
+                              '&:hover': {
+                                color: 'text.primary',
+                              },
+                            }}
+                            title="Clear search"
                           >
-                            <History />
+                            <Clear fontSize="small" />
                           </IconButton>
-                        </InputAdornment>
-                      )}
-                    </>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : 'rgba(0, 0, 0, 0.04)',
-                    backdropFilter: 'blur(4px)',
-                    transition: 'all 0.2s ease-in-out',
+                        ) : (
+                          <Search
+                            sx={{
+                              color: 'text.secondary',
+                              ml: 1,
+                              mr: 0.5,
+                            }}
+                          />
+                        )}
+                        {params.InputProps.startAdornment}
+                      </>
+                    ),
+                    endAdornment: (
+                      <>
+                        {searchHistory.length > 0 && (
+                          <InputAdornment position="end">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSearchHistory([]);
+                              }}
+                              title="Clear search history"
+                            >
+                              <History />
+                            </IconButton>
+                          </InputAdornment>
+                        )}
+                      </>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'rgba(0, 0, 0, 0.04)',
+                      backdropFilter: 'blur(4px)',
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.08)'
+                          : 'rgba(0, 0, 0, 0.06)',
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.1)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                      },
+                    },
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  {...props}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    py: 1,
+                    px: 2,
                     '&:hover': {
                       backgroundColor: theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.08)'
-                        : 'rgba(0, 0, 0, 0.06)',
+                        ? 'rgba(255, 255, 255, 0.05)'
+                        : 'rgba(0, 0, 0, 0.04)',
                     },
-                    '&.Mui-focused': {
-                      backgroundColor: theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : 'rgba(0, 0, 0, 0.08)',
-                    },
-                  },
+                  }}
+                >
+                  <History fontSize="small" sx={{ color: 'text.secondary' }} />
+                  {highlightText(option, searchQuery)}
+                </Box>
+              )}
+            />
+            <Tooltip title="Add new command">
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddClick();
                 }}
-              />
-            )}
-            renderOption={(props, option) => (
-              <Box
-                component="li"
-                {...props}
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  py: 1,
-                  px: 2,
+                  color: 'primary.main',
                   '&:hover': {
-                    backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255, 255, 255, 0.05)'
-                      : 'rgba(0, 0, 0, 0.04)',
+                    color: 'primary.dark',
                   },
                 }}
+                title="Add new command"
               >
-                <History fontSize="small" sx={{ color: 'text.secondary' }} />
-                {option}
-              </Box>
-            )}
-          />
+                <Add />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

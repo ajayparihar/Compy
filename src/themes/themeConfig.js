@@ -5,7 +5,7 @@ export const themes = {
       palette: {
         mode: 'dark',
         primary: { main: '#2ecc71', light: '#52de97', dark: '#27ae60' },
-        secondary: { main: '#95a5a6', light: '#b3b9ba', dark: '#7f8c8d' },
+        secondary: { main: '#e74c3c', light: '#ff6b5b', dark: '#c0392b' },
         background: { default: '#1a2421', paper: '#243430' },
         text: { primary: '#ecf0f1', secondary: '#bdc3c7' },
       }
@@ -15,7 +15,7 @@ export const themes = {
       palette: {
         mode: 'dark',
         primary: { main: '#e74c3c', light: '#ff6b5b', dark: '#c0392b' },
-        secondary: { main: '#95a5a6', light: '#b3b9ba', dark: '#7f8c8d' },
+        secondary: { main: '#2ecc71', light: '#52de97', dark: '#27ae60' },
         background: { default: '#2c1a1a', paper: '#3d2020' },
         text: { primary: '#ecf0f1', secondary: '#bdc3c7' },
       }
@@ -25,7 +25,7 @@ export const themes = {
       palette: {
         mode: 'dark',
         primary: { main: '#f1c40f', light: '#f4d03f', dark: '#f39c12' },
-        secondary: { main: '#95a5a6', light: '#b3b9ba', dark: '#7f8c8d' },
+        secondary: { main: '#3498db', light: '#5dade2', dark: '#2980b9' },
         background: { default: '#1a1c2c', paper: '#232742' },
         text: { primary: '#ecf0f1', secondary: '#bdc3c7' },
       }
@@ -35,7 +35,7 @@ export const themes = {
       palette: {
         mode: 'dark',
         primary: { main: '#3498db', light: '#5dade2', dark: '#2980b9' },
-        secondary: { main: '#95a5a6', light: '#b3b9ba', dark: '#7f8c8d' },
+        secondary: { main: '#f1c40f', light: '#f4d03f', dark: '#f39c12' },
         background: { default: '#1a1a2c', paper: '#232342' },
         text: { primary: '#ecf0f1', secondary: '#bdc3c7' },
       }
@@ -45,7 +45,7 @@ export const themes = {
       palette: {
         mode: 'dark',
         primary: { main: '#9b59b6', light: '#bb8fce', dark: '#8e44ad' },
-        secondary: { main: '#95a5a6', light: '#b3b9ba', dark: '#7f8c8d' },
+        secondary: { main: '#f1c40f', light: '#f4d03f', dark: '#f39c12' },
         background: { default: '#1a1a2c', paper: '#2c2342' },
         text: { primary: '#ecf0f1', secondary: '#bdc3c7' },
       }

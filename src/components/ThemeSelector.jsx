@@ -37,8 +37,19 @@ function ThemeSelector() {
   };
 
   const handleThemeChange = (themeId) => {
-    setCurrentTheme(themeId);
-    handleClose();
+    try {
+      setCurrentTheme(themeId);
+      // Force immediate re-render of theme-dependent components
+      document.documentElement.className = document.documentElement.className
+        .split(" ")
+        .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
+        .join(" ");
+      document.documentElement.classList.add(themeId);
+    } catch (error) {
+      console.error('Error changing theme:', error);
+    } finally {
+      handleClose();
+    }
   };
 
   const handleTabChange = (event, newValue) => {
@@ -56,6 +67,7 @@ function ThemeSelector() {
         width: '100%',
         gap: 1,
       }}
+      aria-label={`Select ${themeData.name} theme`}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
         <Box
@@ -75,6 +87,7 @@ function ThemeSelector() {
           e.stopPropagation();
           toggleFavorite(themeId);
         }}
+        aria-label={`Toggle favorite for ${themeData.name}`}
       >
         {favoriteThemes.includes(themeId) ? (
           <Star fontSize="small" sx={{ color: muiTheme.palette.warning.main }} />
@@ -98,7 +111,17 @@ function ThemeSelector() {
     </Typography>,
     ...Object.entries(themes.light).map(([themeId, themeData]) =>
       renderThemeMenuItem(themeId, themeData)
-    )
+    ),
+    <Divider key="favorites-divider" sx={{ my: 1 }} />,
+    <Typography key="favorites-title" variant="subtitle2" sx={{ p: 1, opacity: 0.7 }}>
+      Favorite Themes
+    </Typography>,
+    ...Object.entries(themes)
+      .flatMap(([category, categoryThemes]) =>
+        Object.entries(categoryThemes)
+          .filter(([themeId]) => favoriteThemes.includes(themeId))
+          .map(([themeId, themeData]) => renderThemeMenuItem(themeId, themeData))
+      )
   ] : [
     ...Object.entries(themes)
       .flatMap(([category, categoryThemes]) =>
