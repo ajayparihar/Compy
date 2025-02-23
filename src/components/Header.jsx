@@ -11,7 +11,10 @@ import {
   Popper,
   Paper,
   InputAdornment,
-  Tooltip
+  Tooltip,
+  Menu,
+  MenuItem,
+  Checkbox
 } from '@mui/material'
 import {
   Brightness4,
@@ -20,7 +23,8 @@ import {
   Search,
   History,
   Clear,
-  Add
+  Add,
+  Person
 } from '@mui/icons-material'
 import ThemeSelector from './ThemeSelector'
 
@@ -66,6 +70,8 @@ function Header({
     return saved ? JSON.parse(saved) : []
   })
   const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [exportOptions, setExportOptions] = useState({ name: false, theme: false, favoriteTheme: false, data: false });
 
   // Save search history to localStorage
   useEffect(() => {
@@ -111,6 +117,23 @@ function Header({
       </Popper>
     )
   }
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleExportOptionChange = (event) => {
+    setExportOptions({ ...exportOptions, [event.target.name]: event.target.checked });
+  };
+
+  const handleExportData = () => {
+    // Logic to export data based on selected options
+    console.log('Exporting data with options:', exportOptions);
+  };
 
   return (
     <Box
@@ -328,6 +351,30 @@ function Header({
           >
             <FileUpload />
           </IconButton>
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton onClick={handleProfileClick} color="inherit">
+            <Person />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleProfileClose}>
+            <MenuItem disabled>User Name</MenuItem>
+            <MenuItem onClick={onImportClick}>Import</MenuItem>
+            <MenuItem onClick={() => setShowResetDialog(true)}>Reset</MenuItem>
+            <MenuItem onClick={handleExportData}>Export Data</MenuItem>
+            <MenuItem>
+              <Checkbox checked={exportOptions.name} onChange={handleExportOptionChange} name="name" /> Name
+            </MenuItem>
+            <MenuItem>
+              <Checkbox checked={exportOptions.theme} onChange={handleExportOptionChange} name="theme" /> Theme Selected
+            </MenuItem>
+            <MenuItem>
+              <Checkbox checked={exportOptions.favoriteTheme} onChange={handleExportOptionChange} name="favoriteTheme" /> Favorite Theme
+            </MenuItem>
+            <MenuItem>
+              <Checkbox checked={exportOptions.data} onChange={handleExportOptionChange} name="data" /> Data
+            </MenuItem>
+          </Menu>
         </Box>
       </Toolbar>
     </Box>

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ThemeProvider, CssBaseline, Container, Grid, Box, Autocomplete, TextField, IconButton, InputAdornment, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
-import Header from './components/Header'
+import { ThemeProvider, CssBaseline, Container, Grid, Box, Autocomplete, TextField, IconButton, InputAdornment, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, Button, Menu, MenuItem, Checkbox } from '@mui/material'
 import CommandList from './components/CommandList'
 import AddEntryModal from './components/AddEntryModal'
 import ImportModal from './components/ImportModal'
@@ -12,7 +11,7 @@ import LoadingSkeleton from './components/LoadingSkeleton'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Search, Clear, Add, FileUpload, RestartAlt } from '@mui/icons-material'
+import { Search, Clear, Add, FileUpload, RestartAlt, Person } from '@mui/icons-material'
 import ThemeSelector from './components/ThemeSelector'
 import Toast from './components/Toast'
 
@@ -29,6 +28,9 @@ function App() {
   const [toastMessage, setToastMessage] = useState('')
   const [editingCommand, setEditingCommand] = useState(null)
   const [showResetDialog, setShowResetDialog] = useState(false)
+  const [userName, setUserName] = useState('User') // Placeholder for user name
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [exportOptions, setExportOptions] = useState({ name: false, theme: false, favoriteTheme: false, data: false })
 
   // Local storage
   const [items, setCommands] = useLocalStorage('commands', [])
@@ -77,8 +79,14 @@ function App() {
   }
 
   const handleEditItem = (editedCommand) => {
-    setCommands(items.map(cmd => 
-      cmd.id === editedCommand.id ? editedCommand : cmd
+    const updatedCommand = {
+      ...editedCommand,
+      command: editedCommand.item,  // Map item back to command
+    }
+    delete updatedCommand.item  // Remove the temporary item property
+    
+    setCommands(commands.map(cmd => 
+      cmd.id === editedCommand.id ? updatedCommand : cmd
     ))
     setEditingCommand(null)
     setToastMessage('Item updated successfully!')
@@ -99,6 +107,23 @@ function App() {
   const handleToastClose = () => {
     setToastMessage('')
   }
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleExportOptionChange = (event) => {
+    setExportOptions({ ...exportOptions, [event.target.name]: event.target.checked });
+  };
+
+  const handleExportData = () => {
+    // Logic to export data based on selected options
+    console.log('Exporting data with options:', exportOptions);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -209,41 +234,28 @@ function App() {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Tooltip title="Reset to default">
-              <IconButton 
-                color="inherit" 
-                onClick={handleReset}
-                sx={{
-                  color: 'primary.main',
-                  '&:hover': {
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' 
-                      ? 'rgba(255, 255, 255, 0.1)' 
-                      : 'rgba(0, 0, 0, 0.05)',
-                    color: 'primary.dark',
-                  },
-                }}
-              >
-                <RestartAlt />
-              </IconButton>
-            </Tooltip>
             <ThemeSelector />
-            <Tooltip title="Import commands">
-              <IconButton 
-                color="inherit" 
-                onClick={() => setShowImportModal(true)}
-                sx={{
-                  color: 'primary.main',
-                  '&:hover': {
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' 
-                      ? 'rgba(255, 255, 255, 0.1)' 
-                      : 'rgba(0, 0, 0, 0.05)',
-                    color: 'primary.dark',
-                  },
-                }}
-              >
-                <FileUpload />
-              </IconButton>
-            </Tooltip>
+            <IconButton onClick={handleProfileClick} color="inherit">
+              <Person />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleProfileClose}>
+              <MenuItem disabled>{userName}</MenuItem>
+              <MenuItem onClick={() => setShowImportModal(true)}>Import</MenuItem>
+              <MenuItem onClick={() => setShowResetDialog(true)}>Reset</MenuItem>
+              <MenuItem onClick={handleExportData}>Export Data</MenuItem>
+              <MenuItem>
+                <Checkbox checked={exportOptions.name} onChange={handleExportOptionChange} name="name" /> Name
+              </MenuItem>
+              <MenuItem>
+                <Checkbox checked={exportOptions.theme} onChange={handleExportOptionChange} name="theme" /> Theme Selected
+              </MenuItem>
+              <MenuItem>
+                <Checkbox checked={exportOptions.favoriteTheme} onChange={handleExportOptionChange} name="favoriteTheme" /> Favorite Theme
+              </MenuItem>
+              <MenuItem>
+                <Checkbox checked={exportOptions.data} onChange={handleExportOptionChange} name="data" /> Data
+              </MenuItem>
+            </Menu>
           </Box>
         </Toolbar>
       </AppBar>
@@ -267,14 +279,6 @@ function App() {
           px: 2,
         }}
       >
-        {/* <Header
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onImportClick={() => setShowImportModal(true)}
-          commands={commands}
-          onAddClick={() => setShowAddModal(true)}
-        /> */}
-
         {isLoading ? (
           <LoadingSkeleton />
         ) : (
@@ -296,7 +300,10 @@ function App() {
           open={Boolean(editingCommand)}
           onClose={() => setEditingCommand(null)}
           onSubmit={handleEditItem}
-          initialValues={editingCommand}
+          initialValues={editingCommand ? {
+            ...editingCommand,
+            item: editingCommand.command,  // Map command to item for the form
+          } : null}
           isEditing
         />
 

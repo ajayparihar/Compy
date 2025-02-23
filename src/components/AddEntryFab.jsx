@@ -12,7 +12,9 @@ function AddEntryFab({ onClick }) {
         bottom: 24,
         right: 24,
         zIndex: 9999,
+        backgroundColor: (theme) => theme.palette.primary.main,
         '&:hover': {
+          backgroundColor: (theme) => theme.palette.primary.dark,
           transform: 'scale(1.05)',
         },
         transition: 'transform 0.2s'
