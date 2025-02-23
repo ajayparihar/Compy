@@ -24,6 +24,34 @@ import {
 } from '@mui/icons-material'
 import ThemeSelector from './ThemeSelector'
 
+// Add highlightText utility function
+const highlightText = (text, searchQuery) => {
+  if (!searchQuery || !text) return text;
+  
+  const parts = text.split(new RegExp(`(${searchQuery})`, 'gi'));
+  return parts.map((part, index) => 
+    part.toLowerCase() === searchQuery.toLowerCase() ? (
+      <Box
+        key={index}
+        component="span"
+        sx={{
+          backgroundColor: (theme) => theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 0, 0.5)'
+            : 'rgba(255, 255, 0, 0.3)',
+          color: (theme) => theme.palette.mode === 'dark'
+            ? theme.palette.primary.light
+            : theme.palette.primary.main,
+          borderRadius: '2px',
+          display: 'inline',
+          boxShadow: '0 0 5px rgba(0, 0, 0, 0.2)',
+        }}
+      >
+        {part}
+      </Box>
+    ) : part
+  );
+};
+
 function Header({
   searchQuery,
   onSearchChange,
@@ -167,6 +195,7 @@ function Header({
             <Autocomplete
               freeSolo
               fullWidth
+              disableClearable
               sx={{
                 width: { xs: '90%', sm: '70vw' },
               }}
@@ -186,33 +215,13 @@ function Header({
                     ...params.InputProps,
                     startAdornment: (
                       <> 
-                        {searchQuery ? (
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSearchChange('');
-                            }}
-                            sx={{
-                              color: 'text.secondary',
-                              ml: 0.5,
-                              '&:hover': {
-                                color: 'text.primary',
-                              },
-                            }}
-                            title="Clear search"
-                          >
-                            <Clear fontSize="small" />
-                          </IconButton>
-                        ) : (
-                          <Search
-                            sx={{
-                              color: 'text.secondary',
-                              ml: 1,
-                              mr: 0.5,
-                            }}
-                          />
-                        )}
+                        {/* <Search
+                          sx={{
+                            color: 'text.secondary',
+                            ml: 1,
+                            mr: 0.5,
+                          }}
+                        /> */}
                         {params.InputProps.startAdornment}
                       </>
                     ),
@@ -234,6 +243,7 @@ function Header({
                         )}
                       </>
                     ),
+                    clearIcon: null
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -288,10 +298,12 @@ function Header({
                 sx={{
                   color: 'primary.main',
                   '&:hover': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.1)' 
+                      : 'rgba(0, 0, 0, 0.05)',
                     color: 'primary.dark',
                   },
                 }}
-                title="Add new item"
               >
                 <Add />
               </IconButton>
@@ -302,9 +314,17 @@ function Header({
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <ThemeSelector />
           <IconButton
-            color="inherit"
             onClick={onImportClick}
-            sx={{ ml: 1 }}
+            sx={{ 
+              ml: 1,
+              color: 'primary.main',
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                  ? 'rgba(255, 255, 255, 0.1)' 
+                  : 'rgba(0, 0, 0, 0.05)',
+                color: 'primary.dark',
+              },
+            }}
           >
             <FileUpload />
           </IconButton>

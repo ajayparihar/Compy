@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ThemeProvider, CssBaseline, Container, Grid, Box, Autocomplete, TextField, IconButton, InputAdornment, Tooltip } from '@mui/material'
+import { ThemeProvider, CssBaseline, Container, Grid, Box, Autocomplete, TextField, IconButton, InputAdornment, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import Header from './components/Header'
 import CommandList from './components/CommandList'
 import AddEntryModal from './components/AddEntryModal'
@@ -12,13 +12,13 @@ import LoadingSkeleton from './components/LoadingSkeleton'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Search, Clear, Add, FileUpload } from '@mui/icons-material'
+import { Search, Clear, Add, FileUpload, RestartAlt } from '@mui/icons-material'
 import ThemeSelector from './components/ThemeSelector'
 import Toast from './components/Toast'
 
 function App() {
   // Theme
-  const { currentTheme } = useTheme()
+  const { currentTheme, setCurrentTheme } = useTheme()
   const theme = getTheme(currentTheme)
 
   // State
@@ -28,9 +28,35 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [toastMessage, setToastMessage] = useState('')
   const [editingCommand, setEditingCommand] = useState(null)
+  const [showResetDialog, setShowResetDialog] = useState(false)
 
   // Local storage
   const [items, setCommands] = useLocalStorage('commands', [])
+
+  // Reset function to restore default state
+  const handleReset = () => {
+    setShowResetDialog(true);
+  }
+
+  const confirmReset = () => {
+    setSearchQuery('')
+    setCommands([])
+    setCurrentTheme('sunrise') // Reset to default theme
+    setToastMessage('All data has been reset to default')
+    setShowResetDialog(false);
+  }
+
+  const exportData = () => {
+    const csvContent = 'data:text/csv;charset=utf-8,' +
+      items.map(e => e.command + ',' + e.description + ',' + e.category + ',' + e.tags.join(';')).join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'commands_backup.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
   // Loading effect
   useEffect(() => {
@@ -93,44 +119,43 @@ function App() {
           gap: 2,
           py: 1,
         }}>
-          
-        <Typography
-          variant="h5"
-          component="h1"
-          color="primary"
-          onClick={() => window.location.reload()}
-          sx={{
-            flexShrink: 0,
-            fontWeight: 600,
-            letterSpacing: '-0.5px',
-            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
-            cursor: 'pointer',
-            position: 'relative',
-            '&:hover': {
-              opacity: 0.8,
-              '&::after': {
-                transform: 'scaleX(1)',
+          <Typography
+            variant="h5"
+            component="h1"
+            color="primary"
+            onClick={() => window.location.reload()}
+            sx={{
+              flexShrink: 0,
+              fontWeight: 600,
+              letterSpacing: '-0.5px',
+              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+              cursor: 'pointer',
+              position: 'relative',
+              '&:hover': {
+                opacity: 0.8,
+                '&::after': {
+                  transform: 'scaleX(1)',
+                },
               },
-            },
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              bottom: -2,
-              left: 0,
-              right: 0,
-              margin: '0 auto',
-              width: '100%',
-              height: '2px',
-              backgroundColor: 'primary.main',
-              transform: 'scaleX(0)',
-              transformOrigin: '50% 50%',
-              transition: 'transform 0.3s ease-out',
-            },
-            transition: 'opacity 0.2s ease-in-out',
-          }}
-        >
-          Compy
-        </Typography>
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -2,
+                left: 0,
+                right: 0,
+                margin: '0 auto',
+                width: '100%',
+                height: '2px',
+                backgroundColor: 'primary.main',
+                transform: 'scaleX(0)',
+                transformOrigin: '50% 50%',
+                transition: 'transform 0.3s ease-out',
+              },
+              transition: 'opacity 0.2s ease-in-out',
+            }}
+          >
+            Compy
+          </Typography>
 
           <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
             <Autocomplete
@@ -176,7 +201,6 @@ function App() {
                 />
               )}
             />
-            
             <Tooltip title="Add new command">
               <IconButton color="inherit" onClick={() => setShowAddModal(true)}>
                 <Add />
@@ -184,17 +208,58 @@ function App() {
             </Tooltip>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title="Reset to default">
+              <IconButton 
+                color="inherit" 
+                onClick={handleReset}
+                sx={{
+                  color: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.1)' 
+                      : 'rgba(0, 0, 0, 0.05)',
+                    color: 'primary.dark',
+                  },
+                }}
+              >
+                <RestartAlt />
+              </IconButton>
+            </Tooltip>
             <ThemeSelector />
             <Tooltip title="Import commands">
-              <IconButton color="inherit" onClick={() => setShowImportModal(true)}>
+              <IconButton 
+                color="inherit" 
+                onClick={() => setShowImportModal(true)}
+                sx={{
+                  color: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.1)' 
+                      : 'rgba(0, 0, 0, 0.05)',
+                    color: 'primary.dark',
+                  },
+                }}
+              >
                 <FileUpload />
               </IconButton>
             </Tooltip>
           </Box>
         </Toolbar>
       </AppBar>
-      
+
+      <Dialog open={showResetDialog} onClose={() => setShowResetDialog(false)}>
+        <DialogTitle>Confirm Reset</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to reset all data to default? This action cannot be undone.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowResetDialog(false)} color="primary">Cancel</Button>
+          <Button onClick={confirmReset} color="secondary">Reset</Button>
+          <Button onClick={exportData} color="primary">Export Data</Button>
+        </DialogActions>
+      </Dialog>
+
       <Container 
         maxWidth="xl"
         sx={{

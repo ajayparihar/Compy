@@ -301,8 +301,17 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                       gap: 1,
                       opacity: 0,
                       visibility: 'hidden',
-                      transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
+                      transition: 'all 0.2s ease-in-out',
                       ml: 2,
+                      '& .MuiIconButton-root': {
+                        color: 'primary.main',
+                        '&:hover': {
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                            ? 'rgba(255, 255, 255, 0.1)' 
+                            : 'rgba(0, 0, 0, 0.05)',
+                          color: 'primary.dark',
+                        },
+                      },
                     }}
                   >
                     <Tooltip title="Copy">
