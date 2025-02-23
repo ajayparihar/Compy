@@ -135,18 +135,21 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                 },
               }}
             >
-              <CardActionArea
+              <Box
                 onClick={(e) => handleCardClick(e, item)}
                 sx={{
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'stretch',
-                  '& .MuiCardActionArea-focusHighlight': {
-                    background: (theme) =>
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: (theme) =>
                       theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.1)'
-                        : 'rgba(0, 0, 0, 0.1)',
+                        ? theme.palette.primary.main + '1A'  // 10% opacity
+                        : theme.palette.primary.main + '0D',  // 5% opacity
+                    boxShadow: (theme) => `0 0 0 1px ${theme.palette.primary.main + '10'}`,  // 20% opacity for border
+                    transition: 'all 0.2s ease-in-out'
                   }
                 }}
               >
@@ -340,7 +343,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                     </Tooltip>
                   </Box>
                 </Box>
-              </CardActionArea>
+              </Box>
             </Card>
           </Grid>
         ))}
