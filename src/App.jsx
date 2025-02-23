@@ -3,6 +3,7 @@ import { ThemeProvider, CssBaseline, Container, Grid, Box, Autocomplete, TextFie
 import CommandList from './components/CommandList'
 import AddEntryModal from './components/AddEntryModal'
 import ImportModal from './components/ImportModal'
+import ExportModal from './components/ExportModal'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useTheme } from './hooks/useTheme'
 import { getTheme } from './theme'
@@ -11,7 +12,7 @@ import LoadingSkeleton from './components/LoadingSkeleton'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
-import { Search, Clear, Add, FileUpload, RestartAlt, Person } from '@mui/icons-material'
+import { Search, Clear, Add, FileUpload, RestartAlt, Person, GetApp } from '@mui/icons-material'
 import ThemeSelector from './components/ThemeSelector'
 import Toast from './components/Toast'
 
@@ -31,6 +32,10 @@ function App() {
   const [userName, setUserName] = useState('User') // Placeholder for user name
   const [anchorEl, setAnchorEl] = useState(null)
   const [exportOptions, setExportOptions] = useState({ name: false, theme: false, favoriteTheme: false, data: false })
+  const [showNameModal, setShowNameModal] = useState(false)
+  const [newUserName, setNewUserName] = useState(userName)
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [exportSource, setExportSource] = useState('profile') // 'profile' or 'reset'
 
   // Local storage
   const [items, setCommands] = useLocalStorage('commands', [])
@@ -125,196 +130,267 @@ function App() {
     console.log('Exporting data with options:', exportOptions);
   };
 
+  const handleNameSubmit = () => {
+    setUserName(newUserName);
+    setShowNameModal(false);
+  };
+
+  const handleExportClick = (source) => {
+    setExportSource(source);
+    setShowExportModal(true);
+    handleProfileClose(); // Close the profile menu if it was opened from there
+  };
+
+  const handleExport = (options) => {
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      version: '1.0'
+    };
+
+    if (options.fullProfile) {
+      exportData.profile = {
+        theme: currentTheme,
+        userName: userName,
+        settings: {
+          // Add any other settings you want to export
+        }
+      };
+    }
+
+    if (options.data) {
+      exportData.data = {
+        commands: items,
+        // Add any other data you want to export
+      };
+    }
+
+    // Create and download the config file
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `compy_config_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setToastMessage('Configuration exported successfully');
+    
+    // If this was triggered from reset dialog, proceed with reset after export
+    if (exportSource === 'reset') {
+      confirmReset();
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{
-        background: theme.palette.mode === 'dark' 
-          ? 'rgba(10, 25, 41, 0.7)'
-          : 'rgba(255, 255, 255, 0.7)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid',
-        borderColor: theme.palette.mode === 'dark'
-          ? 'rgba(255, 255, 255, 0.1)'
-          : 'rgba(0, 0, 0, 0.1)',
-      }}>
-        <Toolbar sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: 2,
-          py: 1,
-        }}>
-          <Typography
-            variant="h5"
-            component="h1"
-            color="primary"
-            onClick={() => window.location.reload()}
-            sx={{
-              flexShrink: 0,
-              fontWeight: 600,
-              letterSpacing: '-0.5px',
-              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
-              cursor: 'pointer',
-              position: 'relative',
-              '&:hover': {
-                opacity: 0.8,
-                '&::after': {
-                  transform: 'scaleX(1)',
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <AppBar position="static" color="default" elevation={1}>
+          <Toolbar>
+            <Typography
+              variant="h5"
+              component="h1"
+              color="primary"
+              onClick={() => window.location.reload()}
+              sx={{
+                flexShrink: 0,
+                fontWeight: 600,
+                letterSpacing: '-0.5px',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+                cursor: 'pointer',
+                position: 'relative',
+                '&:hover': {
+                  opacity: 0.8,
+                  '&::after': {
+                    transform: 'scaleX(1)',
+                  },
                 },
-              },
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                bottom: -2,
-                left: 0,
-                right: 0,
-                margin: '0 auto',
-                width: '100%',
-                height: '2px',
-                backgroundColor: 'primary.main',
-                transform: 'scaleX(0)',
-                transformOrigin: '50% 50%',
-                transition: 'transform 0.3s ease-out',
-              },
-              transition: 'opacity 0.2s ease-in-out',
-            }}
-          >
-            Compy
-          </Typography>
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -2,
+                  left: 0,
+                  right: 0,
+                  margin: '0 auto',
+                  width: '100%',
+                  height: '2px',
+                  backgroundColor: 'primary.main',
+                  transform: 'scaleX(0)',
+                  transformOrigin: '50% 50%',
+                  transition: 'transform 0.3s ease-out',
+                },
+                transition: 'opacity 0.2s ease-in-out',
+              }}
+            >
+              Compy
+            </Typography>
 
-          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Autocomplete
-              freeSolo
-              fullWidth
-              options={[]}
-              inputValue={searchQuery}
-              onInputChange={(event, newValue) => setSearchQuery(newValue)}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Search commands..."
-                  size="small"
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {searchQuery ? (
-                          <IconButton
-                            size="small"
-                            onClick={() => setSearchQuery('')}
-                          >
-                            <Clear fontSize="small" />
-                          </IconButton>
-                        ) : (
-                          <Search />
-                        )}
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.05)'
-                        : 'rgba(0, 0, 0, 0.04)',
-                      '&:hover': {
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Autocomplete
+                freeSolo
+                fullWidth
+                options={[]}
+                inputValue={searchQuery}
+                onInputChange={(event, newValue) => setSearchQuery(newValue)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search commands..."
+                    size="small"
+                    InputProps={{
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          {searchQuery ? (
+                            <IconButton
+                              size="small"
+                              onClick={() => setSearchQuery('')}
+                            >
+                              <Clear fontSize="small" />
+                            </IconButton>
+                          ) : (
+                            <Search />
+                          )}
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
                         backgroundColor: theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.08)'
-                          : 'rgba(0, 0, 0, 0.06)',
+                          ? 'rgba(255, 255, 255, 0.05)'
+                          : 'rgba(0, 0, 0, 0.04)',
+                        '&:hover': {
+                          backgroundColor: theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'rgba(0, 0, 0, 0.06)',
+                        },
                       },
-                    },
-                  }}
-                />
-              )}
-            />
-            <Tooltip title="Add new command">
-              <IconButton color="inherit" onClick={() => setShowAddModal(true)}>
-                <Add />
+                    }}
+                  />
+                )}
+              />
+              <Tooltip title="Add new command">
+                <IconButton color="inherit" onClick={() => setShowAddModal(true)}>
+                  <Add />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ThemeSelector />
+              <IconButton onClick={handleProfileClick} color="inherit">
+                <Person fontSize="large" />
               </IconButton>
-            </Tooltip>
-          </Box>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleProfileClose} sx={{
+                '& .MuiMenuItem-root': {
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                  },
+                },
+              }}>
+                <MenuItem disabled>{userName}</MenuItem>
+                <MenuItem onClick={() => setShowImportModal(true)}>Import</MenuItem>
+                <MenuItem onClick={() => setShowResetDialog(true)}>Reset</MenuItem>
+                <MenuItem onClick={() => handleExportClick('profile')}>Export Data</MenuItem>
+                <MenuItem onClick={() => setShowNameModal(true)}>Change Name</MenuItem>
+                <MenuItem>
+                  <Checkbox checked={exportOptions.name} onChange={handleExportOptionChange} name="name" /> Name
+                </MenuItem>
+                <MenuItem>
+                  <Checkbox checked={exportOptions.theme} onChange={handleExportOptionChange} name="theme" /> Theme Selected
+                </MenuItem>
+                <MenuItem>
+                  <Checkbox checked={exportOptions.favoriteTheme} onChange={handleExportOptionChange} name="favoriteTheme" /> Favorite Theme
+                </MenuItem>
+                <MenuItem>
+                  <Checkbox checked={exportOptions.data} onChange={handleExportOptionChange} name="data" /> Data
+                </MenuItem>
+              </Menu>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ThemeSelector />
-            <IconButton onClick={handleProfileClick} color="inherit">
-              <Person />
-            </IconButton>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleProfileClose}>
-              <MenuItem disabled>{userName}</MenuItem>
-              <MenuItem onClick={() => setShowImportModal(true)}>Import</MenuItem>
-              <MenuItem onClick={() => setShowResetDialog(true)}>Reset</MenuItem>
-              <MenuItem onClick={handleExportData}>Export Data</MenuItem>
-              <MenuItem>
-                <Checkbox checked={exportOptions.name} onChange={handleExportOptionChange} name="name" /> Name
-              </MenuItem>
-              <MenuItem>
-                <Checkbox checked={exportOptions.theme} onChange={handleExportOptionChange} name="theme" /> Theme Selected
-              </MenuItem>
-              <MenuItem>
-                <Checkbox checked={exportOptions.favoriteTheme} onChange={handleExportOptionChange} name="favoriteTheme" /> Favorite Theme
-              </MenuItem>
-              <MenuItem>
-                <Checkbox checked={exportOptions.data} onChange={handleExportOptionChange} name="data" /> Data
-              </MenuItem>
-            </Menu>
-          </Box>
-        </Toolbar>
-      </AppBar>
+        <Dialog open={showResetDialog} onClose={() => setShowResetDialog(false)}>
+          <DialogTitle>Confirm Reset</DialogTitle>
+          <DialogContent>
+            <Typography>Are you sure you want to reset all data to default? This action cannot be undone.</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowResetDialog(false)} color="primary">Cancel</Button>
+            <Button onClick={confirmReset} color="secondary">Reset</Button>
+            <Button onClick={() => handleExportClick('reset')} color="primary">Export Data</Button>
+          </DialogActions>
+        </Dialog>
 
-      <Dialog open={showResetDialog} onClose={() => setShowResetDialog(false)}>
-        <DialogTitle>Confirm Reset</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to reset all data to default? This action cannot be undone.</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowResetDialog(false)} color="primary">Cancel</Button>
-          <Button onClick={confirmReset} color="secondary">Reset</Button>
-          <Button onClick={exportData} color="primary">Export Data</Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={showNameModal} onClose={() => setShowNameModal(false)}>
+          <DialogTitle>Change User Name</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              value={newUserName}
+              onChange={(e) => setNewUserName(e.target.value)}
+              label="User Name"
+              fullWidth
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowNameModal(false)}>Cancel</Button>
+            <Button onClick={handleNameSubmit} color="primary">Submit</Button>
+          </DialogActions>
+        </Dialog>
 
-      <Container 
-        maxWidth="xl"
-        sx={{
-          pt: 10,
-          px: 2,
-        }}
-      >
-        {isLoading ? (
-          <LoadingSkeleton />
-        ) : (
-          <CommandList
-            sx={{ mt: 0 }}
-            commands={filteredItems}
-            onDelete={handleDeleteItem}
-            onEdit={setEditingCommand}
+        <Container 
+          maxWidth="xl"
+          sx={{
+            pt: 10,
+            px: 2,
+          }}
+        >
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : (
+            <CommandList
+              sx={{ mt: 0 }}
+              commands={filteredItems}
+              onDelete={handleDeleteItem}
+              onEdit={setEditingCommand}
+            />
+          )}
+
+          <AddEntryModal
+            open={showAddModal}
+            onClose={() => setShowAddModal(false)}
+            onSubmit={handleAddItem}
           />
-        )}
 
-        <AddEntryModal
-          open={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={handleAddItem}
-        />
+          <AddEntryModal
+            open={Boolean(editingCommand)}
+            onClose={() => setEditingCommand(null)}
+            onSubmit={handleEditItem}
+            initialValues={editingCommand ? {
+              ...editingCommand,
+              item: editingCommand.command,  // Map command to item for the form
+            } : null}
+            isEditing
+          />
 
-        <AddEntryModal
-          open={Boolean(editingCommand)}
-          onClose={() => setEditingCommand(null)}
-          onSubmit={handleEditItem}
-          initialValues={editingCommand ? {
-            ...editingCommand,
-            item: editingCommand.command,  // Map command to item for the form
-          } : null}
-          isEditing
-        />
+          <ImportModal
+            open={showImportModal}
+            onClose={() => setShowImportModal(false)}
+            onImport={handleImportItems}
+          />
 
-        <ImportModal
-          open={showImportModal}
-          onClose={() => setShowImportModal(false)}
-          onImport={handleImportItems}
-        />
+          <ExportModal
+            open={showExportModal}
+            onClose={() => setShowExportModal(false)}
+            onExport={handleExport}
+          />
 
-        <Toast message={toastMessage} onClose={handleToastClose} />
-      </Container>
+          <Toast message={toastMessage} onClose={handleToastClose} />
+        </Container>
+      </Box>
     </ThemeProvider>
   )
 }

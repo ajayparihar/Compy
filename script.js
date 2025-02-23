@@ -422,6 +422,17 @@ const addEventListeners = () => {
       window.location.href.split("?")[0] + "?t=" + Date.now();
     window.location.reload(true);
   });
+
+  // Add export button click handler
+  document.getElementById('exportButton').addEventListener('click', showExportPopup);
+  
+  // Add import button click handler
+  document.getElementById('importButton').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      importConfig(file);
+    }
+  });
 };
 
 // Theme names mapped from themes.css comments
@@ -986,4 +997,134 @@ function showToast(message) {
     toast.textContent = message;
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+/**
+ * Shows the export data popup with options
+ * @function showExportPopup
+ */
+function showExportPopup() {
+    const popupHTML = `
+        <div id="exportPopup" class="modal">
+            <div class="modal-content">
+                <h2>Export Options</h2>
+                <div class="export-options">
+                    <label>
+                        <input type="checkbox" id="exportFullProfile"> Full Profile
+                        <span class="description">(Includes all settings and preferences)</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="exportData"> Data
+                        <span class="description">(Includes commands and entries)</span>
+                    </label>
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="handleExport()" class="primary-button">Export</button>
+                    <button onclick="closeModal('exportPopup')" class="secondary-button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add popup to body if it doesn't exist
+    if (!document.getElementById('exportPopup')) {
+        document.body.insertAdjacentHTML('beforeend', popupHTML);
+    }
+    
+    openModal('exportPopup');
+}
+
+/**
+ * Handles the export based on selected options
+ * @function handleExport
+ */
+async function handleExport() {
+    const exportFullProfile = document.getElementById('exportFullProfile').checked;
+    const exportData = document.getElementById('exportData').checked;
+    
+    if (!exportFullProfile && !exportData) {
+        showToast('Please select at least one option to export');
+        return;
+    }
+    
+    const exportConfig = {
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+    };
+    
+    if (exportFullProfile) {
+        exportConfig.profile = {
+            theme: loadThemeFromLocalStorage(),
+            userName: localStorage.getItem('userName') || '',
+            favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
+            settings: JSON.parse(localStorage.getItem('settings') || '{}')
+        };
+    }
+    
+    if (exportData) {
+        exportConfig.data = {
+            entries: getEntries(),
+            customCommands: JSON.parse(localStorage.getItem('customCommands') || '[]')
+        };
+    }
+    
+    // Create and download the config file
+    const blob = new Blob([JSON.stringify(exportConfig, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `compy_config_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    closeModal('exportPopup');
+    showToast('Configuration exported successfully');
+}
+
+/**
+ * Imports configuration from a file
+ * @function importConfig
+ * @param {File} file - The configuration file to import
+ */
+async function importConfig(file) {
+    try {
+        const content = await file.text();
+        const config = JSON.parse(content);
+        
+        if (config.profile) {
+            // Import profile settings
+            if (config.profile.theme) {
+                saveThemeToLocalStorage(config.profile.theme);
+                applyTheme(config.profile.theme);
+            }
+            if (config.profile.userName) {
+                localStorage.setItem('userName', config.profile.userName);
+                applyUserName(config.profile.userName);
+            }
+            if (config.profile.favorites) {
+                localStorage.setItem('favorites', JSON.stringify(config.profile.favorites));
+            }
+            if (config.profile.settings) {
+                localStorage.setItem('settings', JSON.stringify(config.profile.settings));
+            }
+        }
+        
+        if (config.data) {
+            // Import data
+            if (config.data.entries) {
+                saveEntries(config.data.entries);
+                displayEntries(config.data.entries);
+            }
+            if (config.data.customCommands) {
+                localStorage.setItem('customCommands', JSON.stringify(config.data.customCommands));
+            }
+        }
+        
+        showToast('Configuration imported successfully');
+    } catch (error) {
+        console.error('Error importing configuration:', error);
+        showToast('Error importing configuration');
+    }
 }

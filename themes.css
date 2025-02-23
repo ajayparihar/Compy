@@ -80,3 +80,88 @@ body {
 :root[data-theme] * {
   forced-color-adjust: none;
 }
+
+/* Export Popup Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity var(--transition-speed) var(--transition-easing);
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+}
+
+.export-options {
+    margin: 1.5rem 0;
+}
+
+.export-options label {
+    display: block;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.export-options input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+.export-options .description {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.primary-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color var(--transition-speed) var(--transition-easing);
+}
+
+.primary-button:hover {
+    background-color: var(--primary-color-hover);
+}
+
+.secondary-button {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-easing);
+}
+
+.secondary-button:hover {
+    background-color: var(--background-hover);
+}
