@@ -15,7 +15,7 @@ import { Close } from '@mui/icons-material'
 
 function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
   const [formData, setFormData] = useState({
-    command: '',
+    item: '',
     description: '',
     category: '',
     tags: []
@@ -28,7 +28,7 @@ function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
       setFormData(initialValues)
     } else {
       setFormData({
-        command: '',
+        item: '',
         description: '',
         category: '',
         tags: []
@@ -146,7 +146,7 @@ function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
       }}
     >
       <DialogTitle>
-        {isEditing ? 'Edit Command' : 'Add New Command'}
+        {isEditing ? 'Edit Item' : 'Add New Item'}
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -164,10 +164,10 @@ function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
         <form onSubmit={handleSubmit}>
           <TextField
             autoFocus
-            name="command"
-            label="Command"
+            name="item"
+            label="Item"
             fullWidth
-            value={formData.command}
+            value={formData.item}
             onChange={handleChange}
             variant="outlined"
             required
@@ -279,7 +279,7 @@ function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleSubmit} variant="contained" color="primary">
-          {isEditing ? 'Save Changes' : 'Add Command'}
+          {isEditing ? 'Save Changes' : 'Add Item'}
         </Button>
       </DialogActions>
     </Dialog>

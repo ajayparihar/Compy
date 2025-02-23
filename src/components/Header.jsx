@@ -178,7 +178,7 @@ function Header({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder="Search commands... (Press '/' to focus)"
+                  placeholder="Search items... (Press '/' to focus)"
                   fullWidth
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setIsSearchFocused(false)}
@@ -278,7 +278,7 @@ function Header({
                 </Box>
               )}
             />
-            <Tooltip title="Add new command">
+            <Tooltip title="Add new item">
               <IconButton
                 size="small"
                 onClick={(e) => {
@@ -291,7 +291,7 @@ function Header({
                     color: 'primary.dark',
                   },
                 }}
-                title="Add new command"
+                title="Add new item"
               >
                 <Add />
               </IconButton>

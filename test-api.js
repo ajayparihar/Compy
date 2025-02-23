@@ -1,8 +1,8 @@
 const http = require('http');
 
-// Test GET /commands
-console.log('Testing GET /commands...');
-http.get('http://localhost:3000/commands', (res) => {
+// Test GET /items
+console.log('Testing GET /items...');
+http.get('http://localhost:3000/items', (res) => {
     let data = '';
     
     res.on('data', (chunk) => {
@@ -11,10 +11,10 @@ http.get('http://localhost:3000/commands', (res) => {
     
     res.on('end', () => {
         console.log('Status:', res.statusCode);
-        const commands = JSON.parse(data);
-        console.log('Number of commands:', commands.length);
-        console.log('First 3 commands:');
-        commands.slice(0, 3).forEach(cmd => {
+        const items = JSON.parse(data);
+        console.log('Number of items:', items.length);
+        console.log('First 3 items:');
+        items.slice(0, 3).forEach(cmd => {
             console.log('- Command:', cmd.command);
             console.log('  Description:', cmd.description);
             console.log('---');

@@ -60,7 +60,7 @@ function ImportModal({ open, onClose, onImport }) {
         const lines = text.split('\n')
         const headers = lines[0].split(',')
         
-        const commands = lines.slice(1)
+        const items = lines.slice(1)
           .filter(line => line.trim())
           .map(line => {
             const values = line.split(',')
@@ -74,7 +74,7 @@ function ImportModal({ open, onClose, onImport }) {
           })
           .filter(cmd => cmd.command && cmd.description)
 
-        onImport(commands)
+        onImport(items)
       }
 
       reader.readAsText(file)
@@ -93,7 +93,7 @@ function ImportModal({ open, onClose, onImport }) {
       fullWidth
     >
       <DialogTitle>
-        Import Commands
+        Import Items
         <IconButton
           aria-label="close"
           onClick={onClose}

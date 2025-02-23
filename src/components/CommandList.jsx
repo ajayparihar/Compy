@@ -12,9 +12,9 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
   const [tagsAnchorEl, setTagsAnchorEl] = useState(null)
   const [selectedTags, setSelectedTags] = useState([])
 
-  const handleCopy = async (command) => {
+  const handleCopy = async (item) => {
     try {
-      await navigator.clipboard.writeText(command)
+      await navigator.clipboard.writeText(item.command)
       setSnackbarOpen(true)
     } catch (error) {
       console.error('Failed to copy:', error)
@@ -42,7 +42,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
     setRipplePosition({ x, y })
     setRippleActive(item.id)
     
-    await handleCopy(item.command)
+    await handleCopy(item)
     
     // Reset ripple after animation
     setTimeout(() => {
@@ -310,7 +310,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                         size="small"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleCopy(item.command);
+                          handleCopy(item);
                         }}
                         sx={{ color: theme.palette.primary.main }}
                       >
@@ -418,7 +418,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
       >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this command?
+          Are you sure you want to delete this item?
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel}>Cancel</Button>

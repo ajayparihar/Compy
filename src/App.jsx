@@ -29,7 +29,7 @@ function App() {
   const [editingCommand, setEditingCommand] = useState(null)
 
   // Local storage
-  const [commands, setCommands] = useLocalStorage('commands', [])
+  const [items, setCommands] = useLocalStorage('commands', [])
 
   // Loading effect
   useEffect(() => {
@@ -40,7 +40,7 @@ function App() {
   }, [])
 
   // Filter commands
-  const filteredCommands = commands.filter(cmd => {
+  const filteredItems = items.filter(cmd => {
     const searchLower = searchQuery.toLowerCase()
     return cmd.command.toLowerCase().includes(searchLower) ||
            cmd.description.toLowerCase().includes(searchLower) ||
@@ -49,29 +49,29 @@ function App() {
   })
 
   // Command handlers
-  const handleAddCommand = (newCommand) => {
-    setCommands([...commands, { ...newCommand, id: Date.now() }])
+  const handleAddItem = (newCommand) => {
+    setCommands([...items, { ...newCommand, id: Date.now() }])
     setShowAddModal(false)
-    setToastMessage('Command added successfully!')
+    setToastMessage('Item added successfully!')
   }
 
-  const handleEditCommand = (editedCommand) => {
-    setCommands(commands.map(cmd => 
+  const handleEditItem = (editedCommand) => {
+    setCommands(items.map(cmd => 
       cmd.id === editedCommand.id ? editedCommand : cmd
     ))
     setEditingCommand(null)
-    setToastMessage('Command updated successfully!')
+    setToastMessage('Item updated successfully!')
   }
 
-  const handleDeleteCommand = (commandId) => {
-    setCommands(commands.filter(cmd => cmd.id !== commandId))
-    setToastMessage('Command deleted successfully!')
+  const handleDeleteItem = (commandId) => {
+    setCommands(items.filter(cmd => cmd.id !== commandId))
+    setToastMessage('Item deleted successfully!')
   }
 
-  const handleImportCommands = (importedCommands) => {
-    setCommands([...commands, ...importedCommands])
+  const handleImportItems = (importedCommands) => {
+    setCommands([...items, ...importedCommands])
     setShowImportModal(false)
-    setToastMessage(`${importedCommands.length} commands imported successfully!`)
+    setToastMessage(`${importedCommands.length} items imported successfully!`)
   }
 
   // Toast handlers
@@ -220,8 +220,8 @@ function App() {
         ) : (
           <CommandList
             sx={{ mt: 0 }}
-            commands={filteredCommands}
-            onDelete={handleDeleteCommand}
+            commands={filteredItems}
+            onDelete={handleDeleteItem}
             onEdit={setEditingCommand}
           />
         )}
@@ -229,13 +229,13 @@ function App() {
         <AddEntryModal
           open={showAddModal}
           onClose={() => setShowAddModal(false)}
-          onSubmit={handleAddCommand}
+          onSubmit={handleAddItem}
         />
 
         <AddEntryModal
           open={Boolean(editingCommand)}
           onClose={() => setEditingCommand(null)}
-          onSubmit={handleEditCommand}
+          onSubmit={handleEditItem}
           initialValues={editingCommand}
           isEditing
         />
@@ -243,7 +243,7 @@ function App() {
         <ImportModal
           open={showImportModal}
           onClose={() => setShowImportModal(false)}
-          onImport={handleImportCommands}
+          onImport={handleImportItems}
         />
 
         <Snackbar

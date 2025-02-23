@@ -15,7 +15,7 @@
 /* Date: 11-09-2023 */
 
 // Configuration constants
-const COMMANDS_API_URL =
+const ITEMS_API_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
 
 /**
