@@ -173,7 +173,12 @@ function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
             required
             sx={{
               mb: 2,
-              transition: 'transform 0.2s ease-in-out',
+              '& .MuiInputLabel-root': {
+                transform: 'translate(14px, 16px) scale(1)',
+                '&.Mui-focused, &.MuiFormLabel-filled': {
+                  transform: 'translate(14px, -9px) scale(0.75)',
+                },
+              },
               '& .MuiInputBase-root': {
                 transition: 'all 0.2s ease-in-out',
                 '&.Mui-focused': {
@@ -188,6 +193,7 @@ function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
                 color: 'text.primary',
                 fontFamily: 'monospace',
                 fontSize: '1rem',
+                padding: '16px 14px',
               }
             }}
           />
