@@ -14,6 +14,7 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { Search, Clear, Add, FileUpload } from '@mui/icons-material'
 import ThemeSelector from './components/ThemeSelector'
+import Toast from './components/Toast'
 
 function App() {
   // Theme
@@ -40,13 +41,7 @@ function App() {
   }, [])
 
   // Filter commands
-  const filteredItems = items.filter(cmd => {
-    const searchLower = searchQuery.toLowerCase()
-    return cmd.command.toLowerCase().includes(searchLower) ||
-           cmd.description.toLowerCase().includes(searchLower) ||
-           cmd.category?.toLowerCase().includes(searchLower) ||
-           cmd.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-  })
+  const filteredItems = items.filter(cmd => filterCommands(cmd, searchQuery))
 
   // Command handlers
   const handleAddItem = (newCommand) => {
@@ -246,19 +241,18 @@ function App() {
           onImport={handleImportItems}
         />
 
-        <Snackbar
-          open={Boolean(toastMessage)}
-          autoHideDuration={3000}
-          onClose={handleToastClose}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert onClose={handleToastClose} severity="success">
-            {toastMessage}
-          </Alert>
-        </Snackbar>
+        <Toast message={toastMessage} onClose={handleToastClose} />
       </Container>
     </ThemeProvider>
   )
+}
+
+const filterCommands = (cmd, query) => {
+  const searchLower = query.toLowerCase()
+  return cmd.command.toLowerCase().includes(searchLower) ||
+         cmd.description.toLowerCase().includes(searchLower) ||
+         cmd.category?.toLowerCase().includes(searchLower) ||
+         cmd.tags?.some(tag => tag.toLowerCase().includes(searchLower))
 }
 
 export default App
