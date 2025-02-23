@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { 
   Dialog, 
   DialogTitle, 
@@ -13,8 +13,8 @@ import {
 } from '@mui/material'
 import { Close } from '@mui/icons-material'
 
-function AddEntryModal({ open, onClose, onSave, initialData }) {
-  const [formData, setFormData] = useState(initialData || {
+function AddEntryModal({ open, onClose, onSubmit, initialValues, isEditing }) {
+  const [formData, setFormData] = useState({
     command: '',
     description: '',
     category: '',
@@ -23,9 +23,22 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
   const [newTag, setNewTag] = useState('')
   const [newCategory, setNewCategory] = useState('')
 
+  useEffect(() => {
+    if (initialValues) {
+      setFormData(initialValues)
+    } else {
+      setFormData({
+        command: '',
+        description: '',
+        category: '',
+        tags: []
+      })
+    }
+  }, [initialValues])
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSave(formData)
+    onSubmit(formData)
   }
 
   const handleAddTag = (e) => {
@@ -59,6 +72,52 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
     }
   }
 
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      e.preventDefault()
+      if (!formData.tags.includes(newTag.trim())) {
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, newTag.trim()]
+        }))
+      }
+      setNewTag('')
+    } else if (e.key === 'Backspace' && newTag === '' && formData.tags.length > 0) {
+      e.preventDefault()
+      const newTags = [...formData.tags]
+      newTags.pop()
+      setFormData(prev => ({
+        ...prev,
+        tags: newTags
+      }))
+    }
+  }
+
+  const handleCategoryKeyDown = (e) => {
+    if (e.key === 'Enter' && newCategory.trim()) {
+      e.preventDefault()
+      setFormData(prev => ({
+        ...prev,
+        category: newCategory.trim()
+      }))
+      setNewCategory('')
+    } else if (e.key === 'Backspace' && newCategory === '' && formData.category) {
+      e.preventDefault()
+      setFormData(prev => ({
+        ...prev,
+        category: ''
+      }))
+    }
+  }
+
   return (
     <Dialog 
       open={open} 
@@ -87,7 +146,7 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
       }}
     >
       <DialogTitle>
-        {initialData ? 'Edit Command' : 'Add New Command'}
+        {isEditing ? 'Edit Command' : 'Add New Command'}
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -100,127 +159,125 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
           <Close />
         </IconButton>
       </DialogTitle>
-      <form onSubmit={handleSubmit}>
-        <DialogContent>
+
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
           <TextField
             autoFocus
-            margin="dense"
+            name="command"
             label="Command"
             fullWidth
-            required
             value={formData.command}
-            onChange={(e) => setFormData(prev => ({ ...prev, command: e.target.value }))}
-            sx={{ 
-              mb: { xs: 1.5, sm: 2 },
+            onChange={handleChange}
+            variant="outlined"
+            required
+            sx={{
+              mb: 2,
+              transition: 'transform 0.2s ease-in-out',
               '& .MuiInputBase-root': {
-                fontSize: { xs: '0.875rem', sm: '1rem' }
+                transition: 'all 0.2s ease-in-out',
+                '&.Mui-focused': {
+                  transform: 'scale(1.02)',
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(0, 0, 0, 0.03)'
+                }
+              },
+              '& .MuiInputBase-input': {
+                color: 'text.primary',
+                fontFamily: 'monospace',
+                fontSize: '1rem',
               }
             }}
           />
           
           <TextField
-            margin="dense"
+            name="description"
             label="Description"
             fullWidth
             multiline
             rows={3}
-            required
             value={formData.description}
-            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            sx={{ 
-              mb: { xs: 1.5, sm: 2 },
+            onChange={handleChange}
+            variant="outlined"
+            required
+            sx={{
+              mb: 2,
+              transition: 'transform 0.2s ease-in-out',
               '& .MuiInputBase-root': {
-                fontSize: { xs: '0.875rem', sm: '1rem' }
+                transition: 'all 0.2s ease-in-out',
+                '&.Mui-focused': {
+                  transform: 'scale(1.02)',
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.05)'
+                      : 'rgba(0, 0, 0, 0.03)'
+                }
               }
             }}
           />
 
           <TextField
-            margin="dense"
+            name="category"
             label="Category"
+            fullWidth
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
-            onKeyDown={handleAddCategory}
-            fullWidth
-            helperText="Press Enter to set category"
-            sx={{ mb: { xs: 1.5, sm: 2 } }}
+            onKeyDown={handleCategoryKeyDown}
+            variant="outlined"
+            placeholder="Press Enter to add category"
+            sx={{ mb: 2 }}
             InputProps={{
-              startAdornment: formData.category ? (
-                <InputAdornment 
-                  position="start"
-                  sx={{
-                    height: '100%',
-                    alignItems: 'center',
-                    mt: 0
-                  }}
-                >
+              startAdornment: formData.category && (
+                <InputAdornment position="start">
                   <Chip
                     label={formData.category}
-                    size="small"
                     onDelete={() => setFormData(prev => ({ ...prev, category: '' }))}
-                    color="primary"
+                    size="small"
+                    sx={{ mr: 1 }}
                   />
                 </InputAdornment>
-              ) : null
+              ),
             }}
           />
 
           <TextField
-            margin="dense"
-            label="Add Tags"
+            label="Tags"
+            fullWidth
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
-            onKeyDown={handleAddTag}
-            fullWidth
-            helperText="Press Enter to add a tag"
-            sx={{ mb: { xs: 1.5, sm: 2 } }}
+            onKeyDown={handleTagKeyDown}
+            variant="outlined"
+            placeholder="Press Enter to add tags"
             InputProps={{
-              startAdornment: formData.tags.length > 0 ? (
-                <InputAdornment 
-                  position="start"
-                  sx={{
-                    height: '100%',
-                    alignItems: 'center',
-                    mt: 0
-                  }}
-                >
-                  <Box sx={{ 
-                    display: 'flex', 
-                    flexWrap: 'nowrap',
-                    alignItems: 'center', 
-                    gap: 0.5, 
-                    overflowX: 'auto',
-                    '&::-webkit-scrollbar': { height: '4px' },
-                    '&::-webkit-scrollbar-track': { background: 'transparent' },
-                    '&::-webkit-scrollbar-thumb': { background: '#888', borderRadius: '4px' },
-                    maxWidth: '100%',
-                    minHeight: '32px',  
-                    py: 0.5,  
-                    boxSizing: 'border-box'
-                  }}>
+              startAdornment: formData.tags.length > 0 && (
+                <InputAdornment position="start">
+                  <Box sx={{ display: 'flex', gap: 0.5, flexDirection: 'row' }}>
                     {formData.tags.map((tag, index) => (
                       <Chip
                         key={index}
                         label={tag}
-                        size="small"
                         onDelete={() => handleDeleteTag(tag)}
+                        size="small"
                       />
                     ))}
                   </Box>
                 </InputAdornment>
-              ) : null
+              ),
             }}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
-            {initialData ? 'Save Changes' : 'Add Command'}
-          </Button>
-        </DialogActions>
-      </form>
+        </form>
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary">
+          {isEditing ? 'Save Changes' : 'Add Command'}
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }
 
-export default AddEntryModal 
+export default AddEntryModal

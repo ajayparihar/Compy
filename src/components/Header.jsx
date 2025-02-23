@@ -20,6 +20,7 @@ import {
   History,
   Clear
 } from '@mui/icons-material'
+import ThemeSelector from './ThemeSelector'
 
 function Header({
   searchQuery,
@@ -81,18 +82,23 @@ function Header({
   }
 
   return (
-    <AppBar
-      position="fixed"
-      color="transparent"
-      elevation={0}
+    <Box
+      component="header"
       sx={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 1100,
         backdropFilter: 'blur(10px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        background: theme.palette.mode === 'dark'
-          ? 'rgba(15, 23, 42, 0.8)'
-          : 'rgba(255, 255, 255, 0.8)',
-        width: '100%',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        backgroundColor: (theme) => 
+          theme.palette.mode === 'dark' 
+            ? 'rgba(10, 25, 41, 0.7)'
+            : 'rgba(255, 255, 255, 0.7)',
+        borderBottom: '1px solid',
+        borderColor: (theme) =>
+          theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.1)'
+            : 'rgba(0, 0, 0, 0.1)',
+        mb: 3
       }}
     >
       <Toolbar
@@ -262,50 +268,18 @@ function Header({
           />
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            alignItems: 'center',
-          }}
-        >
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <ThemeSelector />
           <IconButton
+            color="inherit"
             onClick={onImportClick}
-            color="primary"
-            title="Import commands"
-            sx={{
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(0, 0, 0, 0.04)',
-              '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : 'rgba(0, 0, 0, 0.08)',
-              },
-            }}
+            sx={{ ml: 1 }}
           >
             <FileUpload />
           </IconButton>
-          <IconButton
-            onClick={onThemeToggle}
-            color="primary"
-            title="Toggle theme"
-            sx={{
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(0, 0, 0, 0.04)',
-              '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : 'rgba(0, 0, 0, 0.08)',
-              },
-            }}
-          >
-            {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-          </IconButton>
         </Box>
       </Toolbar>
-    </AppBar>
+    </Box>
   )
 }
 

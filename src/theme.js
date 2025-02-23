@@ -1,4 +1,6 @@
 import { createTheme } from '@mui/material'
+import { themes } from './themes/themeConfig'
+import { useTheme } from './hooks/useTheme'
 
 const glassmorphismStyles = {
   background: 'rgba(255, 255, 255, 0.1)',
@@ -49,23 +51,19 @@ const commonTheme = {
               : 'rgba(99, 102, 241, 0.5)',
           },
         },
-        '*': {
-          scrollbarWidth: 'thin',
-          scrollbarColor: `${theme.palette.mode === 'dark' 
-            ? 'rgba(129, 140, 248, 0.3)'
-            : 'rgba(99, 102, 241, 0.3)'} transparent`,
-        },
       }),
     },
     MuiCard: {
       styleOverrides: {
         root: {
           ...glassmorphismStyles,
-          padding: '24px',
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': {
-            boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2)',
-          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
         },
       },
     },
@@ -80,10 +78,15 @@ const commonTheme = {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
           textTransform: 'none',
-          padding: '10px 24px',
-          fontWeight: 500,
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
         },
       },
     },
@@ -91,75 +94,35 @@ const commonTheme = {
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 12,
+            borderRadius: 8,
           },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-          backgroundColor: theme => theme.palette.mode === 'dark'
-            ? 'rgba(15, 23, 42, 0.8)'
-            : 'rgba(255, 255, 255, 0.8)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid',
-          borderColor: theme => theme.palette.mode === 'dark'
-            ? 'rgba(255, 255, 255, 0.1)'
-            : 'rgba(0, 0, 0, 0.1)',
         },
       },
     },
   },
 }
 
-export const lightTheme = createTheme({
-  ...commonTheme,
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#6366f1',
-      light: '#818cf8',
-      dark: '#4f46e5',
-    },
-    secondary: {
-      main: '#14b8a6',
-      light: '#2dd4bf',
-      dark: '#0d9488',
-    },
-    background: {
-      default: '#f8fafc',
-      paper: 'rgba(255, 255, 255, 0.8)',
-    },
-    text: {
-      primary: 'rgba(0, 0, 0, 0.87)',
-      secondary: 'rgba(0, 0, 0, 0.6)',
-    },
-  },
-})
+export function getTheme(themeId = 'sunrise') {
+  let themeConfig = null;
+  
+  // Find the theme configuration
+  for (const [category, categoryThemes] of Object.entries(themes)) {
+    if (themeId in categoryThemes) {
+      themeConfig = categoryThemes[themeId];
+      break;
+    }
+  }
+  
+  // Fallback to sunrise theme if the requested theme is not found
+  if (!themeConfig) {
+    themeConfig = themes.light.sunrise;
+  }
 
-export const darkTheme = createTheme({
-  ...commonTheme,
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#818cf8',
-      light: '#a5b4fc',
-      dark: '#6366f1',
-    },
-    secondary: {
-      main: '#2dd4bf',
-      light: '#5eead4',
-      dark: '#14b8a6',
-    },
-    background: {
-      default: '#0f172a',
-      paper: 'rgba(30, 41, 59, 0.8)',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: 'rgba(255, 255, 255, 0.7)',
-    },
-  },
-})
+  return createTheme({
+    ...commonTheme,
+    palette: themeConfig.palette,
+  })
+}
+
+export const lightTheme = getTheme('sunrise')
+export const darkTheme = getTheme('mysticForest')

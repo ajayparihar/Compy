@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
+import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button, CardActionArea } from '@mui/material'
 import { ContentCopy, Delete, Edit } from '@mui/icons-material'
 import { useState } from 'react'
 
@@ -98,164 +98,128 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
       <Grid container spacing={2}>
         {commands.map((item) => (
           <Grid item xs={12} sm={6} md={4} lg={4} key={item.id}>
-            <Card 
-              onClick={(e) => handleCardClick(e, item)}
+            <Card
               sx={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                position: 'relative',
-                overflow: 'visible',
-                '& .MuiCardContent-root': {
-                  flexGrow: 1,
-                  p: { xs: 1, sm: 1.5 }
-                },
-                '& .MuiCardActions-root': {
-                  p: { xs: 0.75, sm: 1 }
-                },
-                '& .MuiTypography-root': {
-                  fontSize: { xs: '0.8rem', sm: '0.9rem' }
-                },
-                '& .MuiChip-root': {
-                  m: 0.25,
-                  fontSize: { xs: '0.7rem', sm: '0.8rem' }
-                },
-                background: theme.palette.mode === 'dark'
-                  ? 'rgba(30, 41, 59, 0.4)'
-                  : 'rgba(255, 255, 255, 0.7)',
+                background: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(10, 25, 41, 0.7)'
+                    : 'rgba(255, 255, 255, 0.7)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid',
-                borderColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : 'rgba(0, 0, 0, 0.1)',
-                boxShadow: theme.palette.mode === 'dark'
-                  ? '0 4px 12px rgba(0, 0, 0, 0.2)'
-                  : '0 4px 12px rgba(0, 0, 0, 0.06)',
-                cursor: { xs: 'default', sm: 'pointer' },
-                '&:hover': {
-                  '@media (hover: hover)': {
-                    background: theme.palette.mode === 'dark'
-                      ? 'rgba(30, 41, 59, 0.6)'
-                      : 'rgba(255, 255, 255, 0.9)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: theme.palette.mode === 'dark'
-                      ? '0 6px 16px rgba(0, 0, 0, 0.3)'
-                      : '0 6px 16px rgba(0, 0, 0, 0.1)',
-                    '& .card-actions .MuiIconButton-root': {
-                      opacity: 1
-                    }
-                  }
-                },
-                '& .ripple': {
-                  position: 'absolute',
-                  borderRadius: '50%',
-                  transform: 'scale(0)',
-                  animation: rippleActive === item.id ? 'ripple 0.6s linear' : 'none',
-                  background: theme.palette.mode === 'dark'
+                borderColor: (theme) =>
+                  theme.palette.mode === 'dark'
                     ? 'rgba(255, 255, 255, 0.1)'
-                    : 'rgba(0, 0, 0, 0.05)',
-                  pointerEvents: 'none',
-                },
-                '@keyframes ripple': {
-                  to: {
-                    transform: 'scale(4)',
-                    opacity: 0,
-                  }
-                }
+                    : 'rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden'
               }}
             >
-              {rippleActive === item.id && (
-                <Box
-                  className="ripple"
-                  sx={{
-                    width: 100,
-                    height: 100,
-                    left: ripplePosition.x - 50,
-                    top: ripplePosition.y - 50,
-                  }}
-                />
-              )}
-              <CardContent sx={{ flex: '1 0 auto', p: 1.25 }}>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'flex-start', 
-                  mb: 1,
-                  gap: 0.5
+              <CardActionArea
+                onClick={(e) => handleCardClick(e, item)}
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  '& .MuiCardActionArea-focusHighlight': {
+                    background: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.1)'
+                        : 'rgba(0, 0, 0, 0.1)',
+                  }
+                }}
+              >
+                <CardContent sx={{ 
+                  flex: '1 0 auto', 
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1
                 }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'flex-start',
+                    gap: 1
+                  }}>
+                    <Typography 
+                      variant="subtitle1" 
+                      component="h2" 
+                      sx={{ 
+                        fontFamily: 'monospace',
+                        wordBreak: 'break-word',
+                        flex: 1,
+                        fontWeight: 800,
+                        color: '#4B9CDB',
+                        fontSize: '1.1rem',
+                        letterSpacing: '0.01em',
+                        lineHeight: 1.4
+                      }}
+                    >
+                      {highlightText(item.command, searchQuery)}
+                    </Typography>
+                    {item.category && (
+                      <Chip
+                        label={highlightText(item.category, searchQuery)}
+                        size="small"
+                        color="primary"
+                        sx={{ 
+                          flexShrink: 0,
+                          background: theme.palette.mode === 'dark'
+                            ? 'rgba(129, 140, 248, 0.2)'
+                            : 'rgba(99, 102, 241, 0.1)',
+                          color: theme.palette.mode === 'dark'
+                            ? theme.palette.primary.light
+                            : theme.palette.primary.main,
+                          borderColor: 'transparent',
+                          fontWeight: 500,
+                          height: '24px'
+                        }}
+                      />
+                    )}
+                  </Box>
+                  
                   <Typography 
-                    variant="subtitle1" 
-                    component="h2" 
+                    variant="body2" 
+                    color="text.secondary"
                     sx={{ 
-                      fontFamily: 'monospace',
-                      wordBreak: 'break-word',
-                      flex: 1,
-                      fontWeight: 800,
-                      color: '#4B9CDB',
-                      fontSize: '1.2rem',
-                      letterSpacing: '0.01em'
+                      fontSize: '0.875rem',
+                      lineHeight: 1.5,
+                      opacity: 0.8
                     }}
                   >
-                    {highlightText(item.command, searchQuery)}
+                    {highlightText(item.description, searchQuery)}
                   </Typography>
-                  {item.category && (
-                    <Chip
-                      label={highlightText(item.category, searchQuery)}
-                      size="small"
-                      color="primary"
-                      sx={{ 
-                        ml: 1, 
-                        flexShrink: 0,
-                        background: theme.palette.mode === 'dark'
-                          ? 'rgba(129, 140, 248, 0.2)'
-                          : 'rgba(99, 102, 241, 0.1)',
-                        color: theme.palette.mode === 'dark'
-                          ? theme.palette.primary.light
-                          : theme.palette.primary.main,
-                        borderColor: 'transparent',
-                        fontWeight: 500,
-                        height: '24px',
-                        '& .MuiChip-label > span': {
-                          backgroundColor: 'transparent !important',
-                          px: '0 !important'
-                        }
-                      }}
-                    />
-                  )}
-                </Box>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary"
-                  sx={{ 
-                    mb: 1,
-                    lineHeight: 1.4,
-                    fontSize: '0.7rem',
-                    opacity: 0.6,
-                    fontStyle: 'normal'
-                  }}
-                >
-                  {highlightText(item.description, searchQuery)}
-                </Typography>
+                </CardContent>
 
-              </CardContent>
-
-              <Box sx={{ mt: 'auto' }}>
                 <CardActions 
-                  className="card-actions"
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    p: 2,
+                    pt: 1,
                     gap: 1,
-                    p: { xs: 1, sm: 1.5 },
-                    '& .MuiIconButton-root': {
-                      opacity: { xs: 1, sm: 0 },
-                      transition: 'opacity 0.2s ease-in-out',
-                    }
+                    borderTop: '1px solid',
+                    borderColor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.1)'
+                        : 'rgba(0, 0, 0, 0.1)',
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? 'rgba(0, 0, 0, 0.2)'
+                        : 'rgba(0, 0, 0, 0.02)'
                   }}
                 >
                   {/* Tags section */}
-                  <Box sx={{ display: 'flex', gap: 0.5, flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    gap: 0.5, 
+                    flex: 1, 
+                    flexWrap: 'wrap',
+                    minWidth: 0 
+                  }}>
                     {item.tags && item.tags.length > 0 && (
                       <>
                         {item.tags.slice(0, 3).map((tag, index) => (
@@ -268,7 +232,6 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                                 ? 'rgba(255, 255, 255, 0.05)'
                                 : 'rgba(0, 0, 0, 0.05)',
                               color: 'text.secondary',
-                              border: 'none',
                               height: '20px',
                               '& .MuiChip-label': {
                                 px: 1,
@@ -294,7 +257,17 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   </Box>
                   
                   {/* Action buttons */}
-                  <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    gap: 0.5,
+                    ml: 'auto',
+                    flexShrink: 0,
+                    opacity: { xs: 1, sm: 0 },
+                    transition: 'opacity 0.2s ease-in-out',
+                    '.MuiCard-root:hover &': {
+                      opacity: 1
+                    }
+                  }}>
                     <IconButton
                       size="small"
                       onClick={(e) => {
@@ -333,7 +306,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                     </IconButton>
                   </Box>
                 </CardActions>
-              </Box>
+              </CardActionArea>
             </Card>
           </Grid>
         ))}
@@ -387,4 +360,4 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
   )
 }
 
-export default CommandList 
+export default CommandList

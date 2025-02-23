@@ -7,26 +7,25 @@ import ImportModal from './components/ImportModal'
 import AddEntryFab from './components/AddEntryFab'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { useTheme } from './hooks/useTheme'
-import { lightTheme, darkTheme } from './theme'
+import { getTheme } from './theme'
 import { Snackbar, Alert } from '@mui/material'
 import LoadingSkeleton from './components/LoadingSkeleton'
 
 function App() {
   // Theme
-  const { theme, setTheme } = useTheme()
-  const isDarkMode = theme === 'dark'
-  const handleThemeToggle = () => setTheme(isDarkMode ? 'light' : 'dark')
+  const { currentTheme } = useTheme()
+  const theme = getTheme(currentTheme)
+
+  // State
+  const [isLoading, setIsLoading] = useState(true)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [toastMessage, setToastMessage] = useState('')
+  const [editingCommand, setEditingCommand] = useState(null)
 
   // Local storage
   const [commands, setCommands] = useLocalStorage('commands', [])
-  
-  // State
-  const [searchQuery, setSearchQuery] = useState('')
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [showImportModal, setShowImportModal] = useState(false)
-  const [toastMessage, setToastMessage] = useState('')
-  const [editingCommand, setEditingCommand] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
 
   // Loading effect
   useEffect(() => {
@@ -49,7 +48,7 @@ function App() {
   const handleAddCommand = (newCommand) => {
     setCommands([...commands, { ...newCommand, id: Date.now() }])
     setShowAddModal(false)
-    setToastMessage('Command added successfully')
+    setToastMessage('Command added successfully!')
   }
 
   const handleEditCommand = (editedCommand) => {
@@ -57,133 +56,82 @@ function App() {
       cmd.id === editedCommand.id ? editedCommand : cmd
     ))
     setEditingCommand(null)
-    setToastMessage('Command updated successfully')
+    setToastMessage('Command updated successfully!')
+  }
+
+  const handleDeleteCommand = (commandId) => {
+    setCommands(commands.filter(cmd => cmd.id !== commandId))
+    setToastMessage('Command deleted successfully!')
   }
 
   const handleImportCommands = (importedCommands) => {
     setCommands([...commands, ...importedCommands])
     setShowImportModal(false)
-    setToastMessage('Commands imported successfully')
+    setToastMessage(`${importedCommands.length} commands imported successfully!`)
   }
 
-  const handleDeleteCommand = (id) => {
-    setCommands(commands.filter(cmd => cmd.id !== id))
-    setToastMessage('Command deleted successfully')
+  // Toast handlers
+  const handleToastClose = () => {
+    setToastMessage('')
   }
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === '/' && 
-          !e.target.matches('input, textarea') && 
-          !e.target.isContentEditable) {
-        e.preventDefault()
-        const searchInput = document.querySelector('input[placeholder*="Search"]')
-        if (searchInput) {
-          searchInput.focus()
-        }
-      }
-      
-      if (e.key === 'Escape' && searchQuery) {
-        setSearchQuery('')
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyPress)
-    return () => document.removeEventListener('keydown', handleKeyPress)
-  }, [searchQuery])
 
   return (
-    <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth={false} sx={{ 
         minHeight: '100vh',
-        width: '100vw',
-        '@media (min-width: 1200px)': {
-          width: '95vw',
-          margin: '0 auto',
-          padding: '24px',
-        },
-        display: 'flex', 
-        flexDirection: 'column', 
-        p: { xs: 1, sm: 2 },
-        overflow: 'hidden'
+        py: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2
       }}>
-        <Header 
+        <Header
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onImportClick={() => setShowImportModal(true)}
-          isDarkMode={isDarkMode}
-          onThemeToggle={handleThemeToggle}
           commands={commands}
         />
 
-        <Grid container sx={{ flex: 1, overflow: 'auto', marginTop: '80px' }}>
-          <Grid item xs={12} md={12} sx={{ padding: 2 }}>
-            {isLoading ? (
-              <LoadingSkeleton />
-            ) : (
-              <CommandList 
-                commands={filteredCommands} 
-                onDelete={handleDeleteCommand}
-                onEdit={(cmd) => setEditingCommand(cmd)}
-                searchQuery={searchQuery}
-              />
-            )}
-          </Grid>
-        </Grid>
+        {isLoading ? (
+          <LoadingSkeleton />
+        ) : (
+          <CommandList
+            sx={{ mt: 0 }} // Removed marginTop
+            commands={filteredCommands}
+            onDelete={handleDeleteCommand}
+            onEdit={setEditingCommand}
+          />
+        )}
 
         <AddEntryFab onClick={() => setShowAddModal(true)} />
-        
-        {(showAddModal || editingCommand !== null) && (
-          <AddEntryModal
-            open={showAddModal || editingCommand !== null}
-            onClose={() => {
-              setShowAddModal(false)
-              setEditingCommand(null)
-            }}
-            onSave={editingCommand ? handleEditCommand : handleAddCommand}
-            initialData={editingCommand}
-          />
-        )}
 
-        {showImportModal && (
-          <ImportModal
-            open={showImportModal}
-            onClose={() => setShowImportModal(false)}
-            onImport={handleImportCommands}
-          />
-        )}
+        <AddEntryModal
+          open={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddCommand}
+        />
+
+        <AddEntryModal
+          open={Boolean(editingCommand)}
+          onClose={() => setEditingCommand(null)}
+          onSubmit={handleEditCommand}
+          initialValues={editingCommand}
+          isEditing
+        />
+
+        <ImportModal
+          open={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onImport={handleImportCommands}
+        />
 
         <Snackbar
           open={Boolean(toastMessage)}
           autoHideDuration={3000}
-          onClose={() => setToastMessage('')}
+          onClose={handleToastClose}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          <Alert 
-            onClose={() => setToastMessage('')} 
-            severity="success"
-            sx={{ 
-              width: '100%',
-              backdropFilter: 'blur(10px)',
-              background: theme => theme.palette.mode === 'dark' 
-                ? 'rgba(15, 23, 42, 0.8)'
-                : 'rgba(255, 255, 255, 0.8)',
-              border: '1px solid',
-              borderColor: theme => theme.palette.mode === 'dark'
-                ? 'rgba(255, 255, 255, 0.1)'
-                : 'rgba(0, 0, 0, 0.1)',
-              boxShadow: theme => theme.palette.mode === 'dark'
-                ? '0 4px 12px rgba(0, 0, 0, 0.2)'
-                : '0 4px 12px rgba(0, 0, 0, 0.06)',
-              '& .MuiAlert-icon': {
-                color: theme => theme.palette.mode === 'dark'
-                  ? theme.palette.primary.light
-                  : theme.palette.primary.main
-              }
-            }}
-          >
+          <Alert onClose={handleToastClose} severity="success">
             {toastMessage}
           </Alert>
         </Snackbar>
