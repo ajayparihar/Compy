@@ -112,16 +112,6 @@ function ThemeSelector() {
     ...Object.entries(themes.light).map(([themeId, themeData]) =>
       renderThemeMenuItem(themeId, themeData)
     ),
-    <Divider key="favorites-divider" sx={{ my: 1 }} />,
-    <Typography key="favorites-title" variant="subtitle2" sx={{ p: 1, opacity: 0.7 }}>
-      Favorite Themes
-    </Typography>,
-    ...Object.entries(themes)
-      .flatMap(([category, categoryThemes]) =>
-        Object.entries(categoryThemes)
-          .filter(([themeId]) => favoriteThemes.includes(themeId))
-          .map(([themeId, themeData]) => renderThemeMenuItem(themeId, themeData))
-      )
   ] : [
     ...Object.entries(themes)
       .flatMap(([category, categoryThemes]) =>
