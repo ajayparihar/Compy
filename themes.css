@@ -1,0 +1,72 @@
+/* Base theme variables */
+:root {
+  --transition-speed: 200ms;
+  --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global styles */
+* {
+  transition: background-color var(--transition-speed) var(--transition-easing),
+              color var(--transition-speed) var(--transition-easing),
+              border-color var(--transition-speed) var(--transition-easing),
+              box-shadow var(--transition-speed) var(--transition-easing);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  transition: background-color var(--transition-speed) var(--transition-easing);
+}
+
+/* Theme-specific styles */
+[data-theme="light"] {
+  background-color: #f8fafc;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+[data-theme="dark"] {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+/* Material-UI overrides */
+.MuiPopover-root {
+  transition: opacity var(--transition-speed) var(--transition-easing) !important;
+}
+
+.MuiPaper-root {
+  transition: background-color var(--transition-speed) var(--transition-easing),
+              box-shadow var(--transition-speed) var(--transition-easing) !important;
+}
+
+.MuiMenuItem-root {
+  transition: background-color var(--transition-speed) var(--transition-easing) !important;
+}
+
+/* Input styles */
+.MuiInputBase-root {
+  transition: all var(--transition-speed) var(--transition-easing) !important;
+}
+
+[data-theme="dark"] .MuiInputBase-root {
+  background-color: rgba(30, 41, 59, 0.8);
+  color: #ffffff;
+}
+
+[data-theme="light"] .MuiInputBase-root {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* Button styles */
+.MuiButton-root,
+.MuiIconButton-root {
+  transition: all var(--transition-speed) var(--transition-easing) !important;
+}
+
+/* Backdrop blur */
+.MuiDialog-root .MuiPaper-root,
+.MuiPopover-root .MuiPaper-root,
+.MuiAppBar-root {
+  backdrop-filter: blur(10px);
+}

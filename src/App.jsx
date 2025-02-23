@@ -6,28 +6,37 @@ import AddEntryModal from './components/AddEntryModal'
 import ImportModal from './components/ImportModal'
 import AddEntryFab from './components/AddEntryFab'
 import { useLocalStorage } from './hooks/useLocalStorage'
+import { useTheme } from './hooks/useTheme'
 import { lightTheme, darkTheme } from './theme'
 import { Snackbar, Alert } from '@mui/material'
 import LoadingSkeleton from './components/LoadingSkeleton'
 
 function App() {
+  // Theme
+  const { theme, setTheme } = useTheme()
+  const isDarkMode = theme === 'dark'
+  const handleThemeToggle = () => setTheme(isDarkMode ? 'light' : 'dark')
+
+  // Local storage
   const [commands, setCommands] = useLocalStorage('commands', [])
+  
+  // State
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showImportModal, setShowImportModal] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
-  const [isDarkMode, setIsDarkMode] = useLocalStorage('darkMode', false)
   const [editingCommand, setEditingCommand] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Loading effect
   useEffect(() => {
-    // Simulate initial loading
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 1500)
     return () => clearTimeout(timer)
   }, [])
 
+  // Filter commands
   const filteredCommands = commands.filter(cmd => {
     const searchLower = searchQuery.toLowerCase()
     return cmd.command.toLowerCase().includes(searchLower) ||
@@ -36,6 +45,7 @@ function App() {
            cmd.tags?.some(tag => tag.toLowerCase().includes(searchLower))
   })
 
+  // Command handlers
   const handleAddCommand = (newCommand) => {
     setCommands([...commands, { ...newCommand, id: Date.now() }])
     setShowAddModal(false)
@@ -61,14 +71,9 @@ function App() {
     setToastMessage('Command deleted successfully')
   }
 
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode)
-  }
-
-  // Add keyboard shortcut handler
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e) => {
-      // Focus search bar when '/' is pressed
       if (e.key === '/' && 
           !e.target.matches('input, textarea') && 
           !e.target.isContentEditable) {
@@ -79,7 +84,6 @@ function App() {
         }
       }
       
-      // Clear search with Escape
       if (e.key === 'Escape' && searchQuery) {
         setSearchQuery('')
       }
@@ -188,4 +192,4 @@ function App() {
   )
 }
 
-export default App 
+export default App

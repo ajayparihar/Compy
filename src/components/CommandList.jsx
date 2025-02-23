@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, Divider, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
+import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
 import { ContentCopy, Delete, Edit } from '@mui/icons-material'
 import { useState } from 'react'
 
@@ -97,7 +97,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
     <>
       <Grid container spacing={2}>
         {commands.map((item) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
+          <Grid item xs={12} sm={6} md={4} lg={4} key={item.id}>
             <Card 
               onClick={(e) => handleCardClick(e, item)}
               sx={{
@@ -108,17 +108,17 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                 overflow: 'visible',
                 '& .MuiCardContent-root': {
                   flexGrow: 1,
-                  p: { xs: 1.5, sm: 2 }
-                },
-                '& .MuiCardActions-root': {
                   p: { xs: 1, sm: 1.5 }
                 },
+                '& .MuiCardActions-root': {
+                  p: { xs: 0.75, sm: 1 }
+                },
                 '& .MuiTypography-root': {
-                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.9rem' }
                 },
                 '& .MuiChip-root': {
-                  m: 0.5,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  m: 0.25,
+                  fontSize: { xs: '0.7rem', sm: '0.8rem' }
                 },
                 background: theme.palette.mode === 'dark'
                   ? 'rgba(30, 41, 59, 0.4)'
@@ -137,7 +137,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                     background: theme.palette.mode === 'dark'
                       ? 'rgba(30, 41, 59, 0.6)'
                       : 'rgba(255, 255, 255, 0.9)',
-                    transform: 'translateY(-2px)',
+                    transform: 'translateY(-1px)',
                     boxShadow: theme.palette.mode === 'dark'
                       ? '0 6px 16px rgba(0, 0, 0, 0.3)'
                       : '0 6px 16px rgba(0, 0, 0, 0.1)',
@@ -175,7 +175,7 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   }}
                 />
               )}
-              <CardContent sx={{ flex: '1 0 auto', p: 1.5 }}>
+              <CardContent sx={{ flex: '1 0 auto', p: 1.25 }}>
                 <Box sx={{ 
                   display: 'flex', 
                   alignItems: 'flex-start', 
@@ -189,11 +189,10 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                       fontFamily: 'monospace',
                       wordBreak: 'break-word',
                       flex: 1,
-                      fontWeight: 600,
-                      color: theme.palette.mode === 'dark'
-                        ? theme.palette.primary.light
-                        : theme.palette.primary.main,
-                      fontSize: '0.85rem'
+                      fontWeight: 800,
+                      color: '#4B9CDB',
+                      fontSize: '1.2rem',
+                      letterSpacing: '0.01em'
                     }}
                   >
                     {highlightText(item.command, searchQuery)}
@@ -230,55 +229,23 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   sx={{ 
                     mb: 1,
                     lineHeight: 1.4,
-                    fontSize: '0.8rem'
+                    fontSize: '0.7rem',
+                    opacity: 0.6,
+                    fontStyle: 'normal'
                   }}
                 >
                   {highlightText(item.description, searchQuery)}
                 </Typography>
 
-                {item.tags && item.tags.length > 0 && (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {item.tags.map((tag, index) => (
-                      <Chip
-                        key={index}
-                        label={highlightText(tag, searchQuery)}
-                        size="small"
-                        sx={{ 
-                          bgcolor: theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.05)'
-                            : 'rgba(0, 0, 0, 0.05)',
-                          color: 'text.secondary',
-                          border: 'none',
-                          height: '20px',
-                          '& .MuiChip-label': {
-                            px: 1,
-                            fontSize: '0.75rem'
-                          },
-                          '& .MuiChip-label > span': {
-                            backgroundColor: 'transparent !important',
-                            px: '0 !important'
-                          },
-                          '&:hover': {
-                            bgcolor: theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.1)'
-                              : 'rgba(0, 0, 0, 0.08)',
-                          }
-                        }}
-                      />
-                    ))}
-                  </Box>
-                )}
               </CardContent>
 
               <Box sx={{ mt: 'auto' }}>
-                <Divider sx={{ 
-                  opacity: theme.palette.mode === 'dark' ? 0.1 : 0.2 
-                }} />
                 <CardActions 
                   className="card-actions"
                   sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                     gap: 1,
                     p: { xs: 1, sm: 1.5 },
                     '& .MuiIconButton-root': {
@@ -287,42 +254,84 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                     }
                   }}
                 >
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy(item.command);
-                    }}
-                    sx={{
-                      color: theme.palette.primary.main
-                    }}
-                  >
-                    <ContentCopy fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(item);
-                    }}
-                    sx={{
-                      color: theme.palette.info.main
-                    }}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick(item);
-                    }}
-                    sx={{
-                      color: theme.palette.error.main
-                    }}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
+                  {/* Tags section */}
+                  <Box sx={{ display: 'flex', gap: 0.5, flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                    {item.tags && item.tags.length > 0 && (
+                      <>
+                        {item.tags.slice(0, 3).map((tag, index) => (
+                          <Chip
+                            key={index}
+                            label={highlightText(tag, searchQuery)}
+                            size="small"
+                            sx={{ 
+                              bgcolor: theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(0, 0, 0, 0.05)',
+                              color: 'text.secondary',
+                              border: 'none',
+                              height: '20px',
+                              '& .MuiChip-label': {
+                                px: 1,
+                                fontSize: '0.75rem'
+                              }
+                            }}
+                          />
+                        ))}
+                        {item.tags.length > 3 && (
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              color: 'text.secondary',
+                              opacity: 0.7,
+                              alignSelf: 'center'
+                            }}
+                          >
+                            +{item.tags.length - 3}
+                          </Typography>
+                        )}
+                      </>
+                    )}
+                  </Box>
+                  
+                  {/* Action buttons */}
+                  <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(item.command);
+                      }}
+                      sx={{
+                        color: theme.palette.primary.main
+                      }}
+                    >
+                      <ContentCopy fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(item);
+                      }}
+                      sx={{
+                        color: theme.palette.error.main
+                      }}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(item);
+                      }}
+                      sx={{
+                        color: theme.palette.info.main
+                      }}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                  </Box>
                 </CardActions>
               </Box>
             </Card>

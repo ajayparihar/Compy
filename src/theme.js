@@ -96,6 +96,21 @@ const commonTheme = {
         },
       },
     },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          backgroundColor: theme => theme.palette.mode === 'dark'
+            ? 'rgba(15, 23, 42, 0.8)'
+            : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid',
+          borderColor: theme => theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.1)'
+            : 'rgba(0, 0, 0, 0.1)',
+        },
+      },
+    },
   },
 }
 
@@ -109,17 +124,17 @@ export const lightTheme = createTheme({
       dark: '#4f46e5',
     },
     secondary: {
-      main: '#ec4899',
-      light: '#f472b6',
-      dark: '#db2777',
+      main: '#14b8a6',
+      light: '#2dd4bf',
+      dark: '#0d9488',
     },
     background: {
       default: '#f8fafc',
       paper: 'rgba(255, 255, 255, 0.8)',
     },
     text: {
-      primary: '#1e293b',
-      secondary: '#475569',
+      primary: 'rgba(0, 0, 0, 0.87)',
+      secondary: 'rgba(0, 0, 0, 0.6)',
     },
   },
 })
@@ -134,17 +149,17 @@ export const darkTheme = createTheme({
       dark: '#6366f1',
     },
     secondary: {
-      main: '#f472b6',
-      light: '#f9a8d4',
-      dark: '#ec4899',
+      main: '#2dd4bf',
+      light: '#5eead4',
+      dark: '#14b8a6',
     },
     background: {
       default: '#0f172a',
       paper: 'rgba(30, 41, 59, 0.8)',
     },
     text: {
-      primary: '#f1f5f9',
-      secondary: '#cbd5e1',
+      primary: '#ffffff',
+      secondary: 'rgba(255, 255, 255, 0.7)',
     },
   },
-}) 
+})
