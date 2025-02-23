@@ -11,6 +11,11 @@ function AddEntryFab({ onClick }) {
         position: 'fixed',
         bottom: 24,
         right: 24,
+        zIndex: 9999,
+        '&:hover': {
+          transform: 'scale(1.05)',
+        },
+        transition: 'transform 0.2s'
       }}
     >
       <Add />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ThemeProvider, CssBaseline, Container } from '@mui/material'
+import { ThemeProvider, CssBaseline, Container, Grid } from '@mui/material'
 import Header from './components/Header'
 import CommandList from './components/CommandList'
 import AddEntryModal from './components/AddEntryModal'
@@ -8,6 +8,7 @@ import AddEntryFab from './components/AddEntryFab'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { lightTheme, darkTheme } from './theme'
 import { Snackbar, Alert } from '@mui/material'
+import LoadingSkeleton from './components/LoadingSkeleton'
 
 function App() {
   const [commands, setCommands] = useLocalStorage('commands', [])
@@ -16,6 +17,16 @@ function App() {
   const [showImportModal, setShowImportModal] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [isDarkMode, setIsDarkMode] = useLocalStorage('darkMode', false)
+  const [editingCommand, setEditingCommand] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    // Simulate initial loading
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const filteredCommands = commands.filter(cmd => {
     const searchLower = searchQuery.toLowerCase()
@@ -31,10 +42,23 @@ function App() {
     setToastMessage('Command added successfully')
   }
 
+  const handleEditCommand = (editedCommand) => {
+    setCommands(commands.map(cmd => 
+      cmd.id === editedCommand.id ? editedCommand : cmd
+    ))
+    setEditingCommand(null)
+    setToastMessage('Command updated successfully')
+  }
+
   const handleImportCommands = (importedCommands) => {
     setCommands([...commands, ...importedCommands])
     setShowImportModal(false)
     setToastMessage('Commands imported successfully')
+  }
+
+  const handleDeleteCommand = (id) => {
+    setCommands(commands.filter(cmd => cmd.id !== id))
+    setToastMessage('Command deleted successfully')
   }
 
   const handleThemeToggle = () => {
@@ -90,27 +114,32 @@ function App() {
           commands={commands}
         />
 
-        <main style={{ 
-          flex: 1, 
-          overflow: 'auto', 
-          marginTop: '80px',
-          width: '100%',
-          height: '100%',
-          maxWidth: '2000px'
-        }}>
-          <CommandList 
-            commands={filteredCommands} 
-            searchQuery={searchQuery}
-          />
-        </main>
+        <Grid container sx={{ flex: 1, overflow: 'auto', marginTop: '80px' }}>
+          <Grid item xs={12} md={12} sx={{ padding: 2 }}>
+            {isLoading ? (
+              <LoadingSkeleton />
+            ) : (
+              <CommandList 
+                commands={filteredCommands} 
+                onDelete={handleDeleteCommand}
+                onEdit={(cmd) => setEditingCommand(cmd)}
+                searchQuery={searchQuery}
+              />
+            )}
+          </Grid>
+        </Grid>
 
         <AddEntryFab onClick={() => setShowAddModal(true)} />
         
-        {showAddModal && (
+        {(showAddModal || editingCommand !== null) && (
           <AddEntryModal
-            open={showAddModal}
-            onClose={() => setShowAddModal(false)}
-            onSave={handleAddCommand}
+            open={showAddModal || editingCommand !== null}
+            onClose={() => {
+              setShowAddModal(false)
+              setEditingCommand(null)
+            }}
+            onSave={editingCommand ? handleEditCommand : handleAddCommand}
+            initialData={editingCommand}
           />
         )}
 

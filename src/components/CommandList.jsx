@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, Divider, useTheme, Snackbar, Alert } from '@mui/material'
+import { Card, CardContent, Typography, Grid, Box, Chip, IconButton, CardActions, Divider, useTheme, Snackbar, Alert, Dialog, DialogTitle, DialogActions, DialogContent, Button } from '@mui/material'
 import { ContentCopy, Delete, Edit } from '@mui/icons-material'
 import { useState } from 'react'
 
@@ -7,7 +7,9 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
   const [ripplePosition, setRipplePosition] = useState({ x: 0, y: 0 })
   const [rippleActive, setRippleActive] = useState(null)
   const [snackbarOpen, setSnackbarOpen] = useState(false)
-  
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+
   const handleCopy = async (command) => {
     try {
       await navigator.clipboard.writeText(command)
@@ -25,6 +27,11 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
   }
 
   const handleCardClick = async (event, item) => {
+    // Don't copy if clicking on action buttons
+    if (event.target.closest('.card-actions')) {
+      return
+    }
+
     const card = event.currentTarget
     const rect = card.getBoundingClientRect()
     const x = event.clientX - rect.left
@@ -39,6 +46,24 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
     setTimeout(() => {
       setRippleActive(null)
     }, 600)
+  }
+
+  const handleDeleteClick = (item) => {
+    setItemToDelete(item)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (itemToDelete) {
+      onDelete(itemToDelete.id)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false)
+    setItemToDelete(null)
   }
 
   // Add highlightText utility function
@@ -75,10 +100,26 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
           <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
             <Card 
               onClick={(e) => handleCardClick(e, item)}
-              sx={{ 
+              sx={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
+                position: 'relative',
+                overflow: 'visible',
+                '& .MuiCardContent-root': {
+                  flexGrow: 1,
+                  p: { xs: 1.5, sm: 2 }
+                },
+                '& .MuiCardActions-root': {
+                  p: { xs: 1, sm: 1.5 }
+                },
+                '& .MuiTypography-root': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiChip-root': {
+                  m: 0.5,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                },
                 background: theme.palette.mode === 'dark'
                   ? 'rgba(30, 41, 59, 0.4)'
                   : 'rgba(255, 255, 255, 0.7)',
@@ -90,19 +131,19 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                 boxShadow: theme.palette.mode === 'dark'
                   ? '0 4px 12px rgba(0, 0, 0, 0.2)'
                   : '0 4px 12px rgba(0, 0, 0, 0.06)',
-                position: 'relative',
-                overflow: 'hidden',
-                cursor: 'pointer',
+                cursor: { xs: 'default', sm: 'pointer' },
                 '&:hover': {
-                  background: theme.palette.mode === 'dark'
-                    ? 'rgba(30, 41, 59, 0.6)'
-                    : 'rgba(255, 255, 255, 0.85)',
-                  borderColor: theme.palette.mode === 'dark'
-                    ? 'rgba(255, 255, 255, 0.15)'
-                    : 'rgba(0, 0, 0, 0.15)',
-                  '& .copy-button': {
-                    opacity: 1,
-                    visibility: 'visible',
+                  '@media (hover: hover)': {
+                    background: theme.palette.mode === 'dark'
+                      ? 'rgba(30, 41, 59, 0.6)'
+                      : 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: theme.palette.mode === 'dark'
+                      ? '0 6px 16px rgba(0, 0, 0, 0.3)'
+                      : '0 6px 16px rgba(0, 0, 0, 0.1)',
+                    '& .card-actions .MuiIconButton-root': {
+                      opacity: 1
+                    }
                   }
                 },
                 '& .ripple': {
@@ -234,75 +275,73 @@ function CommandList({ commands, onDelete, onEdit, searchQuery }) {
                   opacity: theme.palette.mode === 'dark' ? 0.1 : 0.2 
                 }} />
                 <CardActions 
-                  onClick={(e) => e.stopPropagation()}
-                  sx={{ 
-                    justifyContent: 'flex-end', 
-                    p: 1,
-                    gap: 0.5
+                  className="card-actions"
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 1,
+                    p: { xs: 1, sm: 1.5 },
+                    '& .MuiIconButton-root': {
+                      opacity: { xs: 1, sm: 0 },
+                      transition: 'opacity 0.2s ease-in-out',
+                    }
                   }}
                 >
-                  <IconButton 
-                    size="small" 
+                  <IconButton
+                    size="small"
                     onClick={(e) => {
-                      e.stopPropagation()
-                      handleCopy(item.command)
+                      e.stopPropagation();
+                      handleCopy(item.command);
                     }}
-                    title="Copy item"
-                    className="copy-button"
                     sx={{
-                      color: theme.palette.primary.main,
-                      opacity: 0,
-                      visibility: 'hidden',
-                      transition: 'opacity 0.2s ease-in-out, visibility 0.2s ease-in-out',
-                      '&:hover': {
-                        bgcolor: theme.palette.mode === 'dark'
-                          ? 'rgba(129, 140, 248, 0.1)'
-                          : 'rgba(99, 102, 241, 0.1)',
-                      }
+                      color: theme.palette.primary.main
                     }}
                   >
                     <ContentCopy fontSize="small" />
                   </IconButton>
-                  {onEdit && (
-                    <IconButton 
-                      size="small" 
-                      onClick={() => onEdit(item)}
-                      title="Edit item"
-                      sx={{
-                        color: theme.palette.secondary.main,
-                        '&:hover': {
-                          bgcolor: theme.palette.mode === 'dark'
-                            ? 'rgba(244, 114, 182, 0.1)'
-                            : 'rgba(236, 72, 153, 0.1)',
-                        }
-                      }}
-                    >
-                      <Edit fontSize="small" />
-                    </IconButton>
-                  )}
-                  {onDelete && (
-                    <IconButton 
-                      size="small" 
-                      onClick={() => onDelete(item.id)}
-                      title="Delete item"
-                      sx={{
-                        color: theme.palette.error.main,
-                        '&:hover': {
-                          bgcolor: theme.palette.mode === 'dark'
-                            ? 'rgba(244, 63, 94, 0.1)'
-                            : 'rgba(225, 29, 72, 0.1)',
-                        }
-                      }}
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
-                  )}
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(item);
+                    }}
+                    sx={{
+                      color: theme.palette.info.main
+                    }}
+                  >
+                    <Edit fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteClick(item);
+                    }}
+                    sx={{
+                      color: theme.palette.error.main
+                    }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
                 </CardActions>
               </Box>
             </Card>
           </Grid>
         ))}
       </Grid>
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete this command?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button onClick={handleDeleteConfirm} color="error">Delete</Button>
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}

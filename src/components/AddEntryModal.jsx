@@ -65,6 +65,26 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2, md: 3 },
+          width: { xs: '95%', sm: '80%', md: '60%' },
+          maxWidth: '600px',
+          '& .MuiDialogTitle-root': {
+            p: { xs: 2, sm: 3 },
+            fontSize: { xs: '1.2rem', sm: '1.5rem' }
+          },
+          '& .MuiDialogContent-root': {
+            p: { xs: 2, sm: 3 },
+            '& .MuiTextField-root': {
+              mb: { xs: 1.5, sm: 2 }
+            }
+          },
+          '& .MuiDialogActions-root': {
+            p: { xs: 1.5, sm: 2 }
+          }
+        }
+      }}
     >
       <DialogTitle>
         {initialData ? 'Edit Command' : 'Add New Command'}
@@ -90,7 +110,12 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
             required
             value={formData.command}
             onChange={(e) => setFormData(prev => ({ ...prev, command: e.target.value }))}
-            sx={{ mb: 2 }}
+            sx={{ 
+              mb: { xs: 1.5, sm: 2 },
+              '& .MuiInputBase-root': {
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }
+            }}
           />
           
           <TextField
@@ -102,7 +127,12 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
             required
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            sx={{ mb: 2 }}
+            sx={{ 
+              mb: { xs: 1.5, sm: 2 },
+              '& .MuiInputBase-root': {
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }
+            }}
           />
 
           <TextField
@@ -113,10 +143,17 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
             onKeyDown={handleAddCategory}
             fullWidth
             helperText="Press Enter to set category"
-            sx={{ mb: 2 }}
+            sx={{ mb: { xs: 1.5, sm: 2 } }}
             InputProps={{
               startAdornment: formData.category ? (
-                <InputAdornment position="start">
+                <InputAdornment 
+                  position="start"
+                  sx={{
+                    height: '100%',
+                    alignItems: 'center',
+                    mt: 0
+                  }}
+                >
                   <Chip
                     label={formData.category}
                     size="small"
@@ -136,10 +173,31 @@ function AddEntryModal({ open, onClose, onSave, initialData }) {
             onKeyDown={handleAddTag}
             fullWidth
             helperText="Press Enter to add a tag"
+            sx={{ mb: { xs: 1.5, sm: 2 } }}
             InputProps={{
               startAdornment: formData.tags.length > 0 ? (
-                <InputAdornment position="start">
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                <InputAdornment 
+                  position="start"
+                  sx={{
+                    height: '100%',
+                    alignItems: 'center',
+                    mt: 0
+                  }}
+                >
+                  <Box sx={{ 
+                    display: 'flex', 
+                    flexWrap: 'nowrap',
+                    alignItems: 'center', 
+                    gap: 0.5, 
+                    overflowX: 'auto',
+                    '&::-webkit-scrollbar': { height: '4px' },
+                    '&::-webkit-scrollbar-track': { background: 'transparent' },
+                    '&::-webkit-scrollbar-thumb': { background: '#888', borderRadius: '4px' },
+                    maxWidth: '100%',
+                    minHeight: '32px',  
+                    py: 0.5,  
+                    boxSizing: 'border-box'
+                  }}>
                     {formData.tags.map((tag, index) => (
                       <Chip
                         key={index}
