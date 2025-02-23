@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ThemeProvider, CssBaseline, Container } from '@mui/material'
 import Header from './components/Header'
 import CommandList from './components/CommandList'
@@ -41,15 +41,44 @@ function App() {
     setIsDarkMode(!isDarkMode)
   }
 
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // Focus search bar when '/' is pressed
+      if (e.key === '/' && 
+          !e.target.matches('input, textarea') && 
+          !e.target.isContentEditable) {
+        e.preventDefault()
+        const searchInput = document.querySelector('input[placeholder*="Search"]')
+        if (searchInput) {
+          searchInput.focus()
+        }
+      }
+      
+      // Clear search with Escape
+      if (e.key === 'Escape' && searchQuery) {
+        setSearchQuery('')
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyPress)
+    return () => document.removeEventListener('keydown', handleKeyPress)
+  }, [searchQuery])
+
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       <Container maxWidth={false} sx={{ 
         minHeight: '100vh',
         width: '100vw',
+        '@media (min-width: 1200px)': {
+          width: '95vw',
+          margin: '0 auto',
+          padding: '24px',
+        },
         display: 'flex', 
         flexDirection: 'column', 
-        p: 2,
+        p: { xs: 1, sm: 2 },
         overflow: 'hidden'
       }}>
         <Header 
@@ -58,16 +87,21 @@ function App() {
           onImportClick={() => setShowImportModal(true)}
           isDarkMode={isDarkMode}
           onThemeToggle={handleThemeToggle}
+          commands={commands}
         />
 
         <main style={{ 
           flex: 1, 
           overflow: 'auto', 
-          marginTop: '16px',
+          marginTop: '80px',
           width: '100%',
-          height: '100%'
+          height: '100%',
+          maxWidth: '2000px'
         }}>
-          <CommandList commands={filteredCommands} />
+          <CommandList 
+            commands={filteredCommands} 
+            searchQuery={searchQuery}
+          />
         </main>
 
         <AddEntryFab onClick={() => setShowAddModal(true)} />
@@ -92,11 +126,30 @@ function App() {
           open={Boolean(toastMessage)}
           autoHideDuration={3000}
           onClose={() => setToastMessage('')}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
           <Alert 
             onClose={() => setToastMessage('')} 
-            severity="success" 
-            sx={{ width: '100%' }}
+            severity="success"
+            sx={{ 
+              width: '100%',
+              backdropFilter: 'blur(10px)',
+              background: theme => theme.palette.mode === 'dark' 
+                ? 'rgba(15, 23, 42, 0.8)'
+                : 'rgba(255, 255, 255, 0.8)',
+              border: '1px solid',
+              borderColor: theme => theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.1)',
+              boxShadow: theme => theme.palette.mode === 'dark'
+                ? '0 4px 12px rgba(0, 0, 0, 0.2)'
+                : '0 4px 12px rgba(0, 0, 0, 0.06)',
+              '& .MuiAlert-icon': {
+                color: theme => theme.palette.mode === 'dark'
+                  ? theme.palette.primary.light
+                  : theme.palette.primary.main
+              }
+            }}
           >
             {toastMessage}
           </Alert>
