@@ -85,9 +85,10 @@ function Header({
     <Box
       component="header"
       sx={{
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
         zIndex: 1100,
+        width: '100%',
         backdropFilter: 'blur(10px)',
         backgroundColor: (theme) => 
           theme.palette.mode === 'dark' 

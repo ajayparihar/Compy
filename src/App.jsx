@@ -80,7 +80,8 @@ function App() {
       <CssBaseline />
       <Container maxWidth={false} sx={{ 
         minHeight: '100vh',
-        py: 2,
+        pt: { xs: 12, sm: 13, md: 14 },
+        pb: 2,
         display: 'flex',
         flexDirection: 'column',
         gap: 2
