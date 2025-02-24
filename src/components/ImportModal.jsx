@@ -11,12 +11,14 @@ import {
   LinearProgress
 } from '@mui/material'
 import { Close, CloudUpload } from '@mui/icons-material'
+import { useTheme } from '../hooks/useTheme'
 
-function ImportModal({ open, onClose, onImport }) {
+function ImportModal({ open, onClose, onImport, setUserName }) {
   const [isDragging, setIsDragging] = useState(false)
   const [file, setFile] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const { setCurrentTheme, toggleFavorite } = useTheme()
 
   const handleDragOver = (e) => {
     e.preventDefault()
@@ -37,14 +39,67 @@ function ImportModal({ open, onClose, onImport }) {
   const handleFileSelection = (selectedFile) => {
     if (!selectedFile) return
     
-    if (!selectedFile.name.endsWith('.csv')) {
-      setError('Please select a CSV file')
+    if (!selectedFile.name.endsWith('.csv') && !selectedFile.name.endsWith('.json')) {
+      setError('Please select a CSV or JSON file')
       setFile(null)
       return
     }
 
     setError('')
     setFile(selectedFile)
+  }
+
+  const processJsonData = async (jsonData) => {
+    try {
+      const data = JSON.parse(jsonData)
+      
+      // Process profile information if available
+      if (data.profile) {
+        if (data.profile.theme) {
+          setCurrentTheme(data.profile.theme)
+        }
+        if (data.profile.userName) {
+          setUserName(data.profile.userName)
+        }
+        if (data.profile.favoriteThemes && Array.isArray(data.profile.favoriteThemes)) {
+          // Clear existing favorites from localStorage
+          localStorage.setItem('favoriteThemes', '[]')
+          
+          // Add each theme to favorites using toggleFavorite
+          data.profile.favoriteThemes.forEach(themeId => {
+            toggleFavorite(themeId)
+          })
+        }
+      }
+
+      // Process commands data
+      if (data.data && data.data.commands) {
+        return data.data.commands
+      }
+      
+      return []
+    } catch (err) {
+      throw new Error('Invalid JSON format')
+    }
+  }
+
+  const processCsvData = (text) => {
+    const lines = text.split('\n')
+    const headers = lines[0].split(',')
+    
+    return lines.slice(1)
+      .filter(line => line.trim())
+      .map(line => {
+        const values = line.split(',')
+        return {
+          id: Date.now() + Math.random(),
+          command: values[0]?.trim() || '',
+          description: values[1]?.trim() || '',
+          category: values[2]?.trim() || '',
+          tags: values[3]?.split(';').map(tag => tag.trim()).filter(Boolean) || []
+        }
+      })
+      .filter(cmd => cmd.command && cmd.description)
   }
 
   const handleImport = async () => {
@@ -57,29 +112,23 @@ function ImportModal({ open, onClose, onImport }) {
       const reader = new FileReader()
       reader.onload = async (e) => {
         const text = e.target.result
-        const lines = text.split('\n')
-        const headers = lines[0].split(',')
-        
-        const items = lines.slice(1)
-          .filter(line => line.trim())
-          .map(line => {
-            const values = line.split(',')
-            return {
-              id: Date.now() + Math.random(),
-              command: values[0]?.trim() || '',
-              description: values[1]?.trim() || '',
-              category: values[2]?.trim() || '',
-              tags: values[3]?.split(';').map(tag => tag.trim()).filter(Boolean) || []
-            }
-          })
-          .filter(cmd => cmd.command && cmd.description)
+        let items = []
 
-        onImport(items)
+        try {
+          if (file.name.endsWith('.json')) {
+            items = await processJsonData(text)
+          } else {
+            items = processCsvData(text)
+          }
+          onImport(items)
+        } catch (err) {
+          setError(`Error processing file: ${err.message}`)
+        }
       }
 
       reader.readAsText(file)
     } catch (err) {
-      setError('Error processing file. Please check the format.')
+      setError('Error reading file')
     } finally {
       setIsLoading(false)
     }
@@ -129,13 +178,13 @@ function ImportModal({ open, onClose, onImport }) {
           <input
             type="file"
             id="file-input"
-            accept=".csv"
+            accept=".csv,.json"
             style={{ display: 'none' }}
             onChange={(e) => handleFileSelection(e.target.files[0])}
           />
           <CloudUpload sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
           <Typography variant="h6" gutterBottom>
-            Drag & Drop CSV file here
+            Drag & Drop CSV or JSON file here
           </Typography>
           <Typography variant="body2" color="text.secondary">
             or click to select file

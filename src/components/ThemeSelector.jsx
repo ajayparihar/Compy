@@ -45,6 +45,10 @@ function ThemeSelector() {
         .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
         .join(" ");
       document.documentElement.classList.add(themeId);
+      // Refresh the page after a brief delay to ensure theme is saved
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error('Error changing theme:', error);
     } finally {

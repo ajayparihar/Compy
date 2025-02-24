@@ -6,7 +6,7 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
   const theme = useTheme()
   const [ripplePosition, setRipplePosition] = useState({ x: 0, y: 0 })
   const [rippleActive, setRippleActive] = useState(null)
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' })
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [tagsAnchorEl, setTagsAnchorEl] = useState(null)
@@ -15,9 +15,10 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
   const handleCopy = async (item) => {
     try {
       await navigator.clipboard.writeText(item.item)
-      setSnackbarOpen(true)
+      setSnackbar({ open: true, message: 'Item copied to clipboard!', severity: 'success' })
     } catch (error) {
       console.error('Failed to copy:', error)
+      setSnackbar({ open: true, message: 'Failed to copy to clipboard', severity: 'error' })
     }
   }
 
@@ -25,7 +26,7 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
     if (reason === 'clickaway') {
       return
     }
-    setSnackbarOpen(false)
+    setSnackbar({ ...snackbar, open: false })
   }
 
   const handleCardClick = async (event, item) => {
@@ -60,6 +61,7 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
       onDelete(itemToDelete.id)
       setDeleteConfirmOpen(false)
       setItemToDelete(null)
+      setSnackbar({ open: true, message: 'Item deleted successfully!', severity: 'success' })
     }
   }
 
@@ -204,7 +206,10 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
                       fontSize: '1.1rem',
                       letterSpacing: '0.01em',
                       lineHeight: 1.4,
-                      pr: item.category ? 8 : 0
+                      pr: item.category ? 8 : 0,
+                      mb: 1,
+                      maxHeight: 'none',
+                      overflow: 'visible'
                     }}
                   >
                     {highlightText(item.item, searchQuery)}
@@ -216,7 +221,11 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
                     sx={{ 
                       fontSize: '0.875rem',
                       lineHeight: 1.5,
-                      opacity: 0.8
+                      opacity: 0.8,
+                      wordBreak: 'break-word',
+                      whiteSpace: 'pre-wrap',
+                      overflow: 'visible',
+                      maxHeight: 'none'
                     }}
                   >
                     {highlightText(item.description, searchQuery)}
@@ -435,14 +444,14 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
         </DialogActions>
       </Dialog>
       <Snackbar
-        open={snackbarOpen}
+        open={snackbar.open}
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert 
           onClose={handleSnackbarClose} 
-          severity="success" 
+          severity={snackbar.severity}
           sx={{ 
             width: '100%',
             backdropFilter: 'blur(10px)',
@@ -463,7 +472,7 @@ function ItemList({ items, onDelete, onEdit, searchQuery }) {
             }
           }}
         >
-          Item copied to clipboard!
+          {snackbar.message}
         </Alert>
       </Snackbar>
     </>

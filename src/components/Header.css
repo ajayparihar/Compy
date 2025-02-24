@@ -1,0 +1,57 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  flex: 1;
+  margin-left: 1rem;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color);
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.menu-button:hover {
+  background-color: var(--hover-color);
+}
+
+.theme-controls {
+  margin-left: auto;
+}
+
+.theme-controls select {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.theme-controls select:hover {
+  border-color: var(--accent-color);
+}
+
+.theme-controls select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-color-light);
+} 
