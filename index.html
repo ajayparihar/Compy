@@ -48,7 +48,13 @@
             <div id="user-display"></div>
             <!-- Search container with input and clear button -->
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Type to search..." aria-label="Search commands">
+                <input type="text" id="search-input" placeholder="Press '/' to focus" aria-label="Search commands">
+                <div class="keyboard-hint" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" fill="currentColor">
+                        <path d="M180-180h600v-600H180v600Zm60-100v-80h80v80h-80Zm0-160v-80h80v80h-80Zm160 160v-80h160v80H400Zm0-160v-80h80v80h-80Zm160 0v-80h80v80h-80Zm160 160v-80h80v80h-80Zm0-160v-80h80v80h-80Zm0-160v-80h80v80h-80Zm-320 0v-80h80v80h-80ZM240-600v-80h80v80h-80Z"/>
+                    </svg>
+                    <span>/</span>
+                </div>
                 <div id="clearSearch" class="clear-icon" aria-label="Clear search" role="button" tabindex="0"
                     style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"

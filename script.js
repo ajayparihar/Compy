@@ -473,7 +473,7 @@ const filterData = (query) => {
       if (!noResultsMessage) {
         const message = document.createElement('div');
         message.className = 'no-results-message';
-        message.textContent = 'No matching commands found';
+        message.textContent = 'No matching commands found. Try adjusting your search terms.';
         DOM_ELEMENTS.dataDiv.appendChild(message);
       }
     } else if (noResultsMessage) {
@@ -522,23 +522,13 @@ const updateUserDisplay = (username) => {
 
 // Clean up and optimize event listeners
 const addEventListeners = () => {
-  // Auto-focus on search when typing
+  // Auto-focus on search only when forward slash is pressed
   document.addEventListener("keydown", (event) => {
     // Check if user pressed the forward slash key to focus search
     if (event.key === "/" && document.activeElement !== DOM_ELEMENTS.searchInput) {
       event.preventDefault(); // Prevent the "/" from being typed
       DOM_ELEMENTS.searchInput.focus();
       return;
-    }
-
-    // Auto-focus for other keys only if not in an input field
-    if (
-      event.key.length === 1 &&
-      !["Control", "Shift", "Alt", "Meta"].includes(event.key) &&
-      document.activeElement !== DOM_ELEMENTS.searchInput &&
-      !document.activeElement.matches('input, textarea, select, [contenteditable]')
-    ) {
-      DOM_ELEMENTS.searchInput.focus();
     }
   });
 

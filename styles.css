@@ -1269,8 +1269,101 @@ button:disabled {
 
 /* Better contrast for error messages */
 .error-message {
-  color: var(--error);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: rgba(var(--error-rgb), 0.1);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  z-index: 1000;
+  display: none;
+  border: 1px solid rgba(var(--error-rgb), 0.3);
+  backdrop-filter: blur(8px);
+  min-width: 300px;
+  max-width: 90%;
+  animation: errorSlideIn 0.3s ease-out;
+}
+
+.error-message p {
+  color: var(--error);
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+#retry-button {
+  background-color: var(--error);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#retry-button:hover {
+  background-color: rgba(var(--error-rgb), 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(var(--error-rgb), 0.2);
+}
+
+#retry-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(var(--error-rgb), 0.1);
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Responsive error message */
+@media (max-width: 768px) {
+  .error-message {
+    padding: 1.5rem;
+    min-width: 280px;
+  }
+
+  .error-message p {
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  #retry-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .error-message {
+    padding: 1.2rem;
+    min-width: 250px;
+  }
+
+  .error-message p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  #retry-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
 
 /* Body and HTML for full page scroll */
@@ -1451,40 +1544,6 @@ html {
   display: inline-block;
 }
 
-/* Error Message */
-.error-message {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--card-bg);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  z-index: 1000;
-  display: none;
-}
-
-.error-message p {
-  color: var(--error);
-  margin-bottom: 1rem;
-}
-
-#retry-button {
-  background-color: var(--primary);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-#retry-button:hover {
-  background-color: rgba(var(--primary-rgb), 0.8);
-}
-
 /* Theme Toggle Button */
 #theme-toggle {
   background-color: var(--card-bg);
@@ -1583,5 +1642,124 @@ html {
 .theme-selector {
   position: relative;
   display: inline-block;
+}
+
+/* No Results Message */
+.no-results-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  margin: 3rem auto;
+  text-align: center;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--text);
+  font-size: 1.2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* For dark themes */
+:root.d1 .no-results-message,
+:root.d2 .no-results-message,
+:root.d3 .no-results-message,
+:root.d4 .no-results-message,
+:root.d5 .no-results-message,
+:root.d6 .no-results-message,
+:root.d7 .no-results-message,
+:root.d8 .no-results-message,
+:root.d9 .no-results-message,
+:root.d10 .no-results-message {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-color: rgba(var(--primary-rgb), 0.2);
+}
+
+/* For light themes */
+:root.l1 .no-results-message,
+:root.l2 .no-results-message,
+:root.l3 .no-results-message,
+:root.l4 .no-results-message,
+:root.l5 .no-results-message,
+:root.l6 .no-results-message,
+:root.l7 .no-results-message,
+:root.l8 .no-results-message,
+:root.l9 .no-results-message,
+:root.l10 .no-results-message,
+:root.l11 .no-results-message {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  border-color: rgba(var(--primary-rgb), 0.1);
+}
+
+/* High contrast and reduced motion preferences */
+@media (prefers-contrast: high) {
+  .no-results-message {
+    border-width: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .no-results-message,
+  .no-results-message::before,
+  .no-results-message::after {
+    animation: none;
+    transition: none;
+  }
+}
+
+.keyboard-hint {
+  position: absolute;
+  right: 2.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  font-size: 0.8rem;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.keyboard-hint svg {
+  opacity: 0.8;
+}
+
+.keyboard-hint span {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+/* Hide keyboard hint when search is focused or has value */
+#search-input:focus ~ .keyboard-hint,
+#search-input:not(:placeholder-shown) ~ .keyboard-hint {
+  opacity: 0;
+}
+
+/* Adjust search input padding to accommodate the keyboard hint */
+#search-input {
+  padding-right: 4.5rem;
+}
+
+/* Responsive adjustments for no results message */
+@media (max-width: 768px) {
+  .no-results-message {
+    margin: 2rem auto;
+    font-size: 1.1rem;
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .no-results-message {
+    margin: 1.5rem auto;
+    font-size: 1rem;
+    padding: 1rem;
+    width: 95%;
+  }
 }
 
