@@ -1,73 +1,100 @@
 # COMPY - Your Personal Data Assistant
 
-![COMPY Logo](favicon_io/favicon.ico)
+<div align="center">
+  <img src="favicon_io/favicon.ico" alt="COMPY Logo" width="100">
+  <p><em>Securely store and instantly access your important information</em></p>
+</div>
 
-## Overview
+## 📋 Overview
 
-Welcome to COMPY, your personal data assistant designed to help you securely store and quickly access a wide range of information. Whether it's commands you frequently use, sensitive credentials, common text snippets, or any other text-based information, COMPY has got you covered.
+COMPY is a lightweight, secure personal data assistant designed to help you store and quickly access frequently used information. Whether you need to remember terminal commands, store credentials securely, save code snippets, or manage any text-based information, COMPY provides a streamlined solution with powerful search capabilities.
 
-## Key Features
+## ✨ Key Features
 
-- **Security**: Your data is masked and secure, ensuring your privacy is maintained at all times.
-- **Speed**: Instant search capabilities allow you to find entries lightning fast.
-- **Customization**: Choose from a variety of themes to suit your preferences and workflow.
-- **Portability**: Works seamlessly on both desktop and mobile browsers.
-- **Quick Copy**: One-click access to copy data directly to your clipboard.
-- **Flexibility**: Fully customizable to adapt to your unique needs.
+- **🔒 Enhanced Security**: Sensitive data is masked and protected to maintain your privacy
+- **⚡ Lightning-Fast Search**: Find what you need instantly with real-time filtering
+- **🎨 Customizable Themes**: Multiple themes to match your preferences and reduce eye strain
+- **📱 Cross-Platform**: Works seamlessly on desktop and mobile browsers
+- **📋 One-Click Copy**: Copy any entry to your clipboard with a single click
+- **🔧 Highly Adaptable**: Fully customizable to fit your unique workflow
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Before you begin, ensure that you have the following installed:
-
 - Node.js (version 12 or higher)
-- A modern web browser like Chrome, Firefox, or Edge.
-- Windows operating system (compatibility note).
+- A modern web browser (Chrome, Firefox, Edge, etc.)
+- Windows operating system
 
-### Installation and Setup
+### Installation
 
-1. **Download and Extract**: Download COMPY from the repository and extract it to your preferred location.
-2. **Configure `CompyRunner.bat`**: If needed, configure this batch file to suit your setup. This is optional but recommended for a smoother experience.
-3. **Run the Application**: Double-click `CompyRunner.bat` to start COMPY. The application will open in your default browser.
-4. **Add Your Data**: Start adding entries or import existing CSV files to get started.
-
-## Usage Guide
-
-### Adding Your Data
-
-1. Open your data file (`comm.csv` by default).
-2. Add entries in the following format:
+1. **Clone or Download**:
+   ```bash
+   git clone https://github.com/your-username/compy.git
+   # or download and extract the ZIP file
    ```
-   Command/Text,Description
-   git status,Check git repository status
-   ##mypassword##,Login for example.com
+
+2. **Navigate to the Directory**:
+   ```bash
+   cd compy
    ```
-3. Tips for better organization include using `##` to mask sensitive information and keeping descriptions clear and searchable. Group similar commands together and add tags in the description for easier searching. Maintain a consistent formatting style for similar entries.
+
+3. **Configure CompyRunner.bat** (Optional):
+   - Open `CompyRunner.bat` in a text editor
+   - Modify the `HTML_DIRECTORY` path if needed
+   - Change the `PORT` if port 8000 is already in use
+
+4. **Launch the Application**:
+   - Double-click `CompyRunner.bat`
+   - COMPY will open in your default web browser
+
+## 📝 Usage Guide
+
+### Managing Your Data
+
+1. **Data File Structure**:
+   - Open `comm.csv` (or your configured data file)
+   - Format your entries as follows:
+     ```
+     Command/Text,Description
+     git status,Check git repository status
+     ##mypassword##,Login for example.com
+     ```
+
+2. **Best Practices**:
+   - Use `##` to mask sensitive information
+   - Create clear, searchable descriptions
+   - Group similar commands together
+   - Add tags in descriptions for better searchability
+   - Maintain consistent formatting for similar entries
 
 ### Daily Usage
 
-1. Launch COMPY using `CompyRunner.bat`.
-2. Type your query into the search bar to find relevant entries.
-3. Click any item to copy it directly to your clipboard with just one click.
+1. **Launch**: Start COMPY using `CompyRunner.bat`
+2. **Search**: Type in the search bar to filter entries
+3. **Copy**: Click any item to copy it to your clipboard
+4. **Categories**: Use the category filters to narrow down results
 
-## Customization Guide
+## ⚙️ Customization
 
-### CompyRunner Settings
+### CompyRunner Configuration
 
-Modify `CompyRunner.bat` if needed:
-
-- Change `HTML_DIRECTORY` to match your COMPY installation path.
-- Adjust the `PORT` number if port 8000 is already in use.
+```batch
+@echo off
+set HTML_DIRECTORY=C:\path\to\your\compy
+set PORT=8000
+```
 
 ### Theme Selection
 
-1. Click the theme icon in the top-right corner of the application.
-2. Select from a variety of themes, including dark and light options. Choose your preferred theme to enhance your user experience.
+COMPY offers multiple themes to suit different preferences:
+- Click the theme icon in the top-right corner
+- Choose from light, dark, and custom color schemes
+- Your selection is automatically saved for future sessions
 
-### Configuration Settings
+### User Configuration
 
-Edit `user_config.json` to personalize settings:
+Edit `user_config.json` to personalize your experience:
 
 ```json
 {
@@ -75,43 +102,88 @@ Edit `user_config.json` to personalize settings:
     "file_path": "comm.csv"
   },
   "user_settings": {
-    "user_name": "",
+    "user_name": "YourName",
     "theme": "d4"
   }
 }
 ```
 
-## Technology Stack
+## 🔧 Technical Details
 
-- **Frontend**: HTML5, CSS3, and JavaScript (Vanilla).
-- **Backend**: Node.js.
-- **Data Storage**: CSV format.
-- **Security**: Client-side password masking.
-- **Server**: Local Node.js server.
+### Architecture
 
-## Updating COMPY
+- **Frontend**: HTML5, CSS3, and Vanilla JavaScript
+- **Backend**: Node.js local server
+- **Data Storage**: CSV format for simplicity and portability
+- **Security**: Client-side data masking for sensitive information
 
-To update to the latest version while preserving your personal data:
+### File Structure
+
+- `index.html` - Main application interface
+- `script.js` - Core application logic
+- `styles.css` - Main styling
+- `themes.css` - Theme definitions
+- `toast.css` - Notification styling
+- `server.js` - Local Node.js server
+- `config.js` - Configuration handling
+- `CompyRunner.bat` - Windows launcher
+- `user_config.json` - User preferences
+- `comm.csv` - Data storage
+
+## 🔄 Updating
+
+To update while preserving your personal data:
 
 ```bash
-git pull https://github.com/your-repo/compy.git main --no-rebase
+git pull origin main
 ```
 
-This command ensures that your personal files (`user_config.json`, `comm.csv`, and custom configurations) remain unchanged.
+Your personal files (`user_config.json`, `comm.csv`, and custom configurations) will remain unchanged.
 
-## Troubleshooting
+## ❓ Troubleshooting
 
-### Common Issues and Solutions
+### Common Issues
 
-1. **Application won't start**: Ensure Node.js is installed, check port availability, run `npm install` in the application directory, and verify the `HTML_DIRECTORY` path in `CompyRunner.bat`.
-2. **Data not showing**: Verify that `comm.csv` exists and has the correct format, check file path in `user_config.json`, and ensure the file has read permissions.
-3. **Theme not applying**: Clear browser cache and verify theme name in `user_config.json`.
-4. **Copy not working**: Allow clipboard access in your browser or use the keyboard shortcut for copying.
+1. **Application Won't Start**
+   - Ensure Node.js is properly installed
+   - Check if port 8000 (or your configured port) is available
+   - Verify the path in `CompyRunner.bat` is correct
 
-## License
+2. **Data Not Displaying**
+   - Confirm `comm.csv` exists and has the correct format
+   - Check the file path in `user_config.json`
+   - Ensure the file has proper read permissions
+
+3. **Theme Not Applying**
+   - Clear your browser cache
+   - Verify the theme name in `user_config.json`
+   - Restart the application
+
+4. **Copy Function Not Working**
+   - Allow clipboard access in your browser
+   - Try using keyboard shortcuts (Ctrl+C) as an alternative
+
+## 📱 Mobile Usage
+
+COMPY is designed to work on mobile devices:
+- Access via your mobile browser
+- Bookmark for quick access
+- Responsive design adapts to your screen size
+
+## 🤝 Contributing
+
+Contributions are welcome! If you'd like to improve COMPY:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-Made with ❤️ for productivity enthusiasts.
+<div align="center">
+  <p>Made with ❤️ for productivity enthusiasts</p>
+  <p>© 2023 COMPY Team</p>
+</div>

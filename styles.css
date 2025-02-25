@@ -346,7 +346,8 @@ main {
   margin: 0 auto;
   padding: 0 0.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(400px, 400px));
+  justify-content: center;
   gap: calc(var(--gap-base) * 2);
   box-sizing: border-box;
 }
@@ -1184,21 +1185,21 @@ html {
 /* Ensure max 2 items per row on larger screens */
 @media (min-width: 769px) and (max-width: 1200px) {
   #data {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(350px, 350px));
   }
 }
 
 /* Adjust grid layout for larger screens */
 @media (min-width: 1201px) {
   #data {
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(400px, 400px));
   }
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   #data {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 280px));
     gap: 1rem; /* Maintain consistent gap */
   }
 }
