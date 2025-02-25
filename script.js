@@ -13,30 +13,67 @@
  * You'll thank yourself later for these comments when you've forgotten how this works.
  */
 
+// Theme names mapped from themes.css comments
+window.THEME_NAMES = {
+  d1: "Mystic Forest (Dark)",
+  d2: "Crimson Night (Dark)",
+  d3: "Royal Elegance (Dark)",
+  d4: "Galactic Blue (Dark)",
+  d5: "Twilight Dream (Dark)",
+  d6: "Deep Ocean (Dark)",
+  d7: "Cyber Night (Dark)",
+  d8: "Molten Core (Dark)",
+  d9: "Neon Pulse (Dark)",
+  d10: "Toxic Night (Dark)",
+  l1: "Sunrise (Light)",
+  l2: "Soft Glow (Light)",
+  l3: "Floral Breeze (Light)",
+  l4: "Ocean Breeze (Light)",
+  l5: "Golden Sands (Light)",
+  l6: "Mint Grove (Light)",
+  l7: "Sky Dusk (Light)",
+  l8: "Autumn Leaves (Light)",
+  l9: "Citrus Burst (Light)",
+  l10: "Rose Petal (Light)",
+  l11: "Lavender Mist (Light)",
+};
+
 // Immediately try to apply the saved theme to prevent flash of unstyled content
 (function() {
   try {
-    // Try localStorage first
+    // Get theme from localStorage
     let savedTheme = localStorage.getItem('selectedTheme');
+    console.log('Loading theme from localStorage:', savedTheme);
     
-    // If not in localStorage, try cookie
-    if (!savedTheme) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; selectedTheme=`);
-      if (parts.length === 2) savedTheme = parts.pop().split(";").shift();
+    // If no theme in localStorage, use default
+    if (!savedTheme || !window.THEME_NAMES[savedTheme]) {
+      savedTheme = 'd4';
+      console.log('No valid theme in localStorage, using default:', savedTheme);
     }
     
     // Apply theme if found
-    if (savedTheme) {
+    if (savedTheme && savedTheme.trim() !== '') {
+      // Remove any existing theme classes
       document.documentElement.className = document.documentElement.className
         .split(" ")
         .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
         .join(" ");
+      
+      // Add the saved theme class
       document.documentElement.classList.add(savedTheme);
-      console.log('Early theme application:', savedTheme);
+      console.log('Theme applied successfully:', savedTheme);
+      
+      // Store in localStorage for future use
+      try {
+        localStorage.setItem('selectedTheme', savedTheme);
+      } catch (storageError) {
+        console.warn('Could not save theme to localStorage:', storageError);
+      }
     }
   } catch (e) {
-    console.warn('Error in early theme application:', e);
+    console.error('Error in theme application:', e);
+    // Fallback to default theme if there's an error
+    document.documentElement.classList.add('d4');
   }
 })();
 
@@ -180,117 +217,6 @@ const maskSensitiveData = (text) => {
 };
 
 /**
- * Fetches data from the API with a timeout
- * @async
- * @function fetchDataWithTimeout
- * @param {string} url - The URL to fetch data from
- * @param {number} [timeout=10000] - Timeout in milliseconds
- * @returns {Promise<string>} The fetched data
- * @throws {Error} If the fetch fails or times out
- */
-const fetchDataWithTimeout = async (url, timeout = 10000) => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.text();
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-/**
- * Displays the data in the DOM
- * @function displayData
- * @param {Array<Object>} data - Array of command objects to display
- */
-const displayData = (data) => {
-  const dataDiv = DOM_ELEMENTS.dataDiv;
-  if (!dataDiv) return;
-
-  // Clear existing content
-  dataDiv.innerHTML = "";
-
-  // Create and append new data items
-  data.forEach((item) => {
-    if (item && item.command) {
-      const dataElement = createDataElement(item.command, item.description);
-      dataDiv.appendChild(dataElement);
-    }
-  });
-};
-
-/**
- * Creates a DOM element for a single data item
- * @function createDataElement
- * @param {string} item - The command text
- * @param {string} description - The command description
- * @returns {HTMLElement} The created DOM element
- */
-const createDataElement = (item, description) => {
-  const dataElement = document.createElement("div");
-  dataElement.classList.add("data-item");
-
-  // Store original values as data attributes for later reference
-  // This is crucial for search functionality and clipboard operations
-  // Base64 encode the data to preserve special characters
-  dataElement.dataset.originalItem = btoa(unescape(encodeURIComponent(item)));
-  dataElement.dataset.originalDescription = btoa(unescape(encodeURIComponent(description || "undefined")));
-  
-  // Add click handler to the entire item
-  dataElement.addEventListener("click", (event) => {
-    copyToClipboard(dataElement, event);
-  });
-
-  const contentWrapper = document.createElement("div");
-  contentWrapper.classList.add("data-item-content");
-
-  // Mask sensitive data
-  const maskedItem = maskSensitiveData(item);
-  const maskedDescription = 
-    description === "undefined" ? "undefined" : maskSensitiveData(description);
-  
-  // Create the content using DOM methods instead of innerHTML for better security
-  const paragraph = document.createElement('p');
-  
-  // Create and append the command text element
-  const strongElement = document.createElement('strong');
-  strongElement.className = "command-text";
-  strongElement.textContent = maskedItem; // Use textContent instead of innerHTML
-  paragraph.appendChild(strongElement);
-  
-  // Add a space and the description as text
-  paragraph.appendChild(document.createTextNode(' '));
-  paragraph.appendChild(document.createTextNode(maskedDescription));
-  
-  // Add the paragraph to the content wrapper
-  contentWrapper.appendChild(paragraph);
-
-  // Add copy icon
-  const copyIcon = document.createElement("div");
-  copyIcon.classList.add("copy-icon");
-  copyIcon.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-      <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
-    </svg>
-  `;
-
-  // Add all the elements to the data item container
-  dataElement.appendChild(contentWrapper);
-  dataElement.appendChild(copyIcon);
-
-  return dataElement;
-};
-
-/**
  * Removes masking from sensitive data
  * @function removeMasking
  * @param {string} text - The masked text
@@ -306,11 +232,44 @@ const removeMasking = (text) => {
   try {
     // Use the same string-based approach as maskSensitiveData
     const keyword = config.passwordMaskingKeyword;
-    const placeholder = `${keyword}SensitiveData${keyword}`;
+    let result = '';
+    let currentPos = 0;
     
-    // Simply return the original text since we're using dataset.originalItem
-    // in the copyToClipboard function
-    return text;
+    // Find the first occurrence of the keyword
+    let startPos = text.indexOf(keyword, currentPos);
+    
+    while (startPos !== -1) {
+      // Add the text before the keyword
+      result += text.substring(currentPos, startPos);
+      
+      // Find the ending keyword
+      const endPos = text.indexOf(keyword, startPos + keyword.length);
+      
+      if (endPos === -1) {
+        // No ending keyword found, just add the rest of the text
+        result += text.substring(startPos);
+        break;
+      }
+      
+      // Extract the actual sensitive data between the keywords
+      const sensitiveData = text.substring(startPos + keyword.length, endPos);
+      
+      // Add the actual sensitive data without the masking
+      result += sensitiveData;
+      
+      // Move past the ending keyword
+      currentPos = endPos + keyword.length;
+      
+      // Find the next occurrence
+      startPos = text.indexOf(keyword, currentPos);
+    }
+    
+    // Add any remaining text
+    if (currentPos < text.length) {
+      result += text.substring(currentPos);
+    }
+    
+    return result;
   } catch (error) {
     console.error("Error in removeMasking:", error);
     return text;
@@ -344,8 +303,11 @@ const copyToClipboard = (element, event) => {
     const encodedText = element.dataset.originalItem;
     const originalText = decodeURIComponent(escape(atob(encodedText)));
     
+    // Remove masking before copying
+    const unmaskedText = removeMasking(originalText);
+    
     navigator.clipboard
-      .writeText(originalText)
+      .writeText(unmaskedText)
       .then(() => {
         // Add the copied class to trigger the ripple animation
         // This is what makes the magic happen visually
@@ -545,212 +507,32 @@ const addEventListeners = () => {
   });
 };
 
-// Theme names mapped from themes.css comments
-// Make THEME_NAMES available globally so it can be used in config.js
-window.THEME_NAMES = {
-  d1: "Mystic Forest (Dark)",
-  d2: "Crimson Night (Dark)",
-  d3: "Royal Elegance (Dark)",
-  d4: "Galactic Blue (Dark)",
-  d5: "Twilight Dream (Dark)",
-  d6: "Deep Ocean (Dark)",
-  d7: "Cyber Night (Dark)",
-  d8: "Molten Core (Dark)",
-  d9: "Neon Pulse (Dark)",
-  d10: "Toxic Night (Dark)",
-  l1: "Sunrise (Light)",
-  l2: "Soft Glow (Light)",
-  l3: "Floral Breeze (Light)",
-  l4: "Ocean Breeze (Light)",
-  l5: "Golden Sands (Light)",
-  l6: "Mint Grove (Light)",
-  l7: "Sky Dusk (Light)",
-  l8: "Autumn Leaves (Light)",
-  l9: "Citrus Burst (Light)",
-  l10: "Rose Petal (Light)",
-  l11: "Lavender Mist (Light)",
-};
-
-// Helper functions for cookies
-const setCookie = (name, value, days = 365) => {
-  const date = new Date();
-  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
-};
-
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-};
-
-// Save data to a local file
-const saveToFile = async (data, fileName) => {
-  try {
-    // Request permission to save the file
-    const handle = await window.showSaveFilePicker({
-      suggestedName: fileName,
-      types: [
-        {
-          description: "Text Files",
-          accept: { "text/plain": [".txt"] },
-        },
-      ],
-    });
-
-    // Create a writable stream
-    const writable = await handle.createWritable();
-    await writable.write(data);
-    await writable.close();
-
-    console.log("File saved successfully");
-  } catch (error) {
-    console.error("Error saving file:", error);
-  }
-};
-
-// Example usage
-const saveThemeToFile = async (theme) => {
-  const data = JSON.stringify({ theme }, null, 2);
-  await saveToFile(data, "theme_config.txt");
-};
-
-// Theme persistence functions
-const saveThemeToLocalStorage = (theme) => {
-  try {
-    console.log('Saving theme to localStorage:', theme);
-    localStorage.setItem('selectedTheme', theme);
-    
-    // Also save to cookie as a backup
-    setCookie('selectedTheme', theme, 365);
-    
-    // Verify the theme was saved correctly
-    const savedTheme = localStorage.getItem('selectedTheme');
-    if (savedTheme !== theme) {
-      console.warn('Theme was not saved correctly to localStorage. Expected:', theme, 'Got:', savedTheme);
-    } else {
-      console.log('Theme saved successfully to localStorage');
-    }
-  } catch (error) {
-    console.error('Error saving theme to localStorage:', error);
-    // Try using a cookie as fallback
-    try {
-      setCookie('selectedTheme', theme, 365);
-      console.log('Theme saved to cookie as fallback');
-    } catch (cookieError) {
-      console.error('Error saving theme to cookie:', cookieError);
-    }
-  }
-};
-
 /**
- * Loads theme from localStorage - because who wants to pick the same theme every time?
- * @function loadThemeFromLocalStorage
- * @returns {string} The saved theme or default if none found
- */
-const loadThemeFromLocalStorage = () => {
-  try {
-    // Try to get theme from localStorage first
-    const savedTheme = localStorage.getItem('selectedTheme');
-    console.log('Loading theme from localStorage:', savedTheme);
-    
-    if (savedTheme) {
-      return savedTheme;
-    }
-    
-    // If not in localStorage, try to get from cookie as fallback
-    const cookieTheme = getCookie('selectedTheme');
-    console.log('Loading theme from cookie fallback:', cookieTheme);
-    
-    if (cookieTheme) {
-      // Save to localStorage for next time
-      try {
-        localStorage.setItem('selectedTheme', cookieTheme);
-      } catch (error) {
-        console.warn('Could not save cookie theme to localStorage:', error);
-      }
-      return cookieTheme;
-    }
-    
-    // Default theme if nothing found
-    return 'd4';
-  } catch (error) {
-    console.error('Error loading theme from storage:', error);
-    return 'd4'; // Default to d4 if error
-  }
-};
-
-/**
- * Initializes the theme selector dropdown with all available themes
- * @function initThemeSelector
- * @description Creates options for each theme and sets up event listeners
- * Note to future self: This is where the magic happens for theme selection.
- * Don't touch this unless you want to spend hours debugging CSS again.
- */
-const initThemeSelector = () => {
-  const themeSelect = document.getElementById("themeSelect");
-  if (!themeSelect) return;
-
-  console.log('Initializing theme selector');
-
-  // Add theme options
-  Object.entries(window.THEME_NAMES).forEach(([value, name]) => {
-    const option = document.createElement("option");
-    option.value = value;
-    // Remove (Dark), (Light), and don't add the theme code
-    option.textContent = name.replace(/ \(Dark\)| \(Light\)/g, "");
-    themeSelect.appendChild(option);
-  });
-
-  // Set initial theme from localStorage
-  const savedTheme = loadThemeFromLocalStorage();
-  console.log('Setting theme selector to saved theme:', savedTheme);
-  themeSelect.value = savedTheme;
-  
-  // Always apply the theme here to ensure it's set correctly
-  applyTheme(savedTheme);
-
-  // Handle theme change
-  themeSelect.addEventListener("change", (e) => {
-    const selectedTheme = e.target.value;
-    console.log('Theme changed to:', selectedTheme);
-    applyTheme(selectedTheme);
-    // Update the theme in user_config.json
-    updateUserConfig(selectedTheme);
-  });
-};
-
-/**
- * Updates the user configuration with the new theme selection
+ * Updates the theme selection
  * @async
  * @function updateUserConfig
  * @param {string} theme - The theme identifier to save
- * @description Fetches current config, updates theme, and saves back to server
- * @throws {Error} If there's an issue updating the config
- * 
- * Note: This is where we persist theme changes to the server.
- * Remember that one time you forgot this and users kept losing their theme? Good times.
+ * @description Saves theme to localStorage
+ * @throws {Error} If there's an issue saving to localStorage
  */
 const updateUserConfig = async (theme) => {
+  if (!theme || theme.trim() === '') {
+    console.warn('Attempted to save empty theme');
+    return false;
+  }
+  
   try {
-    // Always save to localStorage first to ensure theme persistence
-    saveThemeToLocalStorage(theme);
+    console.log('Saving theme to localStorage:', theme);
     
-    // Then try to update the server-side config
-    const response = await fetch("user_config.json");
-    const config = await response.json();
-    config.user_settings.theme = theme;
-
-    await fetch("user_config.json", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(config),
-    });
+    // Save to localStorage
+    localStorage.setItem('selectedTheme', theme);
+    
+    console.log('Theme successfully saved');
+    return true;
   } catch (error) {
-    console.error("Error updating user config:", error);
-    // Even if server update fails, theme is still saved to localStorage
+    console.error("Error saving theme:", error);
+    showAlert("Couldn't save theme to localStorage.", "warning");
+    return false;
   }
 };
 
@@ -764,9 +546,15 @@ const updateUserConfig = async (theme) => {
  * to spend a day figuring out why everything suddenly looks terrible.
  */
 window.applyTheme = (theme) => {
-  if (!theme) {
+  if (!theme || theme.trim() === '') {
     console.warn('No theme provided to applyTheme, using default');
     theme = 'd4'; // Default theme if none provided
+  }
+  
+  // Validate that the theme exists in our theme list
+  if (window.THEME_NAMES && !window.THEME_NAMES[theme]) {
+    console.warn('Theme not found in theme list, using default:', theme);
+    theme = 'd4';
   }
   
   console.log('Applying theme:', theme);
@@ -779,21 +567,24 @@ window.applyTheme = (theme) => {
 
   // Add new theme class
   document.documentElement.classList.add(theme);
-
+  
+  // Update theme selector if it exists
+  const themeSelect = document.getElementById("themeSelect");
+  if (themeSelect) {
+    themeSelect.value = theme;
+  }
+  
+  // Always save the theme to localStorage when it's applied
+  const saveSuccess = updateUserConfig(theme);
+  if (!saveSuccess) {
+    console.warn('Failed to save theme to storage, theme may not persist on refresh');
+  }
+  
   // Update spinner colors
   const spinner = document.querySelector(".spinner");
   if (spinner) {
     spinner.style.borderColor = `rgba(var(--primary-rgb), 0.2)`;
     spinner.style.borderTopColor = `var(--primary)`;
-  }
-
-  // Save theme to localStorage and cookie
-  saveThemeToLocalStorage(theme);
-  
-  // Also update the theme selector if it exists
-  const themeSelect = document.getElementById("themeSelect");
-  if (themeSelect && themeSelect.value !== theme) {
-    themeSelect.value = theme;
   }
 };
 
@@ -852,7 +643,118 @@ const processData = (data) => {
   }
 };
 
-// Modify initializeApp to use the new theme management
+/**
+ * Fetches data from the API with a timeout
+ * @async
+ * @function fetchDataWithTimeout
+ * @param {string} url - The URL to fetch data from
+ * @param {number} [timeout=10000] - Timeout in milliseconds
+ * @returns {Promise<string>} The fetched data
+ * @throws {Error} If the fetch fails or times out
+ */
+const fetchDataWithTimeout = async (url, timeout = 10000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.text();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+};
+
+/**
+ * Displays the data in the DOM
+ * @function displayData
+ * @param {Array<Object>} data - Array of command objects to display
+ */
+const displayData = (data) => {
+  const dataDiv = DOM_ELEMENTS.dataDiv;
+  if (!dataDiv) return;
+
+  // Clear existing content
+  dataDiv.innerHTML = "";
+
+  // Create and append new data items
+  data.forEach((item) => {
+    if (item && item.command) {
+      const dataElement = createDataElement(item.command, item.description);
+      dataDiv.appendChild(dataElement);
+    }
+  });
+};
+
+/**
+ * Creates a DOM element for a single data item
+ * @function createDataElement
+ * @param {string} item - The command text
+ * @param {string} description - The command description
+ * @returns {HTMLElement} The created DOM element
+ */
+const createDataElement = (item, description) => {
+  const dataElement = document.createElement("div");
+  dataElement.classList.add("data-item");
+
+  // Store original values as data attributes for later reference
+  // This is crucial for search functionality and clipboard operations
+  // Base64 encode the data to preserve special characters
+  dataElement.dataset.originalItem = btoa(unescape(encodeURIComponent(item)));
+  dataElement.dataset.originalDescription = btoa(unescape(encodeURIComponent(description || "undefined")));
+  
+  // Add click handler to the entire item
+  dataElement.addEventListener("click", (event) => {
+    copyToClipboard(dataElement, event);
+  });
+
+  const contentWrapper = document.createElement("div");
+  contentWrapper.classList.add("data-item-content");
+
+  // Mask sensitive data
+  const maskedItem = maskSensitiveData(item);
+  const maskedDescription = 
+    description === "undefined" ? "undefined" : maskSensitiveData(description);
+  
+  // Create the content using DOM methods instead of innerHTML for better security
+  const paragraph = document.createElement('p');
+  
+  // Create and append the command text element
+  const strongElement = document.createElement('strong');
+  strongElement.className = "command-text";
+  strongElement.textContent = maskedItem; // Use textContent instead of innerHTML
+  paragraph.appendChild(strongElement);
+  
+  // Add a space and the description as text
+  paragraph.appendChild(document.createTextNode(' '));
+  paragraph.appendChild(document.createTextNode(maskedDescription));
+  
+  // Add the paragraph to the content wrapper
+  contentWrapper.appendChild(paragraph);
+
+  // Add copy icon
+  const copyIcon = document.createElement("div");
+  copyIcon.classList.add("copy-icon");
+  copyIcon.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
+      <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
+    </svg>
+  `;
+
+  // Add all the elements to the data item container
+  dataElement.appendChild(contentWrapper);
+  dataElement.appendChild(copyIcon);
+
+  return dataElement;
+};
+
+// Modify initializeApp to use only localStorage
 const initializeApp = async () => {
   try {
     showLoading();
@@ -866,9 +768,27 @@ const initializeApp = async () => {
       console.error("Error loading config:", error);
       return { 
         file_settings: { file_path: "comm.csv" },
-        user_settings: { theme: "d4" }
+        user_settings: { user_name: "" }
       };
     });
+    
+    // Get theme from localStorage
+    const savedTheme = localStorage.getItem('selectedTheme');
+    console.log('Theme from localStorage:', savedTheme);
+    
+    // Use the theme from localStorage if it exists and is valid, otherwise use default
+    let themeToApply = savedTheme;
+    
+    // Validate the theme
+    if (!themeToApply || !window.THEME_NAMES[themeToApply]) {
+      console.log('Local theme invalid or missing, using default');
+      themeToApply = "d4";
+    }
+    
+    console.log('Applying theme:', themeToApply);
+    
+    // Apply the theme immediately
+    applyTheme(themeToApply);
     
     // Initialize theme selector with the saved theme
     initThemeSelector();
@@ -893,6 +813,47 @@ const initializeApp = async () => {
     hideLoading();
   }
   addEventListeners();
+};
+
+/**
+ * Initializes the theme selector dropdown with all available themes
+ * @function initThemeSelector
+ * @description Creates options for each theme and sets up event listeners
+ */
+const initThemeSelector = () => {
+  const themeSelect = document.getElementById("themeSelect");
+  if (!themeSelect) {
+    console.warn('Theme selector element not found');
+    return;
+  }
+
+  console.log('Initializing theme selector');
+
+  // Clear existing options first
+  themeSelect.innerHTML = '';
+
+  // Add theme options
+  Object.entries(window.THEME_NAMES).forEach(([value, name]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = name.replace(/ \(Dark\)| \(Light\)/g, "");
+    themeSelect.appendChild(option);
+  });
+
+  // Set initial theme from localStorage
+  const savedTheme = localStorage.getItem('selectedTheme') || 'd4';
+  if (Object.keys(window.THEME_NAMES).includes(savedTheme)) {
+    themeSelect.value = savedTheme;
+  } else {
+    themeSelect.value = 'd4';
+  }
+
+  // Handle theme change
+  themeSelect.addEventListener("change", (e) => {
+    const selectedTheme = e.target.value;
+    console.log('Theme changed to:', selectedTheme);
+    applyTheme(selectedTheme);
+  });
 };
 
 initializeApp();

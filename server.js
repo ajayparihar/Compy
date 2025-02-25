@@ -52,33 +52,6 @@ app.use(express.static(path.join(__dirname, "public")));
  * Error handling is important here - we don't want to crash the server
  * just because someone's theme preference couldn't be saved.
  */
-app.put("/user_config.json", (req, res) => {
-  const { theme } = req.body;
-
-  const configPath = path.join(__dirname, "user_config.json");
-  fs.readFile(configPath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error reading config file:", err);
-      return res.status(500).send("Error reading config file");
-    }
-
-    // Update theme in configuration
-    // Parse the JSON, modify it, then stringify it back
-    const config = JSON.parse(data);
-    config.user_settings.theme = theme;
-
-    // Write updated configuration back to file
-    // Pretty-print with 2 spaces for readability
-    fs.writeFile(configPath, JSON.stringify(config, null, 2), (err) => {
-      if (err) {
-        console.error("Error writing config file:", err);
-        return res.status(500).send("Error writing config file");
-      }
-
-      res.send("Theme updated successfully");
-    });
-  });
-});
 
 /**
  * Start the server and listen for incoming connections
