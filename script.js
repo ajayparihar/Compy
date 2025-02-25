@@ -3,11 +3,14 @@
  * @author Ajay Singh
  * @version 1.1
  * @created 11-09-2023
- * @updated 19-03-2024
+ * @updated 25-02-2025
  * 
  * This file contains the client-side functionality for the Command Management System.
  * It handles data fetching, display, search, clipboard operations, and theme management.
  * The system supports sensitive data masking and real-time search filtering.
+ * 
+ * WARNING: Future me, don't mess with this code unless absolutely necessary.
+ * You'll thank yourself later for these comments when you've forgotten how this works.
  */
 
 /* Author: Ajay Singh */
@@ -201,8 +204,13 @@ const createDataElement = (item, description) => {
     </svg>
   `;
 
+  // Add all the elements to the data item container
+  // The order matters here - content first, then copy icon
   dataElement.appendChild(contentWrapper);
   dataElement.appendChild(copyIcon);
+  
+  // Store original values as data attributes for later reference
+  // This is crucial for search functionality to work properly
   dataElement.dataset.originalItem = item;
   dataElement.dataset.originalDescription = description;
   dataElement.dataset.originalHTML = contentWrapper.innerHTML;
@@ -215,19 +223,26 @@ const createDataElement = (item, description) => {
  * @function removeMasking
  * @param {string} text - The masked text
  * @returns {string} The unmasked text
+ * 
+ * This is the opposite of maskSensitiveData - it reveals what was hidden.
+ * Like taking off sunglasses at night, but for passwords.
+ * Future me: Don't mess with this regex unless you want to spend hours debugging.
  */
 const removeMasking = (text) => {
   if (!text) return text;
   
   // Escape special characters in the masking keyword
+  // Because regex and special characters are like oil and water
   const escapedKeyword = config.passwordMaskingKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   
   // Create regex that matches content between keywords, handling special characters
+  // This is the magic that finds our masked content
   const regex = new RegExp(
     `${escapedKeyword}([^]*?)${escapedKeyword}`,
     'g'
   );
   
+  // Replace the masked content with just the content itself
   return text.replace(regex, '$1');
 };
 
@@ -237,31 +252,42 @@ const removeMasking = (text) => {
  * @param {string} text - The text to copy
  * @param {HTMLElement} element - The element that triggered the copy
  * @param {MouseEvent} event - The click event
+ * 
+ * This function handles the copy operation and provides visual feedback.
+ * It creates that cool ripple effect when you click, because why not make
+ * copying to clipboard feel magical? Users love that stuff.
  */
 const copyToClipboard = (text, element, event) => {
   if (!text) return;
 
   // Get click position relative to the element
+  // This is for the ripple effect to start from where the user clicked
   const rect = element.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
   // Set CSS variables for ripple origin
+  // CSS variables are amazing for this kind of dynamic positioning
   element.style.setProperty("--mouse-x", `${x}px`);
   element.style.setProperty("--mouse-y", `${y}px`);
 
+  // Remove any masking before copying to clipboard
+  // We want the actual text, not the masked version
   const cleanedText = removeMasking(text);
   navigator.clipboard
     .writeText(cleanedText)
     .then(() => {
       // Add the copied class to trigger the ripple animation
+      // This is what makes the magic happen visually
       element.classList.add("copied");
       // Remove the class after the animation ends
+      // Otherwise it would stay in the "copied" state forever
       setTimeout(() => {
         element.classList.remove("copied");
       }, 600);
       
       // Show toast notification when copy is successful
+      // Because users need that dopamine hit of confirmation
       showAlert("Copied to clipboard", "primary");
     })
     .catch((error) => {
@@ -276,20 +302,27 @@ const copyToClipboard = (text, element, event) => {
  * @param {string} text - The text to highlight
  * @param {string} searchTerm - The term to highlight
  * @returns {string} HTML string with highlighted terms
+ * 
+ * This function is like a highlighter pen that knows to avoid highlighting
+ * over sensitive information. It's smarter than your average highlighter.
+ * Future me: This was tricky to get right, so think twice before changing it.
  */
 const highlightText = (text, searchTerm) => {
   if (!searchTerm) return text;
 
   // Mask sensitive data first
+  // We need to protect the secret stuff before highlighting
   const maskedText = maskSensitiveData(text);
 
   // Create regex pattern for highlighting
+  // Escape special characters to avoid regex issues
   const regex = new RegExp(
     `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
     "gi"
   );
 
   // Split text into parts, only highlight non-sensitive parts
+  // This ensures we don't highlight within sensitive data
   return maskedText
     .split(/(\[SENSITIVE\])/)
     .map((part) => {
@@ -496,11 +529,22 @@ const saveThemeToLocalStorage = (theme) => {
   localStorage.setItem('selectedTheme', theme);
 };
 
+/**
+ * Loads theme from localStorage - because who wants to pick the same theme every time?
+ * @function loadThemeFromLocalStorage
+ * @returns {string} The saved theme or default if none found
+ */
 const loadThemeFromLocalStorage = () => {
   return localStorage.getItem('selectedTheme') || 'd4'; // Default to d4 if no theme saved
 };
 
-// Initialize theme selector
+/**
+ * Initializes the theme selector dropdown with all available themes
+ * @function initThemeSelector
+ * @description Creates options for each theme and sets up event listeners
+ * Note to future self: This is where the magic happens for theme selection.
+ * Don't touch this unless you want to spend hours debugging CSS again.
+ */
 const initThemeSelector = () => {
   const themeSelect = document.getElementById("themeSelect");
   if (!themeSelect) return;
@@ -528,7 +572,17 @@ const initThemeSelector = () => {
   });
 };
 
-// Update user config with new theme
+/**
+ * Updates the user configuration with the new theme selection
+ * @async
+ * @function updateUserConfig
+ * @param {string} theme - The theme identifier to save
+ * @description Fetches current config, updates theme, and saves back to server
+ * @throws {Error} If there's an issue updating the config
+ * 
+ * Note: This is where we persist theme changes to the server.
+ * Remember that one time you forgot this and users kept losing their theme? Good times.
+ */
 const updateUserConfig = async (theme) => {
   try {
     const response = await fetch("user_config.json");
@@ -547,7 +601,15 @@ const updateUserConfig = async (theme) => {
   }
 };
 
-// Theme application logic
+/**
+ * Applies the selected theme to the document
+ * @function applyTheme
+ * @param {string} theme - The theme identifier to apply
+ * @description Removes existing theme classes and adds the new one
+ * 
+ * CSS class magic happens here. Don't mess with this unless you want
+ * to spend a day figuring out why everything suddenly looks terrible.
+ */
 const applyTheme = (theme) => {
   // Remove existing theme classes
   document.documentElement.className = document.documentElement.className
@@ -569,12 +631,22 @@ const applyTheme = (theme) => {
   saveThemeToLocalStorage(theme);
 };
 
-// Initialize theme on page load
+/**
+ * Initialize theme on page load
+ * This ensures we don't show the default theme for a split second before applying the saved one
+ */
 document.addEventListener('DOMContentLoaded', () => {
   initThemeSelector();
 });
 
-// Function to apply user name
+/**
+ * Applies the user's name to the page title
+ * @function applyUserName
+ * @param {string} userName - The user's name to display
+ * @description Updates the page title with the user's name or default
+ * 
+ * Because everyone likes seeing their name in lights... or at least in the header.
+ */
 const applyUserName = (userName) => {
   const pageTitle = document.getElementById("pageTitle");
   if (pageTitle) {
@@ -582,7 +654,17 @@ const applyUserName = (userName) => {
   }
 };
 
-// Process the fetched data
+/**
+ * Processes the fetched data from CSV/Excel format
+ * @function processData
+ * @param {string} data - The raw data to process
+ * @returns {Array<Object>} Array of command objects
+ * @description Converts raw data to structured command objects
+ * 
+ * This is where we transform the raw data into something useful.
+ * Future me: Remember that time you tried to refactor this and broke everything?
+ * Let's not do that again. This works. Leave it alone.
+ */
 const processData = (data) => {
   try {
     const workbook = XLSX.read(data, { type: "string" });

@@ -1,7 +1,7 @@
 <!-- Author: Ajay Singh -->
 <!-- Version: 1.1 -->
 <!-- Original Date: 11-09-2023 -->
-<!-- Updated Date: 19-03-2024 -->
+<!-- Updated Date: 25-02-2025 -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,19 +10,26 @@
         Author: Ajay Singh
         Version: 1.1
         Original Date: 11-09-2023
-        Updated Date: 19-03-2024
+        Updated Date: 25-02-2025
         Description: Main HTML file for the Command Management System
+        
+        WARNING: This HTML structure is carefully crafted.
+        Future me: Remember when you "simplified" the header and broke the entire layout?
+        Let's not do that again. Each div has a purpose, I promise.
     -->
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Compy</title>
 
+    <!-- Favicon links - because every app needs a pretty icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
     <link rel="manifest" href="favicon_io/site.webmanifest">
 
+    <!-- Stylesheets - the order matters here! -->
+    <!-- Google Fonts first, then our custom styles -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="themes.css">
@@ -30,9 +37,15 @@
 </head>
 
 <body>
+    <!-- 
+        Header Section - Fixed at the top of the page
+        Contains the app title, search bar, and theme selector
+        This is the command center for the user
+    -->
     <div class="header-section">
         <header>
             <h1 id="pageTitle">COMPY</h1>
+            <!-- Search container with input and clear button -->
             <div class="search-container">
                 <input type="text" id="searchInput" placeholder="Type to search..." aria-label="Search commands">
                 <div id="clearSearch" class="clear-icon" aria-label="Clear search" role="button" tabindex="0"
@@ -44,6 +57,7 @@
                     </svg>
                 </div>
             </div>
+            <!-- Header controls for theme selection -->
             <div class="header-controls">
                 <div class="theme-selector">
                     <select id="themeSelect" aria-label="Select theme">
@@ -54,15 +68,27 @@
         </header>
     </div>
 
+    <!-- 
+        Main content area - This is where the commands will be displayed
+        The data div is the container for all command items
+        It's marked with ARIA attributes for accessibility
+    -->
     <main>
         <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
     </main>
 
+    <!-- Toast notification for user feedback -->
     <div class="toast" id="toast" role="alert" aria-hidden="true"></div>
+    
+    <!-- Loading overlay with spinner - shown during data fetching -->
     <div class="loading-overlay">
         <div class="spinner"></div>
     </div>
 
+    <!-- 
+        Scripts - loaded at the end for better performance
+        XLSX for Excel/CSV parsing, then our custom scripts
+    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="script.js"></script>
     <script src="config.js"></script>

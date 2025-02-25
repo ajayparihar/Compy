@@ -3,10 +3,14 @@
  * Author: Ajay Singh
  * Version: 1.1
  * Original Date: 11-09-2023
- * Updated Date: 19-03-2024
+ * Updated Date: 25-02-2025
  *
  * This stylesheet contains all the styling for the Command Management System
  * including themes, responsive design, and component-specific styles.
+ * 
+ * WARNING: CSS is where dreams go to die. Proceed with caution.
+ * Future me: Remember that time you changed one line and broke the entire layout?
+ * Yeah, let's not do that again. Test all changes in multiple browsers.
  */
 
 /* Import Google Fonts */
@@ -102,7 +106,15 @@
   );
 }
 
-/* Global Styles */
+/* ==================== */
+/* Global Reset & Base Styles */
+/* ==================== */
+/* 
+ * The holy trinity of CSS resets.
+ * This is where we tell the browser "forget everything you think you know"
+ * and start with a clean slate. Without this, browsers do whatever they want,
+ * and we can't have that kind of anarchy.
+ */
 *,
 *::before,
 *::after {
@@ -113,6 +125,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 
+ * HTML & Body base styles
+ * Setting up the canvas for our masterpiece.
+ * Overflow-x: hidden because horizontal scrollbars are the devil's work.
+ */
 html, body {
   margin: 0;
   padding: 0;
@@ -121,6 +138,14 @@ html, body {
   scroll-behavior: smooth;
 }
 
+/* 
+ * Body styling - the main container for everything
+ * This is where the magic happens. We set up the background,
+ * text color, and overall layout structure.
+ * 
+ * The flex setup ensures our content fills the viewport height
+ * even when there's minimal content.
+ */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -137,12 +162,26 @@ body {
   position: relative;
 }
 
-/* Hide content when loading */
+/* 
+ * Loading state handling
+ * When data is loading, we hide everything except the loading overlay.
+ * It's like throwing a blanket over the mess while we clean up.
+ */
 body.loading > *:not(.loading-overlay) {
   display: none;
 }
 
-/* Loading Screen and Spinner Styles */
+/* ==================== */
+/* Loading Indicators */
+/* ==================== */
+/* 
+ * Loading overlay - the "please wait" screen
+ * This covers the entire viewport with a semi-transparent backdrop
+ * and centers our spinner. The blur effect adds that "premium" feel.
+ * 
+ * Z-index 10000 because we want this to be above EVERYTHING.
+ * Yes, even that one thing you're thinking of.
+ */
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -157,6 +196,14 @@ body.loading > *:not(.loading-overlay) {
   backdrop-filter: blur(4px);
 }
 
+/* 
+ * Spinner animation
+ * The classic "loading circle" that users have been trained to recognize.
+ * Border trick creates that "incomplete circle" look.
+ * 
+ * Will-change: transform tells the browser to optimize for animation.
+ * It's like telling your GPU "heads up, we're about to party".
+ */
 .spinner {
   border: 4px solid rgba(var(--primary-rgb), 0.2);
   border-top: 4px solid var(--primary);
@@ -167,6 +214,11 @@ body.loading > *:not(.loading-overlay) {
   will-change: transform;
 }
 
+/* 
+ * Spin animation keyframes
+ * The simplest animation in the book, but so satisfying.
+ * Just rotate from 0 to 360 degrees, rinse and repeat.
+ */
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -176,7 +228,16 @@ body.loading > *:not(.loading-overlay) {
   }
 }
 
+/* ==================== */
 /* Header Section */
+/* ==================== */
+/* 
+ * Fixed header that stays at the top of the viewport
+ * This is our navigation command center - always visible, always accessible.
+ * 
+ * The gradient background and subtle shadow give it that "floating" effect.
+ * Z-index 100 keeps it above content but below modals/overlays.
+ */
 .header-section {
   position: fixed;
   top: 0;
