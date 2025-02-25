@@ -221,8 +221,8 @@
     "cypress": "^13.6.6"
   },
   "scripts": {
-    "test": "cypress run",
-    "test:open": "cypress open",
+    "test": "cypress run --config-file test/cypress.config.js",
+    "test:open": "cypress open --config-file test/cypress.config.js",
     "start": "node server.js"
   },
   "repository": {
