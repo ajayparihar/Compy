@@ -13,6 +13,33 @@
  * You'll thank yourself later for these comments when you've forgotten how this works.
  */
 
+// Immediately try to apply the saved theme to prevent flash of unstyled content
+(function() {
+  try {
+    // Try localStorage first
+    let savedTheme = localStorage.getItem('selectedTheme');
+    
+    // If not in localStorage, try cookie
+    if (!savedTheme) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; selectedTheme=`);
+      if (parts.length === 2) savedTheme = parts.pop().split(";").shift();
+    }
+    
+    // Apply theme if found
+    if (savedTheme) {
+      document.documentElement.className = document.documentElement.className
+        .split(" ")
+        .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
+        .join(" ");
+      document.documentElement.classList.add(savedTheme);
+      console.log('Early theme application:', savedTheme);
+    }
+  } catch (e) {
+    console.warn('Error in early theme application:', e);
+  }
+})();
+
 /* Author: Ajay Singh */
 /* Version: 1.1 */
 /* Date: 11-09-2023 */
@@ -519,7 +546,8 @@ const addEventListeners = () => {
 };
 
 // Theme names mapped from themes.css comments
-const THEME_NAMES = {
+// Make THEME_NAMES available globally so it can be used in config.js
+window.THEME_NAMES = {
   d1: "Mystic Forest (Dark)",
   d2: "Crimson Night (Dark)",
   d3: "Royal Elegance (Dark)",
@@ -589,7 +617,30 @@ const saveThemeToFile = async (theme) => {
 
 // Theme persistence functions
 const saveThemeToLocalStorage = (theme) => {
-  localStorage.setItem('selectedTheme', theme);
+  try {
+    console.log('Saving theme to localStorage:', theme);
+    localStorage.setItem('selectedTheme', theme);
+    
+    // Also save to cookie as a backup
+    setCookie('selectedTheme', theme, 365);
+    
+    // Verify the theme was saved correctly
+    const savedTheme = localStorage.getItem('selectedTheme');
+    if (savedTheme !== theme) {
+      console.warn('Theme was not saved correctly to localStorage. Expected:', theme, 'Got:', savedTheme);
+    } else {
+      console.log('Theme saved successfully to localStorage');
+    }
+  } catch (error) {
+    console.error('Error saving theme to localStorage:', error);
+    // Try using a cookie as fallback
+    try {
+      setCookie('selectedTheme', theme, 365);
+      console.log('Theme saved to cookie as fallback');
+    } catch (cookieError) {
+      console.error('Error saving theme to cookie:', cookieError);
+    }
+  }
 };
 
 /**
@@ -598,7 +649,35 @@ const saveThemeToLocalStorage = (theme) => {
  * @returns {string} The saved theme or default if none found
  */
 const loadThemeFromLocalStorage = () => {
-  return localStorage.getItem('selectedTheme') || 'd4'; // Default to d4 if no theme saved
+  try {
+    // Try to get theme from localStorage first
+    const savedTheme = localStorage.getItem('selectedTheme');
+    console.log('Loading theme from localStorage:', savedTheme);
+    
+    if (savedTheme) {
+      return savedTheme;
+    }
+    
+    // If not in localStorage, try to get from cookie as fallback
+    const cookieTheme = getCookie('selectedTheme');
+    console.log('Loading theme from cookie fallback:', cookieTheme);
+    
+    if (cookieTheme) {
+      // Save to localStorage for next time
+      try {
+        localStorage.setItem('selectedTheme', cookieTheme);
+      } catch (error) {
+        console.warn('Could not save cookie theme to localStorage:', error);
+      }
+      return cookieTheme;
+    }
+    
+    // Default theme if nothing found
+    return 'd4';
+  } catch (error) {
+    console.error('Error loading theme from storage:', error);
+    return 'd4'; // Default to d4 if error
+  }
 };
 
 /**
@@ -612,8 +691,10 @@ const initThemeSelector = () => {
   const themeSelect = document.getElementById("themeSelect");
   if (!themeSelect) return;
 
+  console.log('Initializing theme selector');
+
   // Add theme options
-  Object.entries(THEME_NAMES).forEach(([value, name]) => {
+  Object.entries(window.THEME_NAMES).forEach(([value, name]) => {
     const option = document.createElement("option");
     option.value = value;
     // Remove (Dark), (Light), and don't add the theme code
@@ -623,12 +704,16 @@ const initThemeSelector = () => {
 
   // Set initial theme from localStorage
   const savedTheme = loadThemeFromLocalStorage();
+  console.log('Setting theme selector to saved theme:', savedTheme);
   themeSelect.value = savedTheme;
+  
+  // Always apply the theme here to ensure it's set correctly
   applyTheme(savedTheme);
 
   // Handle theme change
   themeSelect.addEventListener("change", (e) => {
     const selectedTheme = e.target.value;
+    console.log('Theme changed to:', selectedTheme);
     applyTheme(selectedTheme);
     // Update the theme in user_config.json
     updateUserConfig(selectedTheme);
@@ -648,6 +733,10 @@ const initThemeSelector = () => {
  */
 const updateUserConfig = async (theme) => {
   try {
+    // Always save to localStorage first to ensure theme persistence
+    saveThemeToLocalStorage(theme);
+    
+    // Then try to update the server-side config
     const response = await fetch("user_config.json");
     const config = await response.json();
     config.user_settings.theme = theme;
@@ -661,6 +750,7 @@ const updateUserConfig = async (theme) => {
     });
   } catch (error) {
     console.error("Error updating user config:", error);
+    // Even if server update fails, theme is still saved to localStorage
   }
 };
 
@@ -673,7 +763,14 @@ const updateUserConfig = async (theme) => {
  * CSS class magic happens here. Don't mess with this unless you want
  * to spend a day figuring out why everything suddenly looks terrible.
  */
-const applyTheme = (theme) => {
+window.applyTheme = (theme) => {
+  if (!theme) {
+    console.warn('No theme provided to applyTheme, using default');
+    theme = 'd4'; // Default theme if none provided
+  }
+  
+  console.log('Applying theme:', theme);
+  
   // Remove existing theme classes
   document.documentElement.className = document.documentElement.className
     .split(" ")
@@ -690,17 +787,15 @@ const applyTheme = (theme) => {
     spinner.style.borderTopColor = `var(--primary)`;
   }
 
-  // Save theme to localStorage
+  // Save theme to localStorage and cookie
   saveThemeToLocalStorage(theme);
+  
+  // Also update the theme selector if it exists
+  const themeSelect = document.getElementById("themeSelect");
+  if (themeSelect && themeSelect.value !== theme) {
+    themeSelect.value = theme;
+  }
 };
-
-/**
- * Initialize theme on page load
- * This ensures we don't show the default theme for a split second before applying the saved one
- */
-document.addEventListener('DOMContentLoaded', () => {
-  initThemeSelector();
-});
 
 /**
  * Applies the user's name to the page title
@@ -710,10 +805,11 @@ document.addEventListener('DOMContentLoaded', () => {
  * 
  * Because everyone likes seeing their name in lights... or at least in the header.
  */
-const applyUserName = (userName) => {
+window.applyUserName = (userName) => {
   const pageTitle = document.getElementById("pageTitle");
   if (pageTitle) {
-    pageTitle.textContent = userName ? `${userName}'s COMPY` : "COMPY";
+    // Only show "userName's COMPY" if userName exists and is not empty
+    pageTitle.textContent = userName && userName.trim() ? `${userName}'s COMPY` : "COMPY";
   }
 };
 
@@ -761,18 +857,33 @@ const initializeApp = async () => {
   try {
     showLoading();
 
+    console.log('Initializing app and loading theme...');
+    
+    // Load configuration first
     const config = await fetch("user_config.json").then((response) =>
       response.json()
-    );
+    ).catch(error => {
+      console.error("Error loading config:", error);
+      return { 
+        file_settings: { file_path: "comm.csv" },
+        user_settings: { theme: "d4" }
+      };
+    });
+    
+    // Initialize theme selector with the saved theme
+    initThemeSelector();
+    
+    // Apply user name from config if it exists
+    const userName = config.user_settings?.user_name || "";
+    applyUserName(userName);
+    
+    // Get file path from config
     const filePath = config.file_settings?.file_path;
-
     if (!filePath) {
       throw new Error("No file path specified in config");
     }
 
-    // Apply user name
-    applyUserName(config.user_settings?.user_name || "");
-
+    // Load and process data
     const data = await fetchDataWithTimeout(filePath);
     processData(data);
   } catch (error) {

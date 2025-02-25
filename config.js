@@ -31,12 +31,12 @@ const DEFAULT_FILE_PATH =
  * 
  * These names show up in the theme selector dropdown.
  * Future me: Adding a new theme? Don't forget to add the CSS in themes.css too!
+ * 
+ * Note: THEME_NAMES is now defined in script.js and attached to the window object
+ * to avoid duplicate declarations.
  */
-const THEME_NAMES = {
-  d1: "Mystic Forest (Dark)",
-  d2: "Crimson Night (Dark)",
-  // ... other themes ...
-};
+// Access THEME_NAMES from window object (defined in script.js)
+// const THEME_NAMES = { ... };
 
 /**
  * Fetch and apply user configuration
@@ -54,8 +54,14 @@ fetch("user_config.json")
     const displayTheme = config.user_settings?.display_theme || "root";
 
     // Apply user name and theme
-    applyUserName(userName);
-    applyTheme(displayTheme);
+    // Using applyUserName from script.js
+    if (window.applyUserName) {
+      window.applyUserName(userName);
+    }
+    // Using applyTheme from script.js
+    if (window.applyTheme) {
+      window.applyTheme(displayTheme);
+    }
 
     // Load the specified file
     loadFile(filePath);
@@ -91,13 +97,15 @@ const loadFile = (filePath) => {
  * 
  * A small touch that makes the app feel more personal.
  * Users love seeing their name in the title!
+ * 
+ * Note: This function is now defined in script.js to avoid duplicate declarations.
  */
-const applyUserName = (userName) => {
-  const pageTitle = document.getElementById("pageTitle");
-  if (pageTitle) {
-    pageTitle.textContent = userName ? `${userName}'s COMPY` : "COMPY";
-  }
-};
+// const applyUserName = (userName) => {
+//   const pageTitle = document.getElementById("pageTitle");
+//   if (pageTitle) {
+//     pageTitle.textContent = userName ? `${userName}'s COMPY` : "COMPY";
+//   }
+// };
 
 /**
  * Theme application logic
@@ -108,20 +116,25 @@ const applyUserName = (userName) => {
  * then use to determine the color scheme.
  * 
  * Simple but powerful - one class change affects the entire application.
+ * 
+ * Note: This function is now defined in script.js to avoid duplicate declarations.
  */
-const applyTheme = (theme) => {
-  // Remove existing theme classes
-  document.documentElement.className = document.documentElement.className
-    .split(" ")
-    .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
-    .join(" ");
+// const applyTheme = (theme) => {
+//   // Remove existing theme classes
+//   document.documentElement.className = document.documentElement.className
+//     .split(" ")
+//     .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
+//     .join(" ");
 
-  // Add new theme class
-  document.documentElement.classList.add(theme);
-};
+//   // Add new theme class
+//   document.documentElement.classList.add(theme);
+// };
 
 // On page load, check for saved theme
 // This ensures we apply the theme immediately on page load
 // to avoid that annoying flash of default theme
 const savedTheme = localStorage.getItem("theme") || "d4";
-applyTheme(savedTheme);
+// Using applyTheme from script.js
+if (window.applyTheme) {
+  window.applyTheme(savedTheme);
+}
