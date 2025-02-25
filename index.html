@@ -45,9 +45,10 @@
     <div class="header-section">
         <header>
             <h1 id="pageTitle">COMPY</h1>
+            <div id="user-display"></div>
             <!-- Search container with input and clear button -->
             <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Type to search..." aria-label="Search commands">
+                <input type="text" id="search-input" placeholder="Type to search..." aria-label="Search commands">
                 <div id="clearSearch" class="clear-icon" aria-label="Clear search" role="button" tabindex="0"
                     style="display: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"
@@ -61,34 +62,55 @@
             <div class="header-controls">
                 <div class="theme-selector">
                     <select id="themeSelect" aria-label="Select theme">
-                        <!-- Options will be populated by JavaScript -->
+                        <option value="d1">Mystic Forest</option>
+                        <option value="d2">Crimson Night</option>
+                        <option value="d3">Royal Elegance</option>
+                        <option value="d4">Galactic Blue</option>
+                        <option value="d5">Twilight Dream</option>
+                        <option value="d6">Deep Ocean</option>
+                        <option value="d7">Cyber Night</option>
+                        <option value="d8">Molten Core</option>
+                        <option value="d9">Neon Pulse</option>
+                        <option value="d10">Toxic Night</option>
+                        <option value="l1">Sunrise</option>
+                        <option value="l2">Soft Glow</option>
+                        <option value="l3">Floral Breeze</option>
+                        <option value="l4">Ocean Breeze</option>
+                        <option value="l5">Golden Sands</option>
+                        <option value="l6">Mint Grove</option>
+                        <option value="l7">Sky Dusk</option>
+                        <option value="l8">Autumn Leaves</option>
+                        <option value="l9">Citrus Burst</option>
+                        <option value="l10">Rose Petal</option>
+                        <option value="l11">Lavender Mist</option>
                     </select>
                 </div>
             </div>
         </header>
     </div>
 
-    <!-- 
-        Main content area - This is where the commands will be displayed
-        The data div is the container for all command items
-        It's marked with ARIA attributes for accessibility
-    -->
+    <!-- Error message container -->
+    <div class="error-message" style="display: none;">
+        <p>Could not load data file</p>
+        <button id="retry-button">Retry</button>
+    </div>
+
+    <!-- Main content area -->
     <main>
-        <div id="data" aria-live="polite" role="region" aria-label="Command list"></div>
+        <div id="data-container" aria-live="polite" role="region" aria-label="Command list">
+            <!-- Command items will be populated here with class="command-item" -->
+        </div>
     </main>
 
     <!-- Toast notification for user feedback -->
-    <div class="toast" id="toast" role="alert" aria-hidden="true"></div>
+    <div class="toast-notification" id="toast" role="alert" aria-hidden="true"></div>
     
-    <!-- Loading overlay with spinner - shown during data fetching -->
+    <!-- Loading overlay with spinner -->
     <div class="loading-overlay">
         <div class="spinner"></div>
     </div>
 
-    <!-- 
-        Scripts - loaded at the end for better performance
-        XLSX for Excel/CSV parsing, then our custom scripts
-    -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="script.js"></script>
     <script src="config.js"></script>

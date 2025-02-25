@@ -37,7 +37,7 @@ const PORT = 3000;
  * each request before it gets to the VIP area (our route handlers).
  */
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname)));  // Serve files from the root directory
 
 /**
  * PUT endpoint to update user theme configuration

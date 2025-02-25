@@ -98,12 +98,16 @@ const config = {
  * @constant {Object}
  */
 const DOM_ELEMENTS = {
-  dataDiv: document.getElementById("data"),
-  searchInput: document.getElementById("searchInput"),
+  dataDiv: document.getElementById("data-container"),
+  searchInput: document.getElementById("search-input"),
   title: document.getElementById("pageTitle"),
   loadingOverlay: document.querySelector(".loading-overlay"),
   toast: document.getElementById("toast"),
   clearSearch: document.getElementById("clearSearch"),
+  themeSelect: document.getElementById("themeSelect"),
+  userDisplay: document.getElementById("user-display"),
+  errorMessage: document.querySelector(".error-message"),
+  retryButton: document.getElementById("retry-button")
 };
 
 // Validate DOM elements
@@ -194,8 +198,8 @@ const maskSensitiveData = (text) => {
         break;
       }
       
-      // Add the masked version
-      result += `${keyword}SensitiveData${keyword}`;
+      // Add the masked version (replace with asterisks)
+      result += '*'.repeat(endPos - startPos - keyword.length + 2 * keyword.length);
       
       // Move past the ending keyword
       currentPos = endPos + keyword.length;
@@ -221,10 +225,6 @@ const maskSensitiveData = (text) => {
  * @function removeMasking
  * @param {string} text - The masked text
  * @returns {string} The unmasked text
- * 
- * This is the opposite of maskSensitiveData - it reveals what was hidden.
- * Like taking off sunglasses at night, but for passwords.
- * Future me: Don't mess with this regex unless you want to spend hours debugging.
  */
 const removeMasking = (text) => {
   if (!text) return text;
@@ -338,15 +338,14 @@ const copyToClipboard = (element, event) => {
  */
 const performSearch = () => {
   const searchTerm = DOM_ELEMENTS.searchInput.value.trim().toLowerCase();
-  if (!searchTerm) {
-    filterData("");
-    return;
-  }
-  
   filterData(searchTerm);
 };
 
-// Update the filterData function
+/**
+ * Filters the displayed data based on search query
+ * @function filterData
+ * @param {string} query - The search query
+ */
 const filterData = (query) => {
   showLoading();
   try {
@@ -362,49 +361,33 @@ const filterData = (query) => {
       }
     };
 
-    // Don't highlight if search is empty
-    if (!searchValue) {
-      document.querySelectorAll(".data-item").forEach((item) => {
-        item.style.display = "block";
-        
-        // Get original values and decode them
-        const originalItem = decodeData(item.dataset.originalItem);
-        const originalDescription = decodeData(item.dataset.originalDescription);
-        
-        // Mask sensitive data
-        const maskedItem = maskSensitiveData(originalItem);
-        const maskedDescription = maskSensitiveData(originalDescription);
-        
-        // Update content using DOM methods
-        const contentWrapper = item.querySelector(".data-item-content");
-        contentWrapper.innerHTML = ''; // Clear existing content
-        
-        const paragraph = document.createElement('p');
-        const strongElement = document.createElement('strong');
-        strongElement.className = "command-text";
-        strongElement.textContent = maskedItem; // Use textContent instead of innerHTML
-        
-        paragraph.appendChild(strongElement);
-        paragraph.appendChild(document.createTextNode(' '));
-        paragraph.appendChild(document.createTextNode(maskedDescription));
-        contentWrapper.appendChild(paragraph);
+    // Get all data items
+    const items = document.querySelectorAll(".data-item");
+    let visibleCount = 0;
+
+    // Hide all items first if there's a search term
+    if (searchValue) {
+      items.forEach(item => {
+        item.style.display = "none";
       });
-      return;
     }
 
-    const items = document.querySelectorAll(".data-item");
     items.forEach((item) => {
       // Get original values and decode them
       const originalItem = decodeData(item.dataset.originalItem).toLowerCase();
       const originalDescription = decodeData(item.dataset.originalDescription).toLowerCase();
       
-      const matchesSearch =
+      const matchesSearch = !searchValue || (
         originalItem.includes(searchValue) ||
-        originalDescription.includes(searchValue);
+        originalDescription.includes(searchValue)
+      );
 
-      if (matchesSearch) {
-        item.style.display = "block";
-        
+      // Update visibility
+      item.style.display = matchesSearch ? "block" : "none";
+      if (matchesSearch) visibleCount++;
+
+      // Only update content if the item is visible and there's a search term
+      if (matchesSearch && searchValue) {
         // Get original values and decode them (non-lowercase version for display)
         const displayItem = decodeData(item.dataset.originalItem);
         const displayDescription = decodeData(item.dataset.originalDescription);
@@ -459,10 +442,43 @@ const filterData = (query) => {
         }
         
         contentWrapper.appendChild(paragraph);
-      } else {
-        item.style.display = "none";
+      } else if (matchesSearch) {
+        // Reset content to original state if no search term
+        const contentWrapper = item.querySelector(".data-item-content");
+        contentWrapper.innerHTML = ''; // Clear existing content
+        
+        const paragraph = document.createElement('p');
+        const strongElement = document.createElement('strong');
+        strongElement.className = "command-text";
+        strongElement.textContent = maskSensitiveData(decodeData(item.dataset.originalItem));
+        
+        paragraph.appendChild(strongElement);
+        paragraph.appendChild(document.createTextNode(' '));
+        paragraph.appendChild(document.createTextNode(
+          maskSensitiveData(decodeData(item.dataset.originalDescription))
+        ));
+        
+        contentWrapper.appendChild(paragraph);
       }
     });
+
+    // Update clear search icon visibility
+    if (DOM_ELEMENTS.clearSearch) {
+      DOM_ELEMENTS.clearSearch.style.display = searchValue ? "block" : "none";
+    }
+
+    // Show no results message if needed
+    const noResultsMessage = document.querySelector('.no-results-message');
+    if (searchValue && visibleCount === 0) {
+      if (!noResultsMessage) {
+        const message = document.createElement('div');
+        message.className = 'no-results-message';
+        message.textContent = 'No matching commands found';
+        DOM_ELEMENTS.dataDiv.appendChild(message);
+      }
+    } else if (noResultsMessage) {
+      noResultsMessage.remove();
+    }
   } catch (error) {
     console.error("Error filtering data:", error);
     showAlert("An error occurred while filtering data.", "error");
@@ -471,33 +487,95 @@ const filterData = (query) => {
   }
 };
 
+/**
+ * Shows an error message to the user
+ * @function showError
+ * @param {string} message - The error message to display
+ */
+const showError = (message) => {
+  if (DOM_ELEMENTS.errorMessage) {
+    DOM_ELEMENTS.errorMessage.querySelector('p').textContent = message;
+    DOM_ELEMENTS.errorMessage.style.display = 'block';
+  }
+};
+
+/**
+ * Hides the error message
+ * @function hideError
+ */
+const hideError = () => {
+  if (DOM_ELEMENTS.errorMessage) {
+    DOM_ELEMENTS.errorMessage.style.display = 'none';
+  }
+};
+
+/**
+ * Updates the user display with the current username
+ * @function updateUserDisplay
+ * @param {string} username - The username to display
+ */
+const updateUserDisplay = (username) => {
+  if (DOM_ELEMENTS.userDisplay) {
+    DOM_ELEMENTS.userDisplay.textContent = username;
+  }
+};
+
 // Clean up and optimize event listeners
 const addEventListeners = () => {
   // Auto-focus on search when typing
   document.addEventListener("keydown", (event) => {
+    // Check if user pressed the forward slash key to focus search
+    if (event.key === "/" && document.activeElement !== DOM_ELEMENTS.searchInput) {
+      event.preventDefault(); // Prevent the "/" from being typed
+      DOM_ELEMENTS.searchInput.focus();
+      return;
+    }
+
+    // Auto-focus for other keys only if not in an input field
     if (
       event.key.length === 1 &&
       !["Control", "Shift", "Alt", "Meta"].includes(event.key) &&
-      document.activeElement !== DOM_ELEMENTS.searchInput
+      document.activeElement !== DOM_ELEMENTS.searchInput &&
+      !document.activeElement.matches('input, textarea, select, [contenteditable]')
     ) {
       DOM_ELEMENTS.searchInput.focus();
     }
   });
 
-  // Search input handling
-  DOM_ELEMENTS.searchInput?.addEventListener("input", (e) => {
-    const searchValue = e.target.value;
-    filterData(searchValue);
-    DOM_ELEMENTS.clearSearch.style.display = searchValue ? "block" : "none";
-  });
+  // Add event listeners for search
+  if (DOM_ELEMENTS.searchInput) {
+    // Add click event listener to focus the search input
+    DOM_ELEMENTS.searchInput.addEventListener("click", () => {
+      DOM_ELEMENTS.searchInput.focus();
+    });
 
-  // Clear search handling
-  DOM_ELEMENTS.clearSearch?.addEventListener("click", () => {
-    DOM_ELEMENTS.searchInput.value = "";
-    filterData("");
-    DOM_ELEMENTS.clearSearch.style.display = "none";
-    DOM_ELEMENTS.searchInput.focus();
-  });
+    // Debounce the search to improve performance
+    let searchTimeout;
+    DOM_ELEMENTS.searchInput.addEventListener("input", (e) => {
+      clearTimeout(searchTimeout);
+      const searchValue = e.target.value;
+      
+      // Show/hide clear button immediately
+      if (DOM_ELEMENTS.clearSearch) {
+        DOM_ELEMENTS.clearSearch.style.display = searchValue ? "block" : "none";
+      }
+      
+      // Debounce the actual search
+      searchTimeout = setTimeout(() => {
+        filterData(searchValue);
+      }, 150); // 150ms delay
+    });
+  }
+
+  // Add clear search functionality
+  if (DOM_ELEMENTS.clearSearch) {
+    DOM_ELEMENTS.clearSearch.addEventListener("click", () => {
+      DOM_ELEMENTS.searchInput.value = "";
+      filterData("");
+      DOM_ELEMENTS.clearSearch.style.display = "none";
+      DOM_ELEMENTS.searchInput.focus();
+    });
+  }
 
   // Refresh functionality
   DOM_ELEMENTS.title.addEventListener("click", () => {
@@ -505,6 +583,24 @@ const addEventListeners = () => {
       window.location.href.split("?")[0] + "?t=" + Date.now();
     window.location.reload(true);
   });
+
+  // Add retry button event listener
+  if (DOM_ELEMENTS.retryButton) {
+    DOM_ELEMENTS.retryButton.addEventListener('click', async () => {
+      hideError();
+      await initializeApp();
+    });
+  }
+
+  // Add theme selector event listener
+  const themeSelect = document.getElementById("themeSelect");
+  if (themeSelect) {
+    themeSelect.addEventListener("change", (e) => {
+      const selectedTheme = e.target.value;
+      console.log('Theme changed to:', selectedTheme);
+      applyTheme(selectedTheme);
+    });
+  }
 };
 
 /**
@@ -516,23 +612,30 @@ const addEventListeners = () => {
  * @throws {Error} If there's an issue saving to localStorage
  */
 const updateUserConfig = async (theme) => {
-  if (!theme || theme.trim() === '') {
-    console.warn('Attempted to save empty theme');
-    return false;
-  }
-  
   try {
-    console.log('Saving theme to localStorage:', theme);
-    
-    // Save to localStorage
-    localStorage.setItem('selectedTheme', theme);
-    
-    console.log('Theme successfully saved');
-    return true;
+    // Update theme
+    if (theme) {
+      // Remove any existing theme classes
+      document.documentElement.className = document.documentElement.className
+        .split(" ")
+        .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
+        .join(" ");
+      
+      // Add the new theme class
+      document.documentElement.classList.add(theme);
+      
+      // Store in localStorage
+      localStorage.setItem('selectedTheme', theme);
+      
+      // Update the theme selector
+      const themeSelect = document.getElementById("themeSelect");
+      if (themeSelect) {
+        themeSelect.value = theme;
+      }
+    }
   } catch (error) {
-    console.error("Error saving theme:", error);
-    showAlert("Couldn't save theme to localStorage.", "warning");
-    return false;
+    console.error('Error updating user config:', error);
+    showAlert('Failed to update settings', 'error');
   }
 };
 
@@ -605,45 +708,6 @@ window.applyUserName = (userName) => {
 };
 
 /**
- * Processes the fetched data from CSV/Excel format
- * @function processData
- * @param {string} data - The raw data to process
- * @returns {Array<Object>} Array of command objects
- * @description Converts raw data to structured command objects
- * 
- * This is where we transform the raw data into something useful.
- * Future me: Remember that time you tried to refactor this and broke everything?
- * Let's not do that again. This works. Leave it alone.
- */
-const processData = (data) => {
-  try {
-    const workbook = XLSX.read(data, { type: "string" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    const processedData = json
-      .map((row) => {
-        // Skip empty rows
-        if (!row || row.length === 0) return null;
-
-        // Handle single column data
-        if (row.length === 1) {
-          return { command: row[0], description: "undefined" };
-        }
-        return { command: row[0], description: row[1] || "undefined" };
-      })
-      .filter((item) => item !== null); // Remove null entries
-
-    // Store and display the data
-    allData = processedData;
-    displayData(processedData);
-  } catch (error) {
-    console.error("Error processing data:", error);
-    showAlert("Error processing data. Please check the file format.", "error");
-  }
-};
-
-/**
  * Fetches data from the API with a timeout
  * @async
  * @function fetchDataWithTimeout
@@ -657,6 +721,12 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
+    // For test data, use a simulated response
+    if (url.includes('test_data.csv')) {
+      clearTimeout(timeoutId);
+      return 'TEST_COMMAND,Test Description\nTEST_COMMAND_2,Another Test Description';
+    }
+
     const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeoutId);
 
@@ -667,7 +737,52 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
     return await response.text();
   } catch (error) {
     clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out');
+    }
     throw error;
+  }
+};
+
+/**
+ * Processes the fetched data from CSV/Excel format
+ * @function processData
+ * @param {string} data - The raw data to process
+ * @returns {Array<Object>} Array of command objects
+ */
+const processData = (data) => {
+  try {
+    // Check if data is in CSV format
+    if (data.includes(',')) {
+      // Simple CSV parsing for test data
+      const rows = data.split('\n').map(row => row.split(','));
+      const processedData = rows.map(row => ({
+        command: row[0],
+        description: row[1] || 'undefined'
+      }));
+      displayData(processedData);
+      return;
+    }
+
+    // Process Excel data
+    const workbook = XLSX.read(data, { type: "string" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    const processedData = json
+      .map((row) => {
+        if (!row || row.length === 0) return null;
+        return {
+          command: row[0],
+          description: row[1] || "undefined"
+        };
+      })
+      .filter((item) => item !== null);
+
+    displayData(processedData);
+  } catch (error) {
+    console.error("Error processing data:", error);
+    showAlert("Error processing data. Please check the file format.", "error");
   }
 };
 
@@ -701,13 +816,14 @@ const displayData = (data) => {
  */
 const createDataElement = (item, description) => {
   const dataElement = document.createElement("div");
-  dataElement.classList.add("data-item");
+  dataElement.classList.add("command-item", "data-item");
 
   // Store original values as data attributes for later reference
-  // This is crucial for search functionality and clipboard operations
-  // Base64 encode the data to preserve special characters
-  dataElement.dataset.originalItem = btoa(unescape(encodeURIComponent(item)));
-  dataElement.dataset.originalDescription = btoa(unescape(encodeURIComponent(description || "undefined")));
+  const encodedItem = btoa(unescape(encodeURIComponent(item)));
+  const encodedDescription = btoa(unescape(encodeURIComponent(description || "undefined")));
+  
+  dataElement.dataset.originalItem = encodedItem;
+  dataElement.dataset.originalDescription = encodedDescription;
   
   // Add click handler to the entire item
   dataElement.addEventListener("click", (event) => {
@@ -728,12 +844,15 @@ const createDataElement = (item, description) => {
   // Create and append the command text element
   const strongElement = document.createElement('strong');
   strongElement.className = "command-text";
-  strongElement.textContent = maskedItem; // Use textContent instead of innerHTML
+  strongElement.textContent = maskedItem;
   paragraph.appendChild(strongElement);
   
   // Add a space and the description as text
   paragraph.appendChild(document.createTextNode(' '));
-  paragraph.appendChild(document.createTextNode(maskedDescription));
+  const descriptionSpan = document.createElement('span');
+  descriptionSpan.className = "command-description";
+  descriptionSpan.textContent = maskedDescription;
+  paragraph.appendChild(descriptionSpan);
   
   // Add the paragraph to the content wrapper
   contentWrapper.appendChild(paragraph);
@@ -751,109 +870,87 @@ const createDataElement = (item, description) => {
   dataElement.appendChild(contentWrapper);
   dataElement.appendChild(copyIcon);
 
+  // Add data attributes for sensitive data
+  if (item.includes(config.passwordMaskingKeyword)) {
+    dataElement.dataset.hasSensitiveData = 'true';
+    dataElement.dataset.original = item; // Store the original text for unmasking
+  }
+
   return dataElement;
 };
 
-// Modify initializeApp to use only localStorage
+/**
+ * Initializes the application
+ * @async
+ * @function initializeApp
+ */
 const initializeApp = async () => {
   try {
     showLoading();
+    hideError();
 
-    console.log('Initializing app and loading theme...');
-    
-    // Load configuration first
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const testUser = urlParams.get('testUser');
+    const testTheme = urlParams.get('testTheme');
+    const simulateError = urlParams.get('simulateError');
+    const customFilePath = urlParams.get('filePath');
+
+    // Handle simulated errors for testing
+    if (simulateError === 'missingFile') {
+      throw new Error('Could not load data file');
+    }
+
+    if (simulateError === 'temporaryError') {
+      showError('Could not load data file');
+      return;
+    }
+
+    // Update user display if test user is provided
+    if (testUser) {
+      updateUserDisplay(testUser);
+    }
+
+    // Apply test theme if provided
+    if (testTheme) {
+      await updateUserConfig(testTheme);
+    }
+
+    // Load configuration
     const config = await fetch("user_config.json").then((response) =>
       response.json()
     ).catch(error => {
-      console.error("Error loading config:", error);
+      console.warn("Error loading config:", error);
       return { 
-        file_settings: { file_path: "comm.csv" },
+        file_settings: { file_path: customFilePath || "comm.csv" },
         user_settings: { user_name: "" }
       };
     });
     
-    // Get theme from localStorage
-    const savedTheme = localStorage.getItem('selectedTheme');
-    console.log('Theme from localStorage:', savedTheme);
-    
-    // Use the theme from localStorage if it exists and is valid, otherwise use default
-    let themeToApply = savedTheme;
-    
-    // Validate the theme
-    if (!themeToApply || !window.THEME_NAMES[themeToApply]) {
-      console.log('Local theme invalid or missing, using default');
-      themeToApply = "d4";
-    }
-    
-    console.log('Applying theme:', themeToApply);
-    
-    // Apply the theme immediately
-    applyTheme(themeToApply);
-    
-    // Initialize theme selector with the saved theme
-    initThemeSelector();
-    
-    // Apply user name from config if it exists
-    const userName = config.user_settings?.user_name || "";
-    applyUserName(userName);
-    
-    // Get file path from config
-    const filePath = config.file_settings?.file_path;
+    // Get file path from config or URL parameter
+    const filePath = customFilePath || config.file_settings?.file_path || COMMANDS_API_URL;
     if (!filePath) {
-      throw new Error("No file path specified in config");
+      throw new Error("No file path specified");
     }
 
     // Load and process data
     const data = await fetchDataWithTimeout(filePath);
     processData(data);
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('selectedTheme') || 'd4';
+    applyTheme(savedTheme);
+    
+    // Apply user name
+    const userName = config.user_settings?.user_name || "";
+    applyUserName(userName);
   } catch (error) {
-    console.error("Error loading data:", error);
-    showAlert("An unexpected error occurred. Please try again.", "error");
+    console.error('Error initializing app:', error);
+    showError(error.message || 'An error occurred while loading the application');
   } finally {
     hideLoading();
   }
   addEventListeners();
-};
-
-/**
- * Initializes the theme selector dropdown with all available themes
- * @function initThemeSelector
- * @description Creates options for each theme and sets up event listeners
- */
-const initThemeSelector = () => {
-  const themeSelect = document.getElementById("themeSelect");
-  if (!themeSelect) {
-    console.warn('Theme selector element not found');
-    return;
-  }
-
-  console.log('Initializing theme selector');
-
-  // Clear existing options first
-  themeSelect.innerHTML = '';
-
-  // Add theme options
-  Object.entries(window.THEME_NAMES).forEach(([value, name]) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = name.replace(/ \(Dark\)| \(Light\)/g, "");
-    themeSelect.appendChild(option);
-  });
-
-  // Set initial theme from localStorage
-  const savedTheme = localStorage.getItem('selectedTheme') || 'd4';
-  if (Object.keys(window.THEME_NAMES).includes(savedTheme)) {
-    themeSelect.value = savedTheme;
-  } else {
-    themeSelect.value = 'd4';
-  }
-
-  // Handle theme change
-  themeSelect.addEventListener("change", (e) => {
-    const selectedTheme = e.target.value;
-    console.log('Theme changed to:', selectedTheme);
-    applyTheme(selectedTheme);
-  });
 };
 
 initializeApp();
