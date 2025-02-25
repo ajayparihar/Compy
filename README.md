@@ -29,6 +29,29 @@ COMPY is a lightweight tool that helps you:
    ```
    Access COMPY at `http://localhost:3000` 🎉
 
+## 📝 Managing Your Data
+
+### CSV File Structure
+Your data is stored in `comm.csv` with a simple format:
+```csv
+command_or_text, description
+git reset --hard origin/main, Reset branch to remote main
+npm install, Install project dependencies
+##apikey123##, Development API key (sensitive data masked)
+```
+
+### Adding New Entries
+1. **Direct CSV Edit**:
+   - Open `comm.csv` in any text editor
+   - Add new lines: `command/text, description`
+   - Save the file
+
+2. **Best Practices**:
+   - Keep related commands together
+   - Use clear descriptions
+   - Mask sensitive data with `##` (example: `##password123##`)
+   - Keep a backup of your data
+
 ## 💡 Key Features
 
 1. **Smart Search**
@@ -41,11 +64,6 @@ COMPY is a lightweight tool that helps you:
    - Local storage only - your data stays with you
    - Automatic masking of sensitive data with `##`
    - Secure clipboard handling
-   Example:
-   ```csv
-   git reset --hard origin/main, Reset branch to remote main
-   ##apikey123##, Development API key
-   ```
 
 3. **Rich Customization**
    - 20+ built-in themes (10 Dark + 11 Light variants)
@@ -78,12 +96,18 @@ COMPY is a lightweight tool that helps you:
 2. **Data Not Showing?**
    - Verify `comm.csv` exists and is formatted correctly
    - Check file path in `user_config.json`
+   - Ensure each line follows the format: `command/text, description`
+
+3. **Search Not Working?**
+   - Use `/` key to focus search
+   - Check if your search term matches any command or description
+   - Clear search with `Esc` key
 
 Need more help? Check the [Issues](https://github.com/ajayparihar/compy/issues) section.
 
 ---
 
 <div align="center">
-  <p>Made with ❤️ by the Ajay Singh</p>
+  <p>Made with ❤️ by Ajay Singh</p>
   <p>© 2024 COMPY | MIT License</p>
 </div>
