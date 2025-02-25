@@ -21,10 +21,15 @@
   --bg: #121212; /* Background color */
   --text: #f0f0f0; /* Primary text color */
   --primary: #4a90e2; /* Primary accent color */
+  --primary-rgb: 74, 144, 226; /* Primary accent color in RGB */
   --error: #ff4d4d; /* Error/alert color */
+  --error-rgb: 255, 77, 77; /* Error/alert color in RGB */
+  --success: #4CAF50; /* Success color */
+  --success-rgb: 76, 175, 80; /* Success color in RGB */
 
   /* Card Styling */
   --card-bg: #1e1e1e; /* Card background */
+  --card-bg-rgb: 30, 30, 30; /* Card background in RGB */
   --card-hover: #333; /* Card hover state */
 
   /* Input Styling */
@@ -42,13 +47,11 @@
   --transition-ease: ease;
   --header-height: 60px; /* Fixed header height */
   --search-height: 60px;
-  --content-padding: 2rem;
-  --max-content-width: 1400px;
+  --content-padding: 1rem;
+  --max-content-width: 1800px;
   --font-size-h1: 2rem;
   --gap-base: 1rem;
   --text-secondary: rgba(255, 255, 255, 0.7);
-  --card-bg-rgb: 30, 30, 30;
-  --error-rgb: 255, 77, 77;
 }
 
 /* For light themes */
@@ -110,6 +113,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -120,8 +131,10 @@ body {
   align-items: center;
   font-size: var(--font-base);
   line-height: 1.6;
-  padding: 0 var(--spacing);
+  padding: 0;
   transition: background-color var(--transition-duration) var(--transition-ease);
+  overflow-y: auto;
+  position: relative;
 }
 
 /* Hide content when loading */
@@ -261,16 +274,20 @@ main {
   margin-right: auto;
   height: auto; /* Remove fixed height */
   min-height: calc(100vh - var(--header-height)); /* Ensure it fills the viewport */
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 #data {
   width: 100%;
   max-width: var(--max-content-width);
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 0.5rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: calc(var(--gap-base) * 2);
+  box-sizing: border-box;
 }
 
 .data-item {
@@ -664,158 +681,13 @@ main {
 }
 
 /* Add subtle hover effect to toast */
-.toast {
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
+/* Toast hover styles are now handled in toast.css */
 
-.toast:hover {
-  transform: translateX(-50%) translateY(-10px) scale(1.05);
-}
-
-/* Improve data item visibility */
-.data-item {
-  background-color: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.data-item:hover {
-  background-color: var(--card-hover);
-  border-color: var(--primary);
-}
-
-/* Search Input */
-#searchInput {
-  width: 100%; /* Take full width of container */
-  padding: 0.75rem 2.5rem 0.75rem 1rem; /* Right padding for clear icon */
-  border: 1px solid rgba(var(--primary-rgb), 0.2);
-  border-radius: 8px;
-  background-color: var(--card-bg);
-  color: var(--text);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  will-change: transform, box-shadow;
-  outline: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-#searchInput:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
-    0 0 10px rgba(var(--primary-rgb), 0.2),
-    0 0 15px rgba(var(--primary-rgb), 0.1),
-    inset 0 0 2px rgba(var(--primary-rgb), 0.05);
-  outline: none;
-  background-color: var(--input-bg);
-}
-
-#searchInput:not(:focus):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.15);
-  border-color: var(--primary);
-}
-
-/* Clear Icon */
-.clear-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text);
-  background-color: transparent;
-  padding: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  transition: color 0.2s ease;
-  z-index: 2;
-}
-
-.clear-icon:hover {
-  color: var(--primary);
-}
-
-/* Show clear icon when search input is focused or has value */
-#searchInput:focus ~ .clear-icon,
-#searchInput:not(:placeholder-shown) ~ .clear-icon {
-  opacity: 1;
-}
-
-/* Add focus states for accessibility */
-*:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Add smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Add subtle animation to loading spinner */
-.spinner {
-  animation: spin 1s linear infinite;
-  will-change: transform;
-}
-
-/* Ensure max 2 items per row on larger screens */
-@media (min-width: 769px) and (max-width: 1200px) {
-  #data {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Adjust grid layout for larger screens */
-@media (min-width: 1201px) {
-  #data {
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  }
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  #data {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem; /* Maintain consistent gap */
-  }
-}
-
-@media (max-width: 480px) {
-  #data {
-    grid-template-columns: 1fr;
-    gap: 1rem; /* Maintain consistent gap */
-  }
-}
-
-/* Search Input Animation */
-@keyframes slideIn {
-  0% {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+/* Toast Notification */
+/* Toast styles are now handled in toast.css */
 
 /* Toast Animation */
-@keyframes toastIn {
-  0% {
-    transform: translateX(-50%) translateY(20px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
-}
+/* Toast animations are now handled in toast.css */
 
 /* General Performance Improvements */
 * {
@@ -886,7 +758,7 @@ body {
 main {
   margin-top: var(--header-height);
   padding: var(--content-padding);
-  width: 95%;
+  width: 100%;
   max-width: var(--max-content-width);
   margin-left: auto;
   margin-right: auto;
@@ -914,8 +786,9 @@ main {
 /* Custom scrollbar with active animation */
 ::-webkit-scrollbar {
   width: 16px;  /* Increased width */
-  position: absolute;
+  position: fixed;
   right: 0;
+  z-index: 1000;
 }
 
 ::-webkit-scrollbar-track {
@@ -1155,3 +1028,165 @@ html, body {
   height: 100%;
   overflow: auto;
 }
+
+/* Improve data item visibility */
+.data-item {
+  background-color: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.data-item:hover {
+  background-color: var(--card-hover);
+  border-color: var(--primary);
+}
+
+/* Search Input */
+#searchInput {
+  width: 100%; /* Take full width of container */
+  padding: 0.75rem 2.5rem 0.75rem 1rem; /* Right padding for clear icon */
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 8px;
+  background-color: var(--card-bg);
+  color: var(--text);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  will-change: transform, box-shadow;
+  outline: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#searchInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1),
+    0 0 10px rgba(var(--primary-rgb), 0.2),
+    0 0 15px rgba(var(--primary-rgb), 0.1),
+    inset 0 0 2px rgba(var(--primary-rgb), 0.05);
+  outline: none;
+  background-color: var(--input-bg);
+}
+
+#searchInput:not(:focus):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(var(--primary-rgb), 0.15);
+  border-color: var(--primary);
+}
+
+/* Clear Icon */
+.clear-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background-color: transparent;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.clear-icon:hover {
+  color: var(--primary);
+}
+
+/* Show clear icon when search input is focused or has value */
+#searchInput:focus ~ .clear-icon,
+#searchInput:not(:placeholder-shown) ~ .clear-icon {
+  opacity: 1;
+}
+
+/* Add focus states for accessibility */
+*:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Add smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Add subtle animation to loading spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+  will-change: transform;
+}
+
+/* Ensure max 2 items per row on larger screens */
+@media (min-width: 769px) and (max-width: 1200px) {
+  #data {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Adjust grid layout for larger screens */
+@media (min-width: 1201px) {
+  #data {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  #data {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem; /* Maintain consistent gap */
+  }
+}
+
+@media (max-width: 480px) {
+  #data {
+    grid-template-columns: 1fr;
+    gap: 1rem; /* Maintain consistent gap */
+  }
+}
+
+/* Search Input Animation */
+@keyframes slideIn {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Toast Notification */
+/* Toast styles are now handled in toast.css */
+
+/* Toast Animation */
+/* Toast animations are now handled in toast.css */
+
+/* General Performance Improvements */
+
+/* Ensure scrollbar is always at the rightmost edge */
+@media screen and (min-width: 320px) {
+  html {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100vw;
+  }
+  
+  body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  ::-webkit-scrollbar {
+    position: fixed;
+    right: 0;
+    z-index: 1000;
+  }
+}
+

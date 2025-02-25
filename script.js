@@ -70,14 +70,14 @@ const hideLoading = () => {
  * Displays a toast notification to the user
  * @function showAlert
  * @param {string} message - The message to display
- * @param {string} type - The type of alert ('success' or 'error')
+ * @param {string} type - The type of alert ('primary', 'success', or 'error')
  */
 const showAlert = (message, type) => {
   const toast = DOM_ELEMENTS.toast;
   if (!toast) return;
 
   // Remove existing classes
-  toast.classList.remove("show", "hide", "success", "error");
+  toast.classList.remove("show", "hide", "success", "error", "primary");
 
   // Add the appropriate class based on the type
   toast.classList.add(type);
@@ -260,6 +260,9 @@ const copyToClipboard = (text, element, event) => {
       setTimeout(() => {
         element.classList.remove("copied");
       }, 600);
+      
+      // Show toast notification when copy is successful
+      showAlert("Copied to clipboard", "primary");
     })
     .catch((error) => {
       console.error("Failed to copy:", error);

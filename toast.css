@@ -1,0 +1,233 @@
+/* 
+ * Toast Notification Styles
+ * Author: Ajay Singh
+ * Version: 1.0
+ * Date: 2024
+ */
+
+/* Toast Notification - Base Styles */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff; /* White text for better contrast */
+  padding: 12px 24px;
+  border-radius: 8px;
+  z-index: 1000;
+  font-size: 1rem;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  min-width: 250px;
+  max-width: 80%;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Primary toast styling (default) */
+.toast.primary {
+  background-color: var(--primary);
+  border-left: 4px solid var(--primary);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Light theme toast adjustments */
+:root.l1 .toast,
+:root.l2 .toast,
+:root.l3 .toast,
+:root.l4 .toast,
+:root.l5 .toast,
+:root.l6 .toast,
+:root.l7 .toast,
+:root.l8 .toast,
+:root.l9 .toast,
+:root.l10 .toast,
+:root.l11 .toast {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Dark theme toast adjustments */
+:root.d1 .toast,
+:root.d2 .toast,
+:root.d3 .toast,
+:root.d4 .toast,
+:root.d5 .toast,
+:root.d6 .toast,
+:root.d7 .toast,
+:root.d8 .toast,
+:root.d9 .toast,
+:root.d10 .toast {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Primary toast theme adjustments */
+:root.l1 .toast.primary,
+:root.l2 .toast.primary,
+:root.l3 .toast.primary,
+:root.l4 .toast.primary,
+:root.l5 .toast.primary,
+:root.l6 .toast.primary,
+:root.l7 .toast.primary,
+:root.l8 .toast.primary,
+:root.l9 .toast.primary,
+:root.l10 .toast.primary,
+:root.l11 .toast.primary {
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+}
+
+:root.d1 .toast.primary,
+:root.d2 .toast.primary,
+:root.d3 .toast.primary,
+:root.d4 .toast.primary,
+:root.d5 .toast.primary,
+:root.d6 .toast.primary,
+:root.d7 .toast.primary,
+:root.d8 .toast.primary,
+:root.d9 .toast.primary,
+:root.d10 .toast.primary {
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  animation: toastPopup 0.3s ease forwards;
+}
+
+.toast.hide {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(20px);
+}
+
+/* Success toast styling */
+.toast.success {
+  background-color: var(--success);
+  border-left: 4px solid var(--success);
+  box-shadow: 0 4px 12px rgba(var(--success-rgb), 0.3);
+}
+
+/* Success toast theme adjustments */
+:root.l1 .toast.success,
+:root.l2 .toast.success,
+:root.l3 .toast.success,
+:root.l4 .toast.success,
+:root.l5 .toast.success,
+:root.l6 .toast.success,
+:root.l7 .toast.success,
+:root.l8 .toast.success,
+:root.l9 .toast.success,
+:root.l10 .toast.success,
+:root.l11 .toast.success {
+  box-shadow: 0 4px 12px rgba(var(--success-rgb), 0.2);
+}
+
+:root.d1 .toast.success,
+:root.d2 .toast.success,
+:root.d3 .toast.success,
+:root.d4 .toast.success,
+:root.d5 .toast.success,
+:root.d6 .toast.success,
+:root.d7 .toast.success,
+:root.d8 .toast.success,
+:root.d9 .toast.success,
+:root.d10 .toast.success {
+  box-shadow: 0 4px 12px rgba(var(--success-rgb), 0.3);
+}
+
+/* Error toast styling */
+.toast.error {
+  background-color: var(--error);
+  border-left: 4px solid var(--error);
+  box-shadow: 0 4px 12px rgba(var(--error-rgb), 0.3);
+}
+
+/* Error toast theme adjustments */
+:root.l1 .toast.error,
+:root.l2 .toast.error,
+:root.l3 .toast.error,
+:root.l4 .toast.error,
+:root.l5 .toast.error,
+:root.l6 .toast.error,
+:root.l7 .toast.error,
+:root.l8 .toast.error,
+:root.l9 .toast.error,
+:root.l10 .toast.error,
+:root.l11 .toast.error {
+  box-shadow: 0 4px 12px rgba(var(--error-rgb), 0.2);
+}
+
+:root.d1 .toast.error,
+:root.d2 .toast.error,
+:root.d3 .toast.error,
+:root.d4 .toast.error,
+:root.d5 .toast.error,
+:root.d6 .toast.error,
+:root.d7 .toast.error,
+:root.d8 .toast.error,
+:root.d9 .toast.error,
+:root.d10 .toast.error {
+  box-shadow: 0 4px 12px rgba(var(--error-rgb), 0.3);
+}
+
+/* Hover effects */
+.toast.primary:hover {
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow: 0 8px 16px rgba(var(--primary-rgb), 0.4);
+  filter: brightness(1.1);
+}
+
+.toast.success:hover {
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow: 0 8px 16px rgba(var(--success-rgb), 0.4);
+  filter: brightness(1.1);
+}
+
+.toast.error:hover {
+  transform: translateX(-50%) translateY(-5px);
+  box-shadow: 0 8px 16px rgba(var(--error-rgb), 0.4);
+  filter: brightness(1.1);
+}
+
+/* Light theme toast hover adjustments */
+:root.l1 .toast.primary:hover,
+:root.l2 .toast.primary:hover,
+:root.l3 .toast.primary:hover,
+:root.l4 .toast.primary:hover,
+:root.l5 .toast.primary:hover,
+:root.l6 .toast.primary:hover,
+:root.l7 .toast.primary:hover,
+:root.l8 .toast.primary:hover,
+:root.l9 .toast.primary:hover,
+:root.l10 .toast.primary:hover,
+:root.l11 .toast.primary:hover {
+  box-shadow: 0 8px 16px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Toast Animation */
+@keyframes toastPopup {
+  0% {
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Mobile adjustments for toast */
+@media (max-width: 576px) {
+  .toast {
+    width: 90%;
+    max-width: 300px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    bottom: 16px;
+  }
+} 
