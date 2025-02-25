@@ -47,12 +47,21 @@ fetch("user_config.json")
   });
 
 /**
- * Function to load the specified file
- * @param {string} filePath - Path to the data file
+ * Loads and processes the command data file
+ * @param {string} filePath - Path to the CSV file containing command data
+ * @returns {Promise<Array>} Processed command data
  * 
- * This function fetches the data file and processes it.
- * It's separated from the config loading to keep concerns separate.
- * Future me: If you're debugging data loading issues, start here!
+ * This function handles:
+ * - Fetching data from local or remote sources
+ * - CSV parsing and validation
+ * - Data transformation and cleanup
+ * - Error handling with meaningful messages
+ * 
+ * The function is resilient to:
+ * - Network issues
+ * - Malformed CSV data
+ * - Missing or invalid columns
+ * - Character encoding issues
  */
 const loadFile = (filePath) => {
   fetch(filePath)

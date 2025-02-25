@@ -52,6 +52,15 @@ app.use(express.static(path.join(__dirname)));  // Serve files from the root dir
  * Error handling is important here - we don't want to crash the server
  * just because someone's theme preference couldn't be saved.
  */
+app.put("/user_config.json", (req, res) => {
+  try {
+    fs.writeFileSync("user_config.json", JSON.stringify(req.body, null, 2));
+    res.send("Configuration updated successfully");
+  } catch (error) {
+    console.error("Error updating configuration:", error);
+    res.status(500).send("Error updating configuration");
+  }
+});
 
 /**
  * Start the server and listen for incoming connections

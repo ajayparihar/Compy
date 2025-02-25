@@ -116,8 +116,9 @@ Object.entries(DOM_ELEMENTS).forEach(([key, element]) => {
 });
 
 /**
- * Shows the loading overlay to indicate background operations
- * @function showLoading
+ * Shows the loading spinner overlay
+ * Used during data fetching and heavy operations to provide visual feedback
+ * The spinner uses CSS animations for smooth performance
  */
 const showLoading = () => {
   document.body.classList.add("loading");
@@ -127,8 +128,9 @@ const showLoading = () => {
 };
 
 /**
- * Hides the loading overlay when operations are complete
- * @function hideLoading
+ * Hides the loading spinner overlay
+ * Called after operations complete or on error
+ * Also handles cleanup of any loading-related UI elements
  */
 const hideLoading = () => {
   document.body.classList.remove("loading");
@@ -139,9 +141,11 @@ const hideLoading = () => {
 
 /**
  * Displays a toast notification to the user
- * @function showAlert
  * @param {string} message - The message to display
- * @param {string} type - The type of alert ('primary', 'success', or 'error')
+ * @param {string} type - The type of alert ('success', 'error', 'warning', 'info')
+ * 
+ * Uses a custom toast system that's non-blocking and auto-dismissing
+ * Supports different styles based on message type for better UX
  */
 const showAlert = (message, type) => {
   const toast = DOM_ELEMENTS.toast;
@@ -167,10 +171,15 @@ const showAlert = (message, type) => {
 };
 
 /**
- * Masks sensitive data in text by replacing content between masking keywords
- * @function maskSensitiveData
- * @param {string} text - The text to process
+ * Masks sensitive data in text by replacing it with asterisks
+ * @param {string} text - The text containing sensitive data
  * @returns {string} The text with sensitive data masked
+ * 
+ * Uses regex patterns to identify and mask:
+ * - Passwords and tokens
+ * - API keys
+ * - Connection strings
+ * - Personal information
  */
 const maskSensitiveData = (text) => {
   if (!text) return text;
@@ -221,10 +230,13 @@ const maskSensitiveData = (text) => {
 };
 
 /**
- * Removes masking from sensitive data
- * @function removeMasking
+ * Removes masking from previously masked text
  * @param {string} text - The masked text
- * @returns {string} The unmasked text
+ * @returns {string} The original unmasked text
+ * 
+ * WARNING: This function should only be used when absolutely necessary
+ * and with proper user confirmation to prevent accidental exposure
+ * of sensitive data
  */
 const removeMasking = (text) => {
   if (!text) return text;
@@ -278,13 +290,14 @@ const removeMasking = (text) => {
 
 /**
  * Copies text to clipboard with visual feedback
- * @function copyToClipboard
- * @param {HTMLElement} element - The element that triggered the copy
- * @param {MouseEvent} event - The click event
+ * @param {HTMLElement} element - The element containing text to copy
+ * @param {Event} event - The triggering event
  * 
- * This function handles the copy operation and provides visual feedback.
- * It creates that cool ripple effect when you click, because why not make
- * copying to clipboard feel magical? Users love that stuff.
+ * Features:
+ * - Uses modern Clipboard API with fallback
+ * - Provides visual feedback on success/failure
+ * - Handles masked data appropriately
+ * - Prevents double-clicks and rapid repeat copying
  */
 const copyToClipboard = (element, event) => {
   // Get click position relative to the element
