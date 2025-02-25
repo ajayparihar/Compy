@@ -107,19 +107,49 @@ const showAlert = (message, type) => {
 const maskSensitiveData = (text) => {
   if (!text) return text;
   
-  // Escape special characters in the masking keyword
-  const escapedKeyword = config.passwordMaskingKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  
-  // Create regex that matches content between keywords, handling special characters
-  const regex = new RegExp(
-    `${escapedKeyword}([^]*?)${escapedKeyword}`,
-    'g'
-  );
-  
-  return text.replace(
-    regex,
-    `${config.passwordMaskingKeyword}SensitiveData${config.passwordMaskingKeyword}`
-  );
+  try {
+    // Don't use regex for this - it's too error-prone with special characters
+    // Instead, manually find and replace the sensitive sections
+    const keyword = config.passwordMaskingKeyword;
+    let result = '';
+    let currentPos = 0;
+    
+    // Find the first occurrence of the keyword
+    let startPos = text.indexOf(keyword, currentPos);
+    
+    while (startPos !== -1) {
+      // Add the text before the keyword
+      result += text.substring(currentPos, startPos);
+      
+      // Find the ending keyword
+      const endPos = text.indexOf(keyword, startPos + keyword.length);
+      
+      if (endPos === -1) {
+        // No ending keyword found, just add the rest of the text
+        result += text.substring(startPos);
+        break;
+      }
+      
+      // Add the masked version
+      result += `${keyword}SensitiveData${keyword}`;
+      
+      // Move past the ending keyword
+      currentPos = endPos + keyword.length;
+      
+      // Find the next occurrence
+      startPos = text.indexOf(keyword, currentPos);
+    }
+    
+    // Add any remaining text
+    if (currentPos < text.length) {
+      result += text.substring(currentPos);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in maskSensitiveData:", error);
+    return text; // Return original text if there's an error
+  }
 };
 
 /**
@@ -182,18 +212,40 @@ const createDataElement = (item, description) => {
   const dataElement = document.createElement("div");
   dataElement.classList.add("data-item");
 
+  // Store original values as data attributes for later reference
+  // This is crucial for search functionality and clipboard operations
+  // Base64 encode the data to preserve special characters
+  dataElement.dataset.originalItem = btoa(unescape(encodeURIComponent(item)));
+  dataElement.dataset.originalDescription = btoa(unescape(encodeURIComponent(description || "undefined")));
+  
   // Add click handler to the entire item
   dataElement.addEventListener("click", (event) => {
-    copyToClipboard(item, dataElement, event);
+    copyToClipboard(dataElement, event);
   });
 
   const contentWrapper = document.createElement("div");
   contentWrapper.classList.add("data-item-content");
 
+  // Mask sensitive data
   const maskedItem = maskSensitiveData(item);
-  const maskedDescription =
+  const maskedDescription = 
     description === "undefined" ? "undefined" : maskSensitiveData(description);
-  contentWrapper.innerHTML = `<p><strong class="command-text">${maskedItem}</strong> ${maskedDescription}</p>`;
+  
+  // Create the content using DOM methods instead of innerHTML for better security
+  const paragraph = document.createElement('p');
+  
+  // Create and append the command text element
+  const strongElement = document.createElement('strong');
+  strongElement.className = "command-text";
+  strongElement.textContent = maskedItem; // Use textContent instead of innerHTML
+  paragraph.appendChild(strongElement);
+  
+  // Add a space and the description as text
+  paragraph.appendChild(document.createTextNode(' '));
+  paragraph.appendChild(document.createTextNode(maskedDescription));
+  
+  // Add the paragraph to the content wrapper
+  contentWrapper.appendChild(paragraph);
 
   // Add copy icon
   const copyIcon = document.createElement("div");
@@ -205,15 +257,8 @@ const createDataElement = (item, description) => {
   `;
 
   // Add all the elements to the data item container
-  // The order matters here - content first, then copy icon
   dataElement.appendChild(contentWrapper);
   dataElement.appendChild(copyIcon);
-  
-  // Store original values as data attributes for later reference
-  // This is crucial for search functionality to work properly
-  dataElement.dataset.originalItem = item;
-  dataElement.dataset.originalDescription = description;
-  dataElement.dataset.originalHTML = contentWrapper.innerHTML;
 
   return dataElement;
 };
@@ -231,25 +276,23 @@ const createDataElement = (item, description) => {
 const removeMasking = (text) => {
   if (!text) return text;
   
-  // Escape special characters in the masking keyword
-  // Because regex and special characters are like oil and water
-  const escapedKeyword = config.passwordMaskingKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  
-  // Create regex that matches content between keywords, handling special characters
-  // This is the magic that finds our masked content
-  const regex = new RegExp(
-    `${escapedKeyword}([^]*?)${escapedKeyword}`,
-    'g'
-  );
-  
-  // Replace the masked content with just the content itself
-  return text.replace(regex, '$1');
+  try {
+    // Use the same string-based approach as maskSensitiveData
+    const keyword = config.passwordMaskingKeyword;
+    const placeholder = `${keyword}SensitiveData${keyword}`;
+    
+    // Simply return the original text since we're using dataset.originalItem
+    // in the copyToClipboard function
+    return text;
+  } catch (error) {
+    console.error("Error in removeMasking:", error);
+    return text;
+  }
 };
 
 /**
  * Copies text to clipboard with visual feedback
  * @function copyToClipboard
- * @param {string} text - The text to copy
  * @param {HTMLElement} element - The element that triggered the copy
  * @param {MouseEvent} event - The click event
  * 
@@ -257,9 +300,7 @@ const removeMasking = (text) => {
  * It creates that cool ripple effect when you click, because why not make
  * copying to clipboard feel magical? Users love that stuff.
  */
-const copyToClipboard = (text, element, event) => {
-  if (!text) return;
-
+const copyToClipboard = (element, event) => {
   // Get click position relative to the element
   // This is for the ripple effect to start from where the user clicked
   const rect = element.getBoundingClientRect();
@@ -271,69 +312,35 @@ const copyToClipboard = (text, element, event) => {
   element.style.setProperty("--mouse-x", `${x}px`);
   element.style.setProperty("--mouse-y", `${y}px`);
 
-  // Remove any masking before copying to clipboard
-  // We want the actual text, not the masked version
-  const cleanedText = removeMasking(text);
-  navigator.clipboard
-    .writeText(cleanedText)
-    .then(() => {
-      // Add the copied class to trigger the ripple animation
-      // This is what makes the magic happen visually
-      element.classList.add("copied");
-      // Remove the class after the animation ends
-      // Otherwise it would stay in the "copied" state forever
-      setTimeout(() => {
-        element.classList.remove("copied");
-      }, 600);
-      
-      // Show toast notification when copy is successful
-      // Because users need that dopamine hit of confirmation
-      showAlert("Copied to clipboard", "primary");
-    })
-    .catch((error) => {
-      console.error("Failed to copy:", error);
-      showAlert("Failed to copy to clipboard. Please try again.", "error");
-    });
-};
-
-/**
- * Highlights search terms in text while preserving sensitive data masking
- * @function highlightText
- * @param {string} text - The text to highlight
- * @param {string} searchTerm - The term to highlight
- * @returns {string} HTML string with highlighted terms
- * 
- * This function is like a highlighter pen that knows to avoid highlighting
- * over sensitive information. It's smarter than your average highlighter.
- * Future me: This was tricky to get right, so think twice before changing it.
- */
-const highlightText = (text, searchTerm) => {
-  if (!searchTerm) return text;
-
-  // Mask sensitive data first
-  // We need to protect the secret stuff before highlighting
-  const maskedText = maskSensitiveData(text);
-
-  // Create regex pattern for highlighting
-  // Escape special characters to avoid regex issues
-  const regex = new RegExp(
-    `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
-    "gi"
-  );
-
-  // Split text into parts, only highlight non-sensitive parts
-  // This ensures we don't highlight within sensitive data
-  return maskedText
-    .split(/(\[SENSITIVE\])/)
-    .map((part) => {
-      // Don't highlight the [SENSITIVE] placeholder
-      if (part === "[SENSITIVE]") {
-        return part;
-      }
-      // Highlight matches in non-sensitive parts
-      return part.replace(regex, '<span class="highlight">$1</span>');
-    })
-    .join("");
+  try {
+    // Get the original text directly from the dataset and decode it
+    const encodedText = element.dataset.originalItem;
+    const originalText = decodeURIComponent(escape(atob(encodedText)));
+    
+    navigator.clipboard
+      .writeText(originalText)
+      .then(() => {
+        // Add the copied class to trigger the ripple animation
+        // This is what makes the magic happen visually
+        element.classList.add("copied");
+        // Remove the class after the animation ends
+        // Otherwise it would stay in the "copied" state forever
+        setTimeout(() => {
+          element.classList.remove("copied");
+        }, 600);
+        
+        // Show toast notification when copy is successful
+        // Because users need that dopamine hit of confirmation
+        showAlert("Copied to clipboard", "primary");
+      })
+      .catch((error) => {
+        console.error("Failed to copy:", error);
+        showAlert("Failed to copy to clipboard. Please try again.", "error");
+      });
+  } catch (error) {
+    console.error("Error decoding text:", error);
+    showAlert("Failed to copy to clipboard. Please try again.", "error");
+  }
 };
 
 /**
@@ -341,32 +348,13 @@ const highlightText = (text, searchTerm) => {
  * @function performSearch
  */
 const performSearch = () => {
-  const searchTerm = searchInput.value.trim().toLowerCase();
-  const dataItems = document.querySelectorAll(".data-item");
-
-  dataItems.forEach((item) => {
-    const command = item.dataset.command.toLowerCase();
-    const description = item.dataset.description.toLowerCase();
-
-    // Highlight matches in non-sensitive data
-    const commandHTML = highlightText(item.dataset.command, searchTerm);
-    const descriptionHTML = highlightText(item.dataset.description, searchTerm);
-
-    // Update content
-    item.querySelector("strong").innerHTML = commandHTML;
-    item.querySelector("p").innerHTML = descriptionHTML;
-
-    // Show/hide based on match (excluding sensitive data)
-    const visibleText = `${command} ${description}`.replace(
-      /\[SENSITIVE\]/g,
-      ""
-    );
-    if (visibleText.includes(searchTerm)) {
-      item.style.display = "block";
-    } else {
-      item.style.display = "none";
-    }
-  });
+  const searchTerm = DOM_ELEMENTS.searchInput.value.trim().toLowerCase();
+  if (!searchTerm) {
+    filterData("");
+    return;
+  }
+  
+  filterData(searchTerm);
 };
 
 // Update the filterData function
@@ -375,45 +363,120 @@ const filterData = (query) => {
   try {
     const searchValue = query.trim().toLowerCase();
 
+    // Helper function to decode base64 data
+    const decodeData = (encodedData) => {
+      try {
+        return decodeURIComponent(escape(atob(encodedData)));
+      } catch (error) {
+        console.error("Error decoding data:", error);
+        return "";
+      }
+    };
+
     // Don't highlight if search is empty
     if (!searchValue) {
       document.querySelectorAll(".data-item").forEach((item) => {
         item.style.display = "block";
-        // Restore original content while preserving event listeners
-        item.querySelector(".data-item-content").innerHTML =
-          item.dataset.originalHTML;
+        
+        // Get original values and decode them
+        const originalItem = decodeData(item.dataset.originalItem);
+        const originalDescription = decodeData(item.dataset.originalDescription);
+        
+        // Mask sensitive data
+        const maskedItem = maskSensitiveData(originalItem);
+        const maskedDescription = maskSensitiveData(originalDescription);
+        
+        // Update content using DOM methods
+        const contentWrapper = item.querySelector(".data-item-content");
+        contentWrapper.innerHTML = ''; // Clear existing content
+        
+        const paragraph = document.createElement('p');
+        const strongElement = document.createElement('strong');
+        strongElement.className = "command-text";
+        strongElement.textContent = maskedItem; // Use textContent instead of innerHTML
+        
+        paragraph.appendChild(strongElement);
+        paragraph.appendChild(document.createTextNode(' '));
+        paragraph.appendChild(document.createTextNode(maskedDescription));
+        contentWrapper.appendChild(paragraph);
       });
       return;
     }
 
     const items = document.querySelectorAll(".data-item");
     items.forEach((item) => {
-      const originalItem = item.dataset.originalItem.toLowerCase();
-      const originalDescription =
-        item.dataset.originalDescription.toLowerCase();
+      // Get original values and decode them
+      const originalItem = decodeData(item.dataset.originalItem).toLowerCase();
+      const originalDescription = decodeData(item.dataset.originalDescription).toLowerCase();
+      
       const matchesSearch =
         originalItem.includes(searchValue) ||
         originalDescription.includes(searchValue);
 
       if (matchesSearch) {
         item.style.display = "block";
-        // Update only the content, not the entire item
-        const content = item.querySelector(".data-item-content");
-        if (content) {
-          const highlightedItem = highlightText(
-            item.dataset.originalItem,
-            searchValue
-          );
-          const highlightedDescription = highlightText(
-            item.dataset.originalDescription,
-            searchValue
-          );
-          content.innerHTML = `<p><strong class="command-text">${highlightedItem}</strong> ${highlightedDescription}</p>`;
+        
+        // Get original values and decode them (non-lowercase version for display)
+        const displayItem = decodeData(item.dataset.originalItem);
+        const displayDescription = decodeData(item.dataset.originalDescription);
+        
+        // Mask sensitive data
+        const maskedItem = maskSensitiveData(displayItem);
+        const maskedDescription = maskSensitiveData(displayDescription);
+        
+        // Update content using DOM methods
+        const contentWrapper = item.querySelector(".data-item-content");
+        contentWrapper.innerHTML = ''; // Clear existing content
+        
+        const paragraph = document.createElement('p');
+        const strongElement = document.createElement('strong');
+        strongElement.className = "command-text";
+        
+        // Simple highlighting by splitting and joining with highlight spans
+        if (maskedItem.toLowerCase().includes(searchValue)) {
+          const parts = maskedItem.split(new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi'));
+          parts.forEach(part => {
+            if (part.toLowerCase() === searchValue) {
+              const highlight = document.createElement('span');
+              highlight.className = 'highlight';
+              highlight.textContent = part;
+              strongElement.appendChild(highlight);
+            } else if (part) {
+              strongElement.appendChild(document.createTextNode(part));
+            }
+          });
+        } else {
+          strongElement.textContent = maskedItem;
         }
+        
+        paragraph.appendChild(strongElement);
+        paragraph.appendChild(document.createTextNode(' '));
+        
+        // Highlight description if it contains the search term
+        if (maskedDescription.toLowerCase().includes(searchValue)) {
+          const parts = maskedDescription.split(new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi'));
+          parts.forEach(part => {
+            if (part.toLowerCase() === searchValue) {
+              const highlight = document.createElement('span');
+              highlight.className = 'highlight';
+              highlight.textContent = part;
+              paragraph.appendChild(highlight);
+            } else if (part) {
+              paragraph.appendChild(document.createTextNode(part));
+            }
+          });
+        } else {
+          paragraph.appendChild(document.createTextNode(maskedDescription));
+        }
+        
+        contentWrapper.appendChild(paragraph);
       } else {
         item.style.display = "none";
       }
     });
+  } catch (error) {
+    console.error("Error filtering data:", error);
+    showAlert("An error occurred while filtering data.", "error");
   } finally {
     hideLoading();
   }
