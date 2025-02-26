@@ -11,7 +11,7 @@
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--card-bg);
+  background-color: rgba(var(--card-bg-rgb), 0.85);
   color: var(--text);
   padding: 1rem 2rem;
   border-radius: var(--border-radius);
@@ -25,22 +25,23 @@
   text-align: center;
   min-width: 200px;
   max-width: 400px;
+  backdrop-filter: blur(8px);
 }
 
 /* Toast Types */
 .toast-notification.primary {
   border-color: rgba(var(--primary-rgb), 0.4);
-  background-color: rgba(var(--primary-rgb), 0.1);
+  background-color: rgba(var(--primary-rgb), 0.08);
 }
 
 .toast-notification.success {
   border-color: rgba(var(--success-rgb), 0.4);
-  background-color: rgba(var(--success-rgb), 0.1);
+  background-color: rgba(var(--success-rgb), 0.08);
 }
 
 .toast-notification.error {
   border-color: rgba(var(--error-rgb), 0.4);
-  background-color: rgba(var(--error-rgb), 0.1);
+  background-color: rgba(var(--error-rgb), 0.08);
 }
 
 /* Toast States */
