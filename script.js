@@ -381,11 +381,13 @@ const filterData = (query) => {
     // Hide all items first if there's a search term
     if (searchValue) {
       items.forEach(item => {
-        item.style.display = "none";
+        if (item) item.style.display = "none";
       });
     }
 
     items.forEach((item) => {
+      if (!item) return; // Skip if item is null
+
       // Get original values and decode them
       const originalItem = decodeData(item.dataset.originalItem).toLowerCase();
       const originalDescription = decodeData(item.dataset.originalDescription).toLowerCase();
@@ -411,67 +413,85 @@ const filterData = (query) => {
         
         // Update content using DOM methods
         const contentWrapper = item.querySelector(".data-item-content");
-        contentWrapper.innerHTML = ''; // Clear existing content
-        
-        const paragraph = document.createElement('p');
-        const strongElement = document.createElement('strong');
-        strongElement.className = "command-text";
-        
-        // Simple highlighting by splitting and joining with highlight spans
-        if (maskedItem.toLowerCase().includes(searchValue)) {
-          const parts = maskedItem.split(new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi'));
-          parts.forEach(part => {
-            if (part.toLowerCase() === searchValue) {
-              const highlight = document.createElement('span');
-              highlight.className = 'highlight';
-              highlight.textContent = part;
-              strongElement.appendChild(highlight);
-            } else if (part) {
-              strongElement.appendChild(document.createTextNode(part));
-            }
-          });
-        } else {
-          strongElement.textContent = maskedItem;
+        if (!contentWrapper) {
+          console.warn('Content wrapper not found for item:', item);
+          return;
         }
-        
-        paragraph.appendChild(strongElement);
-        paragraph.appendChild(document.createTextNode(' '));
-        
-        // Highlight description if it contains the search term
-        if (maskedDescription.toLowerCase().includes(searchValue)) {
-          const parts = maskedDescription.split(new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi'));
-          parts.forEach(part => {
-            if (part.toLowerCase() === searchValue) {
-              const highlight = document.createElement('span');
-              highlight.className = 'highlight';
-              highlight.textContent = part;
-              paragraph.appendChild(highlight);
-            } else if (part) {
-              paragraph.appendChild(document.createTextNode(part));
-            }
-          });
-        } else {
-          paragraph.appendChild(document.createTextNode(maskedDescription));
+
+        try {
+          contentWrapper.innerHTML = ''; // Clear existing content
+          
+          const paragraph = document.createElement('p');
+          const strongElement = document.createElement('strong');
+          strongElement.className = "command-text";
+          
+          // Simple highlighting by splitting and joining with highlight spans
+          if (maskedItem.toLowerCase().includes(searchValue)) {
+            const parts = maskedItem.split(new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi'));
+            parts.forEach(part => {
+              if (part.toLowerCase() === searchValue) {
+                const highlight = document.createElement('span');
+                highlight.className = 'highlight';
+                highlight.textContent = part;
+                strongElement.appendChild(highlight);
+              } else if (part) {
+                strongElement.appendChild(document.createTextNode(part));
+              }
+            });
+          } else {
+            strongElement.textContent = maskedItem;
+          }
+          
+          paragraph.appendChild(strongElement);
+          paragraph.appendChild(document.createTextNode(' '));
+          
+          // Highlight description if it contains the search term
+          if (maskedDescription.toLowerCase().includes(searchValue)) {
+            const parts = maskedDescription.split(new RegExp(`(${searchValue.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, 'gi'));
+            parts.forEach(part => {
+              if (part.toLowerCase() === searchValue) {
+                const highlight = document.createElement('span');
+                highlight.className = 'highlight';
+                highlight.textContent = part;
+                paragraph.appendChild(highlight);
+              } else if (part) {
+                paragraph.appendChild(document.createTextNode(part));
+              }
+            });
+          } else {
+            paragraph.appendChild(document.createTextNode(maskedDescription));
+          }
+          
+          contentWrapper.appendChild(paragraph);
+        } catch (innerError) {
+          console.error('Error updating item content:', innerError);
         }
-        
-        contentWrapper.appendChild(paragraph);
       } else if (matchesSearch) {
         // Reset content to original state if no search term
         const contentWrapper = item.querySelector(".data-item-content");
-        contentWrapper.innerHTML = ''; // Clear existing content
-        
-        const paragraph = document.createElement('p');
-        const strongElement = document.createElement('strong');
-        strongElement.className = "command-text";
-        strongElement.textContent = maskSensitiveData(decodeData(item.dataset.originalItem));
-        
-        paragraph.appendChild(strongElement);
-        paragraph.appendChild(document.createTextNode(' '));
-        paragraph.appendChild(document.createTextNode(
-          maskSensitiveData(decodeData(item.dataset.originalDescription))
-        ));
-        
-        contentWrapper.appendChild(paragraph);
+        if (!contentWrapper) {
+          console.warn('Content wrapper not found for item:', item);
+          return;
+        }
+
+        try {
+          contentWrapper.innerHTML = ''; // Clear existing content
+          
+          const paragraph = document.createElement('p');
+          const strongElement = document.createElement('strong');
+          strongElement.className = "command-text";
+          strongElement.textContent = maskSensitiveData(decodeData(item.dataset.originalItem));
+          
+          paragraph.appendChild(strongElement);
+          paragraph.appendChild(document.createTextNode(' '));
+          paragraph.appendChild(document.createTextNode(
+            maskSensitiveData(decodeData(item.dataset.originalDescription))
+          ));
+          
+          contentWrapper.appendChild(paragraph);
+        } catch (innerError) {
+          console.error('Error resetting item content:', innerError);
+        }
       }
     });
 
@@ -487,7 +507,9 @@ const filterData = (query) => {
         const message = document.createElement('div');
         message.className = 'no-results-message';
         message.textContent = 'No matching commands found. Try adjusting your search terms.';
-        DOM_ELEMENTS.dataDiv.appendChild(message);
+        if (DOM_ELEMENTS.dataDiv) {
+          DOM_ELEMENTS.dataDiv.appendChild(message);
+        }
       }
     } else if (noResultsMessage) {
       noResultsMessage.remove();
@@ -731,16 +753,24 @@ window.applyUserName = (userName) => {
  * @throws {Error} If the fetch fails or times out
  */
 const fetchDataWithTimeout = async (url, timeout = 10000) => {
+  console.log('Attempting to fetch data from:', url);
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    // For test data, use a simulated response
-    if (url.includes('test_data.csv')) {
+    // For local files, use a direct fetch without timeout
+    if (url.startsWith('comm.csv') || url.includes('/comm.csv')) {
       clearTimeout(timeoutId);
-      return 'TEST_COMMAND,Test Description\nTEST_COMMAND_2,Another Test Description';
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.text();
+      console.log('Data fetched successfully, first 100 chars:', data.substring(0, 100));
+      return data;
     }
 
+    // For external URLs, use timeout
     const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeoutId);
 
@@ -748,9 +778,12 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.text();
+    const data = await response.text();
+    console.log('Data fetched successfully, first 100 chars:', data.substring(0, 100));
+    return data;
   } catch (error) {
     clearTimeout(timeoutId);
+    console.error('Error fetching data:', error);
     if (error.name === 'AbortError') {
       throw new Error('Request timed out');
     }
@@ -759,115 +792,72 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
 };
 
 /**
- * Processes the fetched data from CSV/Excel format
- * @function processData
- * @param {string} data - The raw data to process
- * @returns {Array<Object>} Array of command objects
+ * Sanitizes and validates input data
+ * @param {string} text - The input text to sanitize
+ * @returns {string} Sanitized text
  */
-const processData = (data) => {
+const sanitizeInput = (text) => {
+  if (!text) return '';
+  return text.replace(/[<>]/g, ''); // Basic XSS prevention
+};
+
+/**
+ * Processes command data and handles edge cases
+ * @param {Object} data - The command data object
+ * @returns {Object} Processed data with defaults
+ */
+const processCommandData = (data) => {
+  return {
+    command: sanitizeInput(data.Command || '').trim(),
+    description: sanitizeInput(data.Description || 'No description available').trim(),
+    isValid: Boolean(data.Command && data.Command.trim())
+  };
+};
+
+/**
+ * Creates a card element for displaying command data
+ * @param {Object} data - The command data
+ * @returns {HTMLElement} The card element
+ */
+const createCard = (data) => {
+  const { command, description, isValid } = processCommandData(data);
+  
+  if (!isValid) return null;
+
   try {
-    // Check if data is in CSV format
-    if (data.includes(',')) {
-      // Parse CSV while respecting double quotes and preserving line breaks
-      const rows = [];
-      let currentRow = [];
-      let currentField = '';
-      let inQuotes = false;
-      let lastChar = '';
-      
-      // Process character by character
-      for (let i = 0; i < data.length; i++) {
-        const char = data[i];
-        const nextChar = data[i + 1];
-        
-        // Handle escaped quotes
-        if (char === '"') {
-          if (!inQuotes) {
-            // Starting a quoted field
-            inQuotes = true;
-            continue;
-          } else if (nextChar === '"') {
-            // Escaped quote inside quoted field
-            currentField += '"';
-            i++; // Skip next quote
-            continue;
-          } else {
-            // Ending a quoted field
-            inQuotes = false;
-            continue;
-          }
-        }
-        
-        // Handle field separators and row endings
-        if (!inQuotes) {
-          if (char === ',') {
-            currentRow.push(currentField.trim());
-            currentField = '';
-            continue;
-          }
-          
-          if (char === '\n' || char === '\r') {
-            // Skip if this is part of \r\n
-            if (char === '\r' && nextChar === '\n') {
-              continue;
-            }
-            
-            // Only add non-empty rows
-            if (currentField || currentRow.length > 0) {
-              currentRow.push(currentField.trim());
-              if (currentRow.length >= 1) {
-                rows.push(currentRow);
-              }
-              currentRow = [];
-              currentField = '';
-            }
-            continue;
-          }
-        }
-        
-        // Add character to current field
-        currentField += char;
-        lastChar = char;
-      }
-      
-      // Handle last row if exists
-      if (currentField || currentRow.length > 0) {
-        currentRow.push(currentField.trim());
-        if (currentRow.length >= 1) {
-          rows.push(currentRow);
-        }
-      }
-
-      // Convert rows to objects, skipping header row
-      const processedData = rows.slice(1).map(row => ({
-        command: row[0] || '',
-        description: row[1] || 'undefined'
-      }));
-
-      displayData(processedData);
-      return;
-    }
-
-    // Process Excel data
-    const workbook = XLSX.read(data, { type: "string" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    const processedData = json
-      .slice(1)
-      .map((row) => {
-        if (!row || row.length === 0) return null;
-        return {
-          command: row[0] || '',
-          description: row[1] || "undefined"
-        };
-      })
-      .filter((item) => item !== null);
-
-    displayData(processedData);
+    const card = document.createElement('div');
+    card.className = 'data-item';
+    
+    // Store original data for search functionality
+    card.dataset.originalItem = btoa(unescape(encodeURIComponent(command)));
+    card.dataset.originalDescription = btoa(unescape(encodeURIComponent(description)));
+    
+    // Create content wrapper
+    const contentWrapper = document.createElement('div');
+    contentWrapper.className = 'data-item-content';
+    
+    // Create command text element
+    const commandDiv = document.createElement('div');
+    commandDiv.className = `command-text${command.length > 50 ? ' long-text' : ''}`;
+    commandDiv.textContent = maskSensitiveData(command);
+    
+    // Create description text element
+    const descriptionDiv = document.createElement('div');
+    descriptionDiv.className = `description-text${description.length > 100 ? ' long-text' : ''}`;
+    descriptionDiv.textContent = maskSensitiveData(description);
+    
+    // Assemble the card
+    contentWrapper.appendChild(commandDiv);
+    contentWrapper.appendChild(descriptionDiv);
+    card.appendChild(contentWrapper);
+    
+    // Add click handler for copying
+    card.addEventListener('click', (event) => copyToClipboard(card, event));
+    
+    return card;
   } catch (error) {
-    console.error("Error processing data:", error);
-    showAlert("Error processing data. Please check the file format.", "error");
+    console.error('Error creating card:', error);
+    return null;
   }
 };
 
@@ -877,99 +867,161 @@ const processData = (data) => {
  * @param {Array<Object>} data - Array of command objects to display
  */
 const displayData = (data) => {
+  console.log('displayData called with', data.length, 'items');
   const dataDiv = DOM_ELEMENTS.dataDiv;
-  if (!dataDiv) return;
+  if (!dataDiv) {
+    console.error('Data container element not found');
+    return;
+  }
 
   // Clear existing content
   dataDiv.innerHTML = "";
+  console.log('Cleared existing content');
 
   // Create and append new data items
+  let itemsCreated = 0;
   data.forEach((item) => {
-    if (item && item.command) {
-      const dataElement = createDataElement(item.command, item.description);
-      dataDiv.appendChild(dataElement);
+    if (item && item.Command) {
+      const dataElement = createCard(item);
+      if (dataElement) {
+        dataDiv.appendChild(dataElement);
+        itemsCreated++;
+      }
     }
   });
+  
+  console.log('Created and appended', itemsCreated, 'items');
+  
+  if (itemsCreated === 0) {
+    console.warn('No items were created and displayed');
+    const noDataMessage = document.createElement('div');
+    noDataMessage.className = 'no-data-message';
+    noDataMessage.textContent = 'No commands available to display.';
+    dataDiv.appendChild(noDataMessage);
+  }
 };
 
 /**
- * Creates a DOM element for a single data item
- * @function createDataElement
- * @param {string} item - The command text
- * @param {string} description - The command description
- * @returns {HTMLElement} The created DOM element
+ * Processes the fetched data from CSV format
+ * @param {string} data - The raw data to process
+ * @returns {void}
  */
-const createDataElement = (item, description) => {
-  const dataElement = document.createElement("div");
-  dataElement.classList.add("command-item", "data-item");
+const processData = (data) => {
+  try {
+    console.log('Processing data, length:', data.length);
+    // Parse CSV data
+    const rows = parseCSV(data);
+    console.log('Parsed rows:', rows.length);
+    
+    if (rows.length === 0) {
+      throw new Error('No data rows found in CSV');
+    }
+    
+    // Get header row
+    const headers = rows[0];
+    console.log('Headers:', headers);
+    
+    const commandIndex = headers.findIndex(h => h.toLowerCase() === 'command');
+    const descriptionIndex = headers.findIndex(h => h.toLowerCase() === 'description');
+    
+    console.log('Column indices - Command:', commandIndex, 'Description:', descriptionIndex);
+    
+    if (commandIndex === -1) {
+      throw new Error('Command column not found in CSV');
+    }
+    
+    // Process data rows
+    const processedData = rows.slice(1)
+      .map(row => {
+        if (!row || row.length === 0) return null;
+        
+        return {
+          Command: row[commandIndex] || '',
+          Description: row[descriptionIndex] || ''
+        };
+      })
+      .filter(item => item !== null);
+    
+    console.log('Processed data items:', processedData.length);
+    
+    if (processedData.length === 0) {
+      throw new Error('No valid data items found after processing');
+    }
+    
+    displayData(processedData);
+  } catch (error) {
+    console.error("Error processing data:", error);
+    showError("Error processing data: " + error.message);
+    showAlert("Error processing data. Please check the file format.", "error");
+  }
+};
 
-  // Store original values as data attributes for later reference
-  const encodedItem = btoa(unescape(encodeURIComponent(item)));
-  const encodedDescription = btoa(unescape(encodeURIComponent(description || "undefined")));
+/**
+ * Parses CSV data while handling edge cases
+ * @param {string} data - Raw CSV data
+ * @returns {Array<Array<string>>} Parsed rows
+ */
+const parseCSV = (data) => {
+  const rows = [];
+  let currentRow = [];
+  let currentField = '';
+  let inQuotes = false;
   
-  dataElement.dataset.originalItem = encodedItem;
-  dataElement.dataset.originalDescription = encodedDescription;
+  // Handle different line endings
+  const normalizedData = data.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   
-  // Add click handler to the entire item
-  dataElement.addEventListener("click", (event) => {
-    copyToClipboard(dataElement, event);
-  });
-
-  const contentWrapper = document.createElement("div");
-  contentWrapper.classList.add("data-item-content");
-
-  // Mask sensitive data
-  const maskedItem = maskSensitiveData(item);
-  const maskedDescription = 
-    description === "undefined" ? "undefined" : maskSensitiveData(description);
-  
-  // Create the content using DOM methods instead of innerHTML for better security
-  const paragraph = document.createElement('p');
-  paragraph.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
-  paragraph.style.wordBreak = 'break-word'; // Prevent overflow
-  
-  // Create and append the command text element
-  const strongElement = document.createElement('strong');
-  strongElement.className = "command-text";
-  strongElement.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
-  strongElement.style.wordBreak = 'break-word'; // Prevent overflow
-  strongElement.textContent = maskedItem || ''; // Ensure we don't pass undefined
-  paragraph.appendChild(strongElement);
-  
-  // Add a space and the description as text
-  if (maskedDescription && maskedDescription !== 'undefined') {
-    paragraph.appendChild(document.createTextNode(' '));
-    const descriptionSpan = document.createElement('span');
-    descriptionSpan.className = "command-description";
-    descriptionSpan.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
-    descriptionSpan.style.wordBreak = 'break-word'; // Prevent overflow
-    descriptionSpan.textContent = maskedDescription;
-    paragraph.appendChild(descriptionSpan);
+  for (let i = 0; i < normalizedData.length; i++) {
+    const char = normalizedData[i];
+    const nextChar = normalizedData[i + 1];
+    
+    // Handle quoted fields
+    if (char === '"') {
+      if (!inQuotes) {
+        inQuotes = true;
+        continue;
+      } else if (nextChar === '"') {
+        // Escaped quote inside quoted field
+        currentField += '"';
+        i++; // Skip next quote
+        continue;
+      } else {
+        inQuotes = false;
+        continue;
+      }
+    }
+    
+    // Handle field separators and row endings
+    if (!inQuotes) {
+      if (char === ',') {
+        currentRow.push(currentField.trim());
+        currentField = '';
+        continue;
+      }
+      
+      if (char === '\n') {
+        currentRow.push(currentField.trim());
+        if (currentRow.some(field => field)) { // Only add rows with non-empty fields
+          rows.push(currentRow);
+        }
+        currentRow = [];
+        currentField = '';
+        continue;
+      }
+    }
+    
+    // Add character to current field
+    currentField += char;
   }
   
-  // Add the paragraph to the content wrapper
-  contentWrapper.appendChild(paragraph);
-
-  // Add copy icon
-  const copyIcon = document.createElement("div");
-  copyIcon.classList.add("copy-icon");
-  copyIcon.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor">
-      <path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"/>
-    </svg>
-  `;
-
-  // Add all the elements to the data item container
-  dataElement.appendChild(contentWrapper);
-  dataElement.appendChild(copyIcon);
-
-  // Add data attributes for sensitive data
-  if (item && item.includes(config.passwordMaskingKeyword)) {
-    dataElement.dataset.hasSensitiveData = 'true';
-    dataElement.dataset.original = item; // Store the original text for unmasking
+  // Handle last row if exists
+  if (currentField || currentRow.length > 0) {
+    currentRow.push(currentField.trim());
+    if (currentRow.some(field => field)) {
+      rows.push(currentRow);
+    }
   }
-
-  return dataElement;
+  
+  return rows;
 };
 
 /**
@@ -1046,5 +1098,49 @@ const initializeApp = async () => {
   }
   addEventListeners();
 };
+
+// Add these styles to handle long text
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  .long-text {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .card-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .command-text {
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  
+  .description-text {
+    flex-grow: 1;
+    color: var(--text-secondary);
+  }
+  
+  .data-item {
+    transition: transform 0.2s ease;
+    height: auto;
+    min-height: 100px;
+    padding: 16px;
+    margin: 8px;
+    border-radius: 8px;
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+  }
+  
+  .data-item:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+document.head.appendChild(styleSheet);
 
 initializeApp();

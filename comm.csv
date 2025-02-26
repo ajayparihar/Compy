@@ -14,7 +14,7 @@ touch newfile.txt,Create a new empty file named 'newfile.txt'.
 Please don't forget to prepare the agenda.",A reminder for a meeting at 3 PM with a note to prepare the agenda.
 "Note: Update the document before the deadline. 
 Ensure all sections are completed.",A note to update the document with all sections completed before the deadline.
-git status,"Show the current status of the Git repository, including staged, unstaged, and untracked files."
+"git status,Show the current status of the Git repository", "including staged, unstaged, and untracked files."
 git commit -m 'Initial commit',Commit changes to the repository with the message 'Initial commit'.
 admin@example.com,Example of an admin email address.
 user123@gmail.com,Example of a user email address.
