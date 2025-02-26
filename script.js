@@ -207,8 +207,8 @@ const maskSensitiveData = (text) => {
         break;
       }
       
-      // Add the masked version (replace with asterisks)
-      result += '*'.repeat(endPos - startPos - keyword.length + 2 * keyword.length);
+      // Add exactly 10 asterisks for masking
+      result += '*'.repeat(10);
       
       // Move past the ending keyword
       currentPos = endPos + keyword.length;
