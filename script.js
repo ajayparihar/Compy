@@ -917,23 +917,29 @@ const processData = (data) => {
       throw new Error('No data rows found in CSV');
     }
     
-    // Get header row
+    // Get header row or use default headers if first row contains data
     const headers = rows[0];
-    console.log('Headers:', headers);
+    let commandIndex = headers.findIndex(h => h.toLowerCase() === 'command');
+    let descriptionIndex = headers.findIndex(h => h.toLowerCase() === 'description');
     
-    const commandIndex = headers.findIndex(h => h.toLowerCase() === 'command');
-    const descriptionIndex = headers.findIndex(h => h.toLowerCase() === 'description');
-    
-    console.log('Column indices - Command:', commandIndex, 'Description:', descriptionIndex);
-    
-    if (commandIndex === -1) {
-      throw new Error('Command column not found in CSV');
+    // If headers are not found, assume first row is data and use column positions
+    let startFromRow = 1;
+    if (commandIndex === -1 || descriptionIndex === -1) {
+      commandIndex = 0;
+      descriptionIndex = 1;
+      startFromRow = 0;  // Start processing from the first row
+      console.log('No headers found, using default column positions');
+    } else {
+      console.log('Headers found - Command:', commandIndex, 'Description:', descriptionIndex);
     }
     
     // Process data rows
-    const processedData = rows.slice(1)
+    const processedData = rows.slice(startFromRow)
       .map(row => {
         if (!row || row.length === 0) return null;
+        
+        // Skip rows that don't have enough columns
+        if (row.length <= Math.max(commandIndex, descriptionIndex)) return null;
         
         return {
           Command: row[commandIndex] || '',
