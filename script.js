@@ -533,8 +533,19 @@ const updateUserDisplay = (username) => {
   }
 };
 
+// Function to update search placeholder based on screen size
+const updateSearchPlaceholder = () => {
+  const searchInput = DOM_ELEMENTS.searchInput;
+  if (searchInput) {
+    searchInput.placeholder = window.innerWidth <= 768 ? "Search commands..." : "Press '/' to focus";
+  }
+};
+
 // Clean up and optimize event listeners
 const addEventListeners = () => {
+  // Update search placeholder on window resize
+  window.addEventListener('resize', updateSearchPlaceholder);
+
   // Auto-focus on search only when forward slash is pressed
   document.addEventListener("keydown", (event) => {
     // Check if user pressed the forward slash key to focus search
@@ -890,6 +901,7 @@ const createDataElement = (item, description) => {
 const initializeApp = async () => {
   try {
     showLoading();
+    updateSearchPlaceholder(); // Set initial placeholder text
     hideError();
 
     // Get URL parameters

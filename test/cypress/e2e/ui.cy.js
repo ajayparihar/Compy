@@ -87,6 +87,10 @@ describe('Mobile Responsiveness', () => {
       .invoke('outerWidth')
       .should('be.lte', mobileViewport.width);
     
+    // Verify theme selector is hidden on mobile
+    cy.get('.theme-selector').should('not.be.visible');
+    cy.get('.header-controls').should('not.be.visible');
+    
     // Verify command items are visible and properly sized
     cy.get('.command-item')
       .should('be.visible')
@@ -110,17 +114,5 @@ describe('Mobile Responsiveness', () => {
     cy.get('.command-item').first().click();
     cy.window().its('navigator.clipboard.writeText').should('be.called');
     cy.get('.toast-notification').should('be.visible');
-  });
-
-  it('should have accessible theme switching on mobile', () => {
-    // Verify theme toggle is accessible
-    cy.get('#theme-toggle').should('be.visible').click();
-    cy.get('.theme-menu').should('be.visible');
-    
-    // Theme options should be properly sized for mobile
-    cy.get('.theme-option')
-      .should('be.visible')
-      .invoke('outerWidth')
-      .should('be.lte', mobileViewport.width);
   });
 }); 
