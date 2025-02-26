@@ -768,12 +768,82 @@ const processData = (data) => {
   try {
     // Check if data is in CSV format
     if (data.includes(',')) {
-      // Simple CSV parsing for test data
-      const rows = data.split('\n').map(row => row.split(','));
-      const processedData = rows.map(row => ({
-        command: row[0],
+      // Parse CSV while respecting double quotes and preserving line breaks
+      const rows = [];
+      let currentRow = [];
+      let currentField = '';
+      let inQuotes = false;
+      let lastChar = '';
+      
+      // Process character by character
+      for (let i = 0; i < data.length; i++) {
+        const char = data[i];
+        const nextChar = data[i + 1];
+        
+        // Handle escaped quotes
+        if (char === '"') {
+          if (!inQuotes) {
+            // Starting a quoted field
+            inQuotes = true;
+            continue;
+          } else if (nextChar === '"') {
+            // Escaped quote inside quoted field
+            currentField += '"';
+            i++; // Skip next quote
+            continue;
+          } else {
+            // Ending a quoted field
+            inQuotes = false;
+            continue;
+          }
+        }
+        
+        // Handle field separators and row endings
+        if (!inQuotes) {
+          if (char === ',') {
+            currentRow.push(currentField.trim());
+            currentField = '';
+            continue;
+          }
+          
+          if (char === '\n' || char === '\r') {
+            // Skip if this is part of \r\n
+            if (char === '\r' && nextChar === '\n') {
+              continue;
+            }
+            
+            // Only add non-empty rows
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField.trim());
+              if (currentRow.length >= 1) {
+                rows.push(currentRow);
+              }
+              currentRow = [];
+              currentField = '';
+            }
+            continue;
+          }
+        }
+        
+        // Add character to current field
+        currentField += char;
+        lastChar = char;
+      }
+      
+      // Handle last row if exists
+      if (currentField || currentRow.length > 0) {
+        currentRow.push(currentField.trim());
+        if (currentRow.length >= 1) {
+          rows.push(currentRow);
+        }
+      }
+
+      // Convert rows to objects, skipping header row
+      const processedData = rows.slice(1).map(row => ({
+        command: row[0] || '',
         description: row[1] || 'undefined'
       }));
+
       displayData(processedData);
       return;
     }
@@ -784,10 +854,11 @@ const processData = (data) => {
     const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
     const processedData = json
+      .slice(1)
       .map((row) => {
         if (!row || row.length === 0) return null;
         return {
-          command: row[0],
+          command: row[0] || '',
           description: row[1] || "undefined"
         };
       })
@@ -854,19 +925,27 @@ const createDataElement = (item, description) => {
   
   // Create the content using DOM methods instead of innerHTML for better security
   const paragraph = document.createElement('p');
+  paragraph.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+  paragraph.style.wordBreak = 'break-word'; // Prevent overflow
   
   // Create and append the command text element
   const strongElement = document.createElement('strong');
   strongElement.className = "command-text";
-  strongElement.textContent = maskedItem;
+  strongElement.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+  strongElement.style.wordBreak = 'break-word'; // Prevent overflow
+  strongElement.textContent = maskedItem || ''; // Ensure we don't pass undefined
   paragraph.appendChild(strongElement);
   
   // Add a space and the description as text
-  paragraph.appendChild(document.createTextNode(' '));
-  const descriptionSpan = document.createElement('span');
-  descriptionSpan.className = "command-description";
-  descriptionSpan.textContent = maskedDescription;
-  paragraph.appendChild(descriptionSpan);
+  if (maskedDescription && maskedDescription !== 'undefined') {
+    paragraph.appendChild(document.createTextNode(' '));
+    const descriptionSpan = document.createElement('span');
+    descriptionSpan.className = "command-description";
+    descriptionSpan.style.whiteSpace = 'pre-wrap'; // Preserve line breaks
+    descriptionSpan.style.wordBreak = 'break-word'; // Prevent overflow
+    descriptionSpan.textContent = maskedDescription;
+    paragraph.appendChild(descriptionSpan);
+  }
   
   // Add the paragraph to the content wrapper
   contentWrapper.appendChild(paragraph);
@@ -885,7 +964,7 @@ const createDataElement = (item, description) => {
   dataElement.appendChild(copyIcon);
 
   // Add data attributes for sensitive data
-  if (item.includes(config.passwordMaskingKeyword)) {
+  if (item && item.includes(config.passwordMaskingKeyword)) {
     dataElement.dataset.hasSensitiveData = 'true';
     dataElement.dataset.original = item; // Store the original text for unmasking
   }
