@@ -492,8 +492,9 @@ main {
   padding: 1rem;
   position: relative;
   z-index: 1;
-  margin-top: 20px;
+  margin: 20px auto;
   overflow: visible;
+  justify-content: center;
 }
 
 .data-item {
@@ -1467,6 +1468,7 @@ html {
 @media (min-width: 769px) and (max-width: 1200px) {
   #data-container {
     grid-template-columns: repeat(auto-fill, minmax(350px, 350px));
+    justify-content: center;
   }
 }
 
@@ -1474,6 +1476,7 @@ html {
 @media (min-width: 1201px) {
   #data-container {
     grid-template-columns: repeat(auto-fill, minmax(400px, 400px));
+    justify-content: center;
   }
 }
 
@@ -1481,14 +1484,15 @@ html {
 @media (max-width: 768px) {
   #data-container {
     grid-template-columns: repeat(auto-fill, minmax(280px, 280px));
-    gap: 1rem; /* Maintain consistent gap */
+    gap: 1rem;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
   #data-container {
     grid-template-columns: 1fr;
-    gap: 1rem; /* Maintain consistent gap */
+    gap: 1rem;
   }
 }
 
