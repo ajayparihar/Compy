@@ -487,14 +487,15 @@ main {
   width: 100%;
   max-width: var(--max-content-width);
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
   padding: 1rem;
   position: relative;
   z-index: 1;
   margin: 20px auto;
-  overflow: visible;
+  overflow: hidden;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 .data-item {
@@ -505,9 +506,11 @@ main {
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   border: 1px solid rgba(var(--primary-rgb), 0.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .data-item:hover {
