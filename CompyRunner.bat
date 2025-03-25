@@ -4,7 +4,7 @@
 :: ================================
 
 :: Set the directory where your HTML files are located
-set "HTML_DIRECTORY=C:\Users\username\path\to\html_file" REM Replace with the actual path to your HTML files
+set "HTML_DIRECTORY=%~dp0" REM Uses the directory where the batch file is located
 
 :: Set the port number for the HTTP server (default is 8000)
 set "PORT=8000"
