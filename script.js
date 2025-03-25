@@ -733,8 +733,6 @@ const updateUserConfig = async (theme) => {
       .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
       .join(" ");
     document.documentElement.classList.add(theme);
-    
-    showAlert("Theme updated successfully", "success");
   } catch (error) {
     console.error("Error updating theme:", error);
     showAlert("Failed to update theme", "error");
