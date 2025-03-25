@@ -12,6 +12,7 @@ COMPY is a lightweight tool that helps you:
 - Store and find commands, snippets, and notes with real-time search
 - Protect sensitive information with automatic masking
 - Access your data through a modern interface with 20+ themes
+- Sync with Google Sheets for easy data management
 
 ## 🚀 Quick Start
 
@@ -31,14 +32,20 @@ COMPY is a lightweight tool that helps you:
 
 ## 📝 Managing Your Data
 
-### CSV File Structure
-Your data is stored in `comm.csv` with a simple format:
-```csv
-command_or_text, description
-git reset --hard origin/main, Reset branch to remote main
-npm install, Install project dependencies
-##apikey123##, Development API key (sensitive data masked)
-```
+### Data Storage Options
+1. **Local CSV File**:
+   Store your data in `comm.csv` with this format:
+   ```csv
+   command_or_text, description
+   git reset --hard origin/main, Reset branch to remote main
+   npm install, Install project dependencies
+   ##apikey123##, Development API key (sensitive data masked)
+   ```
+
+2. **Google Sheets Integration**:
+   - Publish your Google Sheet as CSV
+   - Update the file path in `user_config.json`
+   - Format follows the same structure as local CSV
 
 ### Adding New Entries
 1. **Direct CSV Edit**:
@@ -54,21 +61,24 @@ npm install, Install project dependencies
 
 ## 💡 Key Features
 
-1. **Smart Search**
+1. **Enhanced Search**
    - Type `/` to focus search
    - Real-time filtering with 150ms debounce
    - Click items to copy instantly
    - Search in both commands and descriptions
+   - Keyboard navigation support
 
 2. **Data Security**
    - Local storage only - your data stays with you
    - Automatic masking of sensitive data with `##`
    - Secure clipboard handling
+   - HTTPS support for Google Sheets integration
 
 3. **Rich Customization**
-   - 20+ built-in themes (10 Dark + 11 Light variants)
+   - 21+ built-in themes (10 Dark + 11 Light variants)
    - Persistent theme settings
    - Custom user display name
+   - Mobile-responsive design
    - Configure in `user_config.json`:
      ```json
      {
@@ -85,6 +95,21 @@ npm install, Install project dependencies
 - `/` - Focus search
 - `Esc` - Clear search
 - `Enter` - Copy selected item
+- `↑/↓` - Navigate through items
+
+## 🔧 Advanced Configuration
+
+1. **Google Sheets Integration**
+   ```javascript
+   // Default Google Sheets URL in config.js
+   const DEFAULT_FILE_PATH = "https://docs.google.com/spreadsheets/d/[YOUR-SHEET-ID]/pub?output=csv";
+   ```
+
+2. **Performance Optimizations**
+   - Debounced search (150ms)
+   - Optimized DOM operations
+   - Lazy loading for large datasets
+   - Mobile-optimized animations
 
 ## ❓ Troubleshooting
 
@@ -96,12 +121,14 @@ npm install, Install project dependencies
 2. **Data Not Showing?**
    - Verify `comm.csv` exists and is formatted correctly
    - Check file path in `user_config.json`
+   - For Google Sheets, ensure the sheet is published and accessible
    - Ensure each line follows the format: `command/text, description`
 
 3. **Search Not Working?**
    - Use `/` key to focus search
    - Check if your search term matches any command or description
    - Clear search with `Esc` key
+   - Try refreshing the page
 
 Need more help? Check the [Issues](https://github.com/ajayparihar/compy/issues) section.
 
