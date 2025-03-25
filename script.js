@@ -724,29 +724,20 @@ const addEventListeners = () => {
  */
 const updateUserConfig = async (theme) => {
   try {
-    // Update theme
-    if (theme) {
-      // Remove any existing theme classes
-      document.documentElement.className = document.documentElement.className
-        .split(" ")
-        .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
-        .join(" ");
-      
-      // Add the new theme class
-      document.documentElement.classList.add(theme);
-      
-      // Store in localStorage
-      localStorage.setItem('selectedTheme', theme);
-      
-      // Update the theme selector
-      const themeSelect = document.getElementById("themeSelect");
-      if (themeSelect) {
-        themeSelect.value = theme;
-      }
-    }
+    // Save theme to localStorage
+    localStorage.setItem('selectedTheme', theme);
+    
+    // Update the UI
+    document.documentElement.className = document.documentElement.className
+      .split(" ")
+      .filter((cls) => !cls.startsWith("d") && !cls.startsWith("l"))
+      .join(" ");
+    document.documentElement.classList.add(theme);
+    
+    showAlert("Theme updated successfully", "success");
   } catch (error) {
-    console.error('Error updating user config:', error);
-    showAlert('Failed to update settings', 'error');
+    console.error("Error updating theme:", error);
+    showAlert("Failed to update theme", "error");
   }
 };
 
