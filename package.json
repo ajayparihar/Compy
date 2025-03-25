@@ -7,12 +7,7 @@
     "express": "^4.21.2",
     "xlsx": "^0.18.5"
   },
-  "devDependencies": {
-    "cypress": "^13.6.6"
-  },
   "scripts": {
-    "test": "cypress run --config-file test/cypress.config.js",
-    "test:open": "cypress open --config-file test/cypress.config.js",
     "start": "node server.js"
   },
   "repository": {

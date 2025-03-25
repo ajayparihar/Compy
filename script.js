@@ -1,9 +1,9 @@
 /**
  * @fileoverview Command Management System - Main Client-side Script
  * @author Ajay Singh
- * @version 1.1
+ * @version 1.2
  * @created 11-09-2023
- * @updated 25-02-2025
+ * @updated 25-03-2024
  * 
  * This file contains the client-side functionality for the Command Management System.
  * It handles data fetching, display, search, clipboard operations, and theme management.
@@ -82,8 +82,7 @@ window.THEME_NAMES = {
 /* Date: 11-09-2023 */
 
 // Configuration constants
-const COMMANDS_API_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpgO5dkZtima-Pn9QPveTMsANWp-oMYBwNAc2xU0n-MsMiJKMSFqUP42xWOBZYQiUAoQsbnIysArka/pub?output=csv";
+const COMMANDS_API_URL = "/comm.csv";  // Local CSV file path
 
 /**
  * Configuration object for the application settings

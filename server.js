@@ -1,9 +1,9 @@
 /**
  * @fileoverview Command Management System - Server
  * @author Ajay Singh
- * @version 1.1
+ * @version 1.2
  * @created 11-09-2023
- * @updated 25-02-2025
+ * @updated 25-03-2024
  * 
  * This file implements the backend server for the Command Management System.
  * It provides endpoints for serving static files and managing user configuration,
@@ -40,7 +40,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));  // Serve files from the root directory
 
 /**
- * PUT endpoint to update user theme configuration
+ * Updates user theme configuration
  * @route PUT /user_config.json
  * @param {Object} req.body.theme - The theme configuration to update
  * @returns {string} Success or error message
