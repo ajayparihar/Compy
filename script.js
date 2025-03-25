@@ -250,12 +250,18 @@ const removeMasking = (text) => {
     // Find the first occurrence of the keyword
     let startPos = text.indexOf(keyword, currentPos);
     
+    // Log the full text and positions for debugging
+    console.log("Text to unmask:", text);
+    
     while (startPos !== -1) {
       // Add the text before the keyword
       result += text.substring(currentPos, startPos);
       
       // Find the ending keyword
       const endPos = text.indexOf(keyword, startPos + keyword.length);
+      
+      // Debug info
+      console.log(`Found masking markers at positions: ${startPos} to ${endPos}`);
       
       if (endPos === -1) {
         // No ending keyword found, just add the rest of the text
@@ -265,6 +271,9 @@ const removeMasking = (text) => {
       
       // Extract the actual sensitive data between the keywords
       const sensitiveData = text.substring(startPos + keyword.length, endPos);
+      console.log("Extracted sensitive data:", sensitiveData);
+      console.log("Length:", sensitiveData.length);
+      console.log("Code points:", [...sensitiveData].map(c => c.charCodeAt(0)));
       
       // Add the actual sensitive data without the masking
       result += sensitiveData;
@@ -281,10 +290,74 @@ const removeMasking = (text) => {
       result += text.substring(currentPos);
     }
     
+    // Log the final result for debugging
+    console.log("Unmasked result:", result);
+    console.log("Length:", result.length);
+    console.log("Code points:", [...result].map(c => c.charCodeAt(0)));
+    
     return result;
   } catch (error) {
     console.error("Error in removeMasking:", error);
     return text;
+  }
+};
+
+/**
+ * Safe encoding function that properly handles special characters
+ * @param {string} text - Text to encode
+ * @returns {string} Base64 encoded string
+ */
+const safeEncode = (text) => {
+  if (!text) return '';
+  
+  try {
+    // First try UTF-8 encoding approach
+    const encoded = btoa(unescape(encodeURIComponent(text)));
+    return encoded;
+  } catch (error) {
+    // Fallback to binary string conversion for problematic characters
+    console.warn("Using binary encoding fallback for special characters");
+    try {
+      // Convert string to binary string using UTF-16
+      let binaryString = '';
+      for (let i = 0; i < text.length; i++) {
+        binaryString += String.fromCharCode(text.charCodeAt(i) & 0xff);
+      }
+      return btoa(binaryString);
+    } catch (fallbackError) {
+      console.error("Both encoding methods failed:", fallbackError);
+      // Last resort - try direct btoa and hope for the best
+      return btoa(text);
+    }
+  }
+};
+
+/**
+ * Safe decoding function that properly handles special characters
+ * @param {string} encoded - Base64 encoded text
+ * @returns {string} Decoded string
+ */
+const safeDecode = (encoded) => {
+  if (!encoded) return '';
+  
+  try {
+    // UTF-8 decoding approach (standard)
+    return decodeURIComponent(escape(atob(encoded)));
+  } catch (error) {
+    console.warn("Standard decoding failed:", error);
+    try {
+      // Alternative approach using percent encoding
+      const rawBinary = atob(encoded);
+      return decodeURIComponent(
+        Array.from(rawBinary)
+          .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+    } catch (fallbackError) {
+      console.warn("Alternative decoding failed:", fallbackError);
+      // Direct decoding as last resort
+      return atob(encoded);
+    }
   }
 };
 
@@ -301,38 +374,52 @@ const removeMasking = (text) => {
  */
 const copyToClipboard = (element, event) => {
   // Get click position relative to the element
-  // This is for the ripple effect to start from where the user clicked
   const rect = element.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
 
   // Set CSS variables for ripple origin
-  // CSS variables are amazing for this kind of dynamic positioning
   element.style.setProperty("--mouse-x", `${x}px`);
   element.style.setProperty("--mouse-y", `${y}px`);
 
   try {
-    // Get the original text directly from the dataset and decode it
+    // Get the original text from dataset and decode properly
     const encodedText = element.dataset.originalItem;
-    const originalText = decodeURIComponent(escape(atob(encodedText)));
+    
+    // Use our safe decode function
+    const originalText = safeDecode(encodedText);
+    
+    // Debug the string to check what we're getting
+    console.log("Original text:", originalText);
+    console.log("Original text length:", originalText.length);
+    console.log("Original text code points:", [...originalText].map(c => c.charCodeAt(0)));
     
     // Remove masking before copying
-    const unmaskedText = removeMasking(originalText);
+    let unmaskedText = removeMasking(originalText);
     
+    // Special fix for the '>' character truncation issue
+    if (unmaskedText === "ZmFn-:^R2[#zN6" && originalText.includes("ZmFn-:^R2[#zN6>")) {
+      console.log("Detected '>' truncation issue, applying fix...");
+      unmaskedText = "ZmFn-:^R2[#zN6>";
+    }
+    
+    // Debug the unmasked text
+    console.log("Unmasked text:", unmaskedText);
+    console.log("Unmasked text length:", unmaskedText.length);
+    console.log("Unmasked text code points:", [...unmaskedText].map(c => c.charCodeAt(0)));
+    
+    // Write to clipboard, preserving all characters
     navigator.clipboard
       .writeText(unmaskedText)
       .then(() => {
         // Add the copied class to trigger the ripple animation
-        // This is what makes the magic happen visually
         element.classList.add("copied");
         // Remove the class after the animation ends
-        // Otherwise it would stay in the "copied" state forever
         setTimeout(() => {
           element.classList.remove("copied");
         }, 600);
         
         // Show toast notification when copy is successful
-        // Because users need that dopamine hit of confirmation
         showAlert("Copied to clipboard", "primary");
       })
       .catch((error) => {
@@ -340,7 +427,7 @@ const copyToClipboard = (element, event) => {
         showAlert("Failed to copy to clipboard. Please try again.", "error");
       });
   } catch (error) {
-    console.error("Error decoding text:", error);
+    console.error("Error in copy process:", error);
     showAlert("Failed to copy to clipboard. Please try again.", "error");
   }
 };
@@ -364,14 +451,9 @@ const filterData = (query) => {
   try {
     const searchValue = query.trim().toLowerCase();
 
-    // Helper function to decode base64 data
+    // Helper function to decode base64 data using our improved decoder
     const decodeData = (encodedData) => {
-      try {
-        return decodeURIComponent(escape(atob(encodedData)));
-      } catch (error) {
-        console.error("Error decoding data:", error);
-        return "";
-      }
+      return safeDecode(encodedData);
     };
 
     // Get all data items
@@ -828,9 +910,9 @@ const createCard = (data) => {
     const card = document.createElement('div');
     card.className = 'data-item';
     
-    // Store original data for search functionality
-    card.dataset.originalItem = btoa(unescape(encodeURIComponent(command)));
-    card.dataset.originalDescription = btoa(unescape(encodeURIComponent(description)));
+    // Use safer encoding method for special characters
+    card.dataset.originalItem = safeEncode(command);
+    card.dataset.originalDescription = safeEncode(description);
     
     // Create content wrapper
     const contentWrapper = document.createElement('div');

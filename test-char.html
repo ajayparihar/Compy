@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Greater Than Character Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        pre { background: #f0f0f0; padding: 10px; border-radius: 5px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Greater Than Character Test</h1>
+    <div id="output"></div>
+
+    <script>
+        // Function to log to the page
+        function log(message, isError = false) {
+            const output = document.getElementById('output');
+            output.innerHTML += `<pre class="${isError ? 'error' : ''}">${message}</pre>`;
+        }
+
+        // Test the '>' character specifically
+        log("Testing handling of '>' character in sensitive data");
+        
+        // Our test string with the problematic '>' character
+        const testString = "ZmFn-:^R2[#zN6>";
+        log(`Original string: "${testString}"`);
+        log(`String length: ${testString.length}`);
+        log(`Character codes: ${[...testString].map(c => c.charCodeAt(0))}`);
+        
+        // Try different encoding methods
+        try {
+            // Method 1: Standard btoa
+            const encoded1 = btoa(testString);
+            log(`Standard btoa encoding: ${encoded1}`);
+            
+            // Decode back
+            const decoded1 = atob(encoded1);
+            log(`Standard atob decoding: ${decoded1}`);
+            log(`Matches original: ${decoded1 === testString ? 'YES' : 'NO'}`);
+            
+            if (decoded1 !== testString) {
+                log(`Length comparison: Original ${testString.length}, Decoded ${decoded1.length}`);
+                log(`Character comparison:`);
+                for (let i = 0; i < Math.max(testString.length, decoded1.length); i++) {
+                    const origChar = i < testString.length ? testString[i] : 'N/A';
+                    const decodedChar = i < decoded1.length ? decoded1[i] : 'N/A';
+                    const origCode = i < testString.length ? testString.charCodeAt(i) : 'N/A';
+                    const decodedCode = i < decoded1.length ? decoded1.charCodeAt(i) : 'N/A';
+                    
+                    log(`Position ${i}: Original "${origChar}" (${origCode}) vs Decoded "${decodedChar}" (${decodedCode})`);
+                }
+            }
+        } catch (e) {
+            log(`Error with standard btoa/atob: ${e.message}`, true);
+        }
+        
+        // Method 2: URL encoding first
+        try {
+            const encoded2 = btoa(unescape(encodeURIComponent(testString)));
+            log(`URL-safe encoding: ${encoded2}`);
+            
+            // Decode back
+            const decoded2 = decodeURIComponent(escape(atob(encoded2)));
+            log(`URL-safe decoding: ${decoded2}`);
+            log(`Matches original: ${decoded2 === testString ? 'YES' : 'NO'}`);
+            
+            if (decoded2 !== testString) {
+                log(`Length comparison: Original ${testString.length}, Decoded ${decoded2.length}`);
+                log(`Character comparison:`);
+                for (let i = 0; i < Math.max(testString.length, decoded2.length); i++) {
+                    const origChar = i < testString.length ? testString[i] : 'N/A';
+                    const decodedChar = i < decoded2.length ? decoded2[i] : 'N/A';
+                    const origCode = i < testString.length ? testString.charCodeAt(i) : 'N/A';
+                    const decodedCode = i < decoded2.length ? decoded2.charCodeAt(i) : 'N/A';
+                    
+                    log(`Position ${i}: Original "${origChar}" (${origCode}) vs Decoded "${decodedChar}" (${decodedCode})`);
+                }
+            }
+        } catch (e) {
+            log(`Error with URL-safe encoding/decoding: ${e.message}`, true);
+        }
+        
+        // Method 3: Custom binary encoding
+        try {
+            let binaryString = '';
+            for (let i = 0; i < testString.length; i++) {
+                binaryString += String.fromCharCode(testString.charCodeAt(i) & 0xff);
+            }
+            const encoded3 = btoa(binaryString);
+            log(`Binary encoding: ${encoded3}`);
+            
+            // Decode back
+            const binaryDecoded = atob(encoded3);
+            let decoded3 = '';
+            for (let i = 0; i < binaryDecoded.length; i++) {
+                decoded3 += String.fromCharCode(binaryDecoded.charCodeAt(i));
+            }
+            log(`Binary decoding: ${decoded3}`);
+            log(`Matches original: ${decoded3 === testString ? 'YES' : 'NO'}`);
+            
+            if (decoded3 !== testString) {
+                log(`Length comparison: Original ${testString.length}, Decoded ${decoded3.length}`);
+                log(`Character comparison:`);
+                for (let i = 0; i < Math.max(testString.length, decoded3.length); i++) {
+                    const origChar = i < testString.length ? testString[i] : 'N/A';
+                    const decodedChar = i < decoded3.length ? decoded3[i] : 'N/A';
+                    const origCode = i < testString.length ? testString.charCodeAt(i) : 'N/A';
+                    const decodedCode = i < decoded3.length ? decoded3.charCodeAt(i) : 'N/A';
+                    
+                    log(`Position ${i}: Original "${origChar}" (${origCode}) vs Decoded "${decodedChar}" (${decodedCode})`);
+                }
+            }
+        } catch (e) {
+            log(`Error with binary encoding/decoding: ${e.message}`, true);
+        }
+        
+        // Test 4: Direct character handling
+        log("\nDirect character handling test:");
+        const problematicChar = '>';
+        log(`Testing character: "${problematicChar}" (${problematicChar.charCodeAt(0)})`);
+        
+        // See if the '>' character gets truncated in any way
+        log(`Checking if '>' character can be properly stored in variables:`);
+        const testVar = "ZmFn-:^R2[#zN6>";
+        log(`Variable value: "${testVar}"`);
+        log(`Last character: "${testVar[testVar.length-1]}"`);
+        log(`Last character code: ${testVar.charCodeAt(testVar.length-1)}`);
+        
+        // Test with removeMasking function
+        log("\nTesting with removeMasking function:");
+        const maskedText = "##ZmFn-:^R2[#zN6>##";
+        log(`Masked text: "${maskedText}"`);
+        
+        function removeMasking(text) {
+            if (!text) return text;
+            
+            const keyword = "##";
+            let result = '';
+            let currentPos = 0;
+            
+            let startPos = text.indexOf(keyword, currentPos);
+            log(`First keyword found at position: ${startPos}`);
+            
+            while (startPos !== -1) {
+                result += text.substring(currentPos, startPos);
+                
+                const endPos = text.indexOf(keyword, startPos + keyword.length);
+                log(`Second keyword found at position: ${endPos}`);
+                
+                if (endPos === -1) {
+                    result += text.substring(startPos);
+                    break;
+                }
+                
+                const sensitiveData = text.substring(startPos + keyword.length, endPos);
+                log(`Extracted sensitive data: "${sensitiveData}"`);
+                log(`Extracted data length: ${sensitiveData.length}`);
+                log(`Extracted data character codes: ${[...sensitiveData].map(c => c.charCodeAt(0))}`);
+                
+                result += sensitiveData;
+                currentPos = endPos + keyword.length;
+                startPos = text.indexOf(keyword, currentPos);
+            }
+            
+            if (currentPos < text.length) {
+                result += text.substring(currentPos);
+            }
+            
+            log(`Final result: "${result}"`);
+            return result;
+        }
+        
+        const unmaskedText = removeMasking(maskedText);
+        log(`Unmasked result: "${unmaskedText}"`);
+        log(`Expected result: "ZmFn-:^R2[#zN6>"`);
+        log(`Matches expected: ${unmaskedText === "ZmFn-:^R2[#zN6>" ? 'YES' : 'NO'}`);
+        
+        if (unmaskedText !== "ZmFn-:^R2[#zN6>") {
+            log(`Character comparison for unmasked text:`);
+            const expected = "ZmFn-:^R2[#zN6>";
+            for (let i = 0; i < Math.max(expected.length, unmaskedText.length); i++) {
+                const expChar = i < expected.length ? expected[i] : 'N/A';
+                const actChar = i < unmaskedText.length ? unmaskedText[i] : 'N/A';
+                const expCode = i < expected.length ? expected.charCodeAt(i) : 'N/A';
+                const actCode = i < unmaskedText.length ? unmaskedText.charCodeAt(i) : 'N/A';
+                
+                log(`Position ${i}: Expected "${expChar}" (${expCode}) vs Actual "${actChar}" (${actCode})`);
+            }
+        }
+    </script>
+</body>
+</html> 
