@@ -311,24 +311,20 @@ const safeEncode = (text) => {
   if (!text) return '';
   
   try {
-    // First try UTF-8 encoding approach
-    const encoded = btoa(unescape(encodeURIComponent(text)));
-    return encoded;
-  } catch (error) {
-    // Fallback to binary string conversion for problematic characters
-    console.warn("Using binary encoding fallback for special characters");
-    try {
-      // Convert string to binary string using UTF-16
-      let binaryString = '';
-      for (let i = 0; i < text.length; i++) {
-        binaryString += String.fromCharCode(text.charCodeAt(i) & 0xff);
-      }
-      return btoa(binaryString);
-    } catch (fallbackError) {
-      console.error("Both encoding methods failed:", fallbackError);
-      // Last resort - try direct btoa and hope for the best
-      return btoa(text);
+    // For sensitive data (passwords), use a more robust encoding
+    if (text.includes('##')) {
+      // Convert to UTF-8 bytes, then base64
+      const bytes = new TextEncoder().encode(text);
+      const base64 = btoa(String.fromCharCode(...bytes));
+      return base64;
     }
+    
+    // For regular text, use standard encoding
+    return btoa(unescape(encodeURIComponent(text)));
+  } catch (error) {
+    console.warn("Encoding failed:", error);
+    // Fallback to direct encoding
+    return btoa(text);
   }
 };
 
@@ -341,23 +337,21 @@ const safeDecode = (encoded) => {
   if (!encoded) return '';
   
   try {
-    // UTF-8 decoding approach (standard)
-    return decodeURIComponent(escape(atob(encoded)));
-  } catch (error) {
-    console.warn("Standard decoding failed:", error);
-    try {
-      // Alternative approach using percent encoding
-      const rawBinary = atob(encoded);
-      return decodeURIComponent(
-        Array.from(rawBinary)
-          .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-    } catch (fallbackError) {
-      console.warn("Alternative decoding failed:", fallbackError);
-      // Direct decoding as last resort
-      return atob(encoded);
+    // First try UTF-8 decoding
+    const binary = atob(encoded);
+    // Check if this is likely a password (contains special chars)
+    if (binary.includes('##') || /[^\x20-\x7E]/.test(binary)) {
+      // Use TextDecoder for proper UTF-8 handling
+      const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+      return new TextDecoder().decode(bytes);
     }
+    
+    // For regular text, use standard decoding
+    return decodeURIComponent(escape(binary));
+  } catch (error) {
+    console.warn("Decoding failed:", error);
+    // Fallback to direct decoding
+    return atob(encoded);
   }
 };
 
@@ -880,7 +874,15 @@ const fetchDataWithTimeout = async (url, timeout = 10000) => {
  */
 const sanitizeInput = (text) => {
   if (!text) return '';
-  return text.replace(/[<>]/g, ''); // Basic XSS prevention
+  
+  // Check if the text is a password or sensitive data (contains ## markers)
+  if (text.includes('##')) {
+    // For sensitive data, preserve all characters
+    return text;
+  }
+  
+  // For non-sensitive data, only remove HTML tags
+  return text.replace(/<[^>]*>/g, '');
 };
 
 /**
